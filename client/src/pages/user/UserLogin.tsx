@@ -2,15 +2,23 @@ import React, { useState } from 'react'
 import { logo } from '@/constant'
 import { Account } from '@/types'
 import { useLoginMutation } from '@/services'
+import { showToast } from '@/components'
+import Cookies from 'js-cookie'
+import { useNavigate } from 'react-router-dom'
+import { authActions } from '@/store/auth'
+import { useAppDispatch } from '@/hooks'
+
+const initialState: Account = {
+  email: '',
+  password: '',
+}
 
 export const UserLogin = () => {
-  const [account, setAccount] = useState<Account>({
-    email: '',
-    password: '',
-  })
+  const [account, setAccount] = useState<Account>(initialState)
+  const [login] = useLoginMutation()
 
-  const [login, loginResult] = useLoginMutation()
-
+  const navigate = useNavigate()
+  const dispath = useAppDispatch()
   const handleChangeAccount = (
     e: React.ChangeEvent<HTMLInputElement>,
   ): void => {
@@ -18,8 +26,18 @@ export const UserLogin = () => {
     setAccount((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleLogin = () => {
-    login(account)
+  const handleLogin = async () => {
+    const result = await login(account)
+    if (result.error) {
+      showToast.error('Login failed')
+    } else {
+      dispath(authActions.setUser(result.data.data))
+      showToast.success('Login success')
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000)
+      })
+      navigate('/admin')
+    }
   }
 
   return (

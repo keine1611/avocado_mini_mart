@@ -1,4 +1,4 @@
 export * from './Account'
-export * from './User'
 export * from './Brand'
 export * from './Profile'
+export * from './Role'

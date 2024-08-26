@@ -47,13 +47,11 @@ export const login = async ({ email, password }) => {
   writeRefreshTokens(refreshTokens)
 
   return {
-    user: {
-      email: account.email,
-      avatar_url: account.avatarUrl,
-      role: account.role,
-      profile: account.profile,
-    },
-    accessToken,
+    email: account.email,
+    avatarUrl: account.avatarUrl,
+    role: account.role,
+    profile: account.profile,
     refreshToken,
+    accessToken,
   }
 }

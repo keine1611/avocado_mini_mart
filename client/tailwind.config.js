@@ -14,10 +14,10 @@ export default {
       {
         light: {
           ...require('daisyui/src/theming/themes')['light'],
-          primary: '#D8EFD3',
-          secondary: '#95D2B3',
-          neutral: '#EFF6EE',
-          accent: '55AD9B',
+          primary: '#1FAB89',
+          secondary: '#62D2A2',
+          accent: '#9DF3C4',
+          neutral: '#D7FBE8',
         },
       },
     ],

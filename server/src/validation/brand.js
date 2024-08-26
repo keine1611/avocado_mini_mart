@@ -1,6 +1,6 @@
 import Joi from 'joi'
 
-export const createValidation = ({ data }) => {
+export const createBrandValidation = ({ data }) => {
   const schema = Joi.object({
     name: Joi.string().max(50).min(10).required(),
     slug: Joi.string().max(100),

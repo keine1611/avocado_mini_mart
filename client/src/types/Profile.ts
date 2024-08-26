@@ -1,8 +1,10 @@
 export interface Profile {
   id: number
-  firstName: string
-  lastName: string
-  phone: string
-  address: string
-  dob: string
+  firstName: string | null
+  lastName: string | null
+  dob: string | null
+  phone: string | null
+  address: string | null
+  updateAt: string
+  accountId: number
 }

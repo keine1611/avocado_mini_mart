@@ -1,15 +1,12 @@
 import React from 'react'
-import { AdminNavBar, AdminSideBar } from '../ui'
+import { AdminNavBar } from '../ui'
 import { Outlet } from 'react-router-dom'
 
-export const AdminLayout = () => {
+export const AdminLayout: React.FC = () => {
   return (
-    <div className='  w-full grid grid-cols-6 h-screen'>
-      <div className='col-span-1'>
-        <AdminSideBar />
-      </div>
-      <div className=' col-span-5 flex flex-col'>
-        <AdminNavBar />
+    <div className=' w-full flex flex-col h-screen'>
+      <AdminNavBar />
+      <div className=' flex-1 bg-neutral'>
         <Outlet />
       </div>
     </div>

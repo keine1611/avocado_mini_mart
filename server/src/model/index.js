@@ -132,3 +132,15 @@ export const models = {
   MainCategory,
   Cart,
 }
+export * from './account'
+export * from './brand'
+export * from './product'
+export * from './batch'
+export * from './batchDetail'
+export * from './role'
+export * from './profile'
+export * from './order'
+export * from './orderItem'
+export * from './subCategory'
+export * from './mainCategory'
+export * from './cart'

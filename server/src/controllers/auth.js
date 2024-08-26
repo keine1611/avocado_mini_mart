@@ -1,4 +1,5 @@
 import { login, register } from '@/services/auth'
+import { Account, Role, Profile } from '@/model'
 import {
   createAccessToken,
   readRefreshTokens,
@@ -6,6 +7,7 @@ import {
   writeRefreshTokens,
 } from '@/utils'
 import { registerValidation } from '@/validation'
+
 import jwt from 'jsonwebtoken'
 
 export const authController = {
@@ -39,7 +41,12 @@ export const authController = {
       setTokenCookie({ res, name: 'refreshToken', data: account.refreshToken })
       res.status(200).json({
         message: 'success',
-        data: account,
+        data: {
+          email: account.email,
+          avatarUrl: account.avatarUrl,
+          role: account.role,
+          profile: account.profile,
+        },
       })
     } catch (error) {
       res.status(400).json({
@@ -51,24 +58,48 @@ export const authController = {
 
   refresh: async (req, res, next) => {
     const refreshToken = req.cookies.refreshToken
-    if (!refreshToken) return res.status(401).json({ message: 'Unauthorized' })
+    if (!refreshToken)
+      return res.status(401).json({ message: 'Unauthorized', data: {} })
     try {
       const refreshTokens = readRefreshTokens()
       const storedToken = refreshTokens.find((token) => token.refreshToken)
-      if (!storedToken) return res.status(403).json({ message: 'Forbidden' })
+      if (!storedToken)
+        return res.status(403).json({ message: 'Forbidden', data: {} })
       jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
-        (err, data) => {
-          if (err) return res.status(403).json({ message: 'Forbidden' })
+        async (err, data) => {
+          if (err)
+            return res.status(403).json({ message: 'Forbidden', data: {} })
           const accessToken = createAccessToken({
             id: data.id,
             email: data.email,
           })
+          const account = await Account.findOne({
+            where: { id: data.id, email: data.email },
+            include: [
+              {
+                model: Profile,
+                as: 'profile',
+              },
+              {
+                model: Role,
+                as: 'role',
+              },
+            ],
+          })
 
           setTokenCookie({ res, name: 'accessToken', data: accessToken })
-          res.status(200).json({ message: 'success' })
-        },
+          res.status(200).json({
+            message: 'success',
+            data: {
+              email: account.email,
+              avatarUrl: account.avatarUrl,
+              role: account.role,
+              profile: account.profile,
+            },
+          })
+        }
       )
     } catch (error) {
       res.status(403).json({ message: 'Forbidden' })
@@ -79,7 +110,7 @@ export const authController = {
     const refreshToken = req.cookies.refreshToken
     let refreshTokens = readRefreshTokens()
     refreshTokens = refreshTokens.filter(
-      (token) => token.refreshToken !== refreshToken,
+      (token) => token.refreshToken !== refreshToken
     )
     writeRefreshTokens(refreshTokens)
     res.clearCookie('accessToken')

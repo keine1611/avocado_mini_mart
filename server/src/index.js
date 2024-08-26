@@ -5,19 +5,29 @@ import { connectToDB, syncDatabase } from './config'
 import { models } from './model'
 import { route } from './routes'
 import cookieParser from 'cookie-parser'
-import { logRequest } from './middlewares/logRequest'
+
+import cors from 'cors'
+import { delayResponse, logRequest } from './middlewares'
 
 const port = 1611
 dotenv.config()
 const app = express()
 
-//tạo file để lưu log vào file
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  methods: 'all',
+  allowedHeaders: 'Content-Type,Authorization',
+  credentials: true,
+}
+
+app.use(cors(corsOptions))
 
 app.use(cookieParser())
 app.use(express.json())
-syncDatabase()
+// syncDatabase()
 
 app.use(logRequest)
+app.use(delayResponse(1000))
 
 route(app)
 
