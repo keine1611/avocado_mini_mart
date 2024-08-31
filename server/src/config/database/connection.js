@@ -13,7 +13,7 @@ export const sequelize = new Sequelize(
     define: {
       timestamps: false,
     },
-  },
+  }
 )
 
 export const connectToDB = async () => {

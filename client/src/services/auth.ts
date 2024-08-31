@@ -26,7 +26,21 @@ export const authApi = createApi({
         url: '/refresh',
       }),
     }),
+    register: builder.mutation<{ message: string, data: { email: string } }, { email: string, password: string }>({
+      query: (body) => ({
+        url: '/register',
+        method: 'POST',
+        body,
+      }),
+    }),
+    verifyAndCreateAccount: builder.mutation<{ message: string, data: any }, { email: string, verificationCode: string }>({
+      query: (body) => ({
+        url: '/verify',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 })
 
-export const { useLoginMutation, useRefreshMutation } = authApi
+export const { useLoginMutation, useRefreshMutation, useRegisterMutation, useVerifyAndCreateAccountMutation } = authApi

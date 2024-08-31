@@ -3,10 +3,11 @@ import { logo } from '@/constant'
 import { Account } from '@/types'
 import { useLoginMutation } from '@/services'
 import { showToast } from '@/components'
-import Cookies from 'js-cookie'
 import { useNavigate } from 'react-router-dom'
 import { authActions } from '@/store/auth'
 import { useAppDispatch } from '@/hooks'
+import { FiMail, FiLock, FiLogIn } from 'react-icons/fi'
+import { loadingActions } from '@/store/loading'
 
 const initialState: Account = {
   email: '',
@@ -16,87 +17,115 @@ const initialState: Account = {
 export const UserLogin = () => {
   const [account, setAccount] = useState<Account>(initialState)
   const [login] = useLoginMutation()
+  const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState({ email: '', password: '' })
 
   const navigate = useNavigate()
-  const dispath = useAppDispatch()
-  const handleChangeAccount = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ): void => {
+  const dispatch = useAppDispatch()
+
+  const validateForm = () => {
+    let isValid = true
+    const newErrors = { email: '', password: '' }
+
+    if (!account.email || !/\S+@\S+\.\S+/.test(account.email)) {
+      newErrors.email = 'Please enter a valid email address'
+      isValid = false
+    }
+
+    if (!account.password || account.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long'
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
+
+  const handleChangeAccount = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target
     setAccount((prev) => ({ ...prev, [name]: value }))
+    setErrors((prev) => ({ ...prev, [name]: '' }))
   }
 
   const handleLogin = async () => {
-    const result = await login(account)
-    if (result.error) {
-      showToast.error('Login failed')
-    } else {
-      dispath(authActions.setUser(result.data.data))
-      showToast.success('Login success')
-      await new Promise((resolve) => {
-        setTimeout(resolve, 2000)
-      })
-      navigate('/admin')
+    if (!validateForm()) return
+
+    setIsLoading(true)
+    dispatch(loadingActions.setLoading(true))
+    try {
+      const result = await login(account).unwrap()
+      dispatch(authActions.setUser(result.data))
+      showToast.success('Login successful')
+      setTimeout(() => navigate('/admin'), 2000)
+    } catch (error: any) {
+      showToast.error(error.data.message)
+    } finally {
+      setIsLoading(false)
+      dispatch(loadingActions.setLoading(false))
     }
   }
 
   return (
-    <div className='h-screen w-screen bg-cover bg-center flex justify-center items-center bg-gradient-to-br from-neutral to-accent'>
-      <div className=' border border-gray-300 md:px-24 md:py-12 px-8 py-8 relative backdrop-blur-md bg-white/20 shadow-lg rounded-md'>
-        <img
-          src={logo}
-          alt='logo'
-          className='mx-auto h-28'
-        />
-        <p className=' mt-2 font-bold text-2xl text-center mb-5'>LOGIN</p>
-        <div className=' flex flex-col gap-4 '>
-          <label className='input input-bordered flex items-center gap-2 sm:w-80'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              viewBox='0 0 16 16'
-              fill='currentColor'
-              className='w-4 h-4 opacity-70'
-            >
-              <path d='M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z' />
-              <path d='M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z' />
-            </svg>
-            <input
-              name='email'
-              type='email'
-              className='grow'
-              placeholder='Email'
-              value={account.email}
-              onChange={handleChangeAccount}
-            />
-          </label>
-          <label className='input input-bordered flex items-center gap-2'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              viewBox='0 0 16 16'
-              fill='currentColor'
-              className='h-4 w-4 opacity-70'
-            >
-              <path
-                fillRule='evenodd'
-                d='M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z'
-                clipRule='evenodd'
+    <div className='min-h-screen w-full bg-gradient-to-br from-primary to-accent flex justify-center items-center p-4'>
+      <div className='bg-base-100 rounded-3xl shadow-2xl md:w-96 w-full p-8 space-y-6 backdrop-blur-sm bg-opacity-80'>
+        <div className='text-center'>
+          <img src={logo} alt='logo' className='mx-auto h-24 w-auto' />
+          <h2 className='mt-6 text-3xl font-bold text-primary'>Welcome Back</h2>
+          <p className='mt-2 text-base text-base-content'>Sign in to your account</p>
+        </div>
+        <form className='mt-8 space-y-6' onSubmit={(e) => { e.preventDefault(); handleLogin(); }} noValidate>
+          <div className='space-y-4'>
+            <div className='relative'>
+              <FiMail className='absolute top-3 left-3 text-gray-400 z-20' size={20} />
+              <input
+                id='email-address'
+                name='email'
+                type='email'
+                autoComplete='email'
+                required
+                className='pl-10 appearance-none rounded-md relative block w-full px-3 py-2 border border-base-300 placeholder-base-400 text-base-content focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm'
+                placeholder='Email address'
+                value={account.email}
+                onChange={handleChangeAccount}
               />
-            </svg>
-            <input
-              type='password'
-              name='password'
-              className='grow'
-              placeholder='Password'
-              value={account.password}
-              onChange={handleChangeAccount}
-            />
-          </label>
-          <button
-            onClick={handleLogin}
-            className=' btn btn-primary'
-          >
-            LOGIN
-          </button>
+              {errors.email && <p className='mt-2 text-sm text-error'>{errors.email}</p>}
+            </div>
+            <div className='relative'>
+              <FiLock className='absolute top-3 left-3 text-gray-400 z-20' size={20} />
+              <input
+                id='password'
+                name='password'
+                type='password'
+                autoComplete='current-password'
+                required
+                className='pl-10 appearance-none rounded-md relative block w-full px-3 py-2 border border-base-300 placeholder-base-400 text-base-content focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm'
+                placeholder='Password'
+                value={account.password}
+                onChange={handleChangeAccount}
+              />
+              {errors.password && <p className='mt-2 text-sm text-error'>{errors.password}</p>}
+            </div>
+          </div>
+          <div>
+            <button
+              type='submit'
+              className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
+              disabled={isLoading}
+            >
+              <span className='absolute left-0 inset-y-0 flex items-center pl-3'>
+                <FiLogIn className='h-5 w-5 text-primary-content group-hover:text-white' />
+              </span>
+              {isLoading ? 'Signing in...' : 'Sign in'}
+            </button>
+          </div>
+        </form>
+        <div className='text-center'>
+          <p className='text-sm text-base-content'>
+            Don't have an account?{' '}
+            <a href='/register' className='font-medium text-primary hover:text-primary-focus'>
+              Register here
+            </a>
+          </p>
         </div>
       </div>
     </div>

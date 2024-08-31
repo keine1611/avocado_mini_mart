@@ -1,4 +1,5 @@
-import 'module-alias/register'
+// import 'module-alias/register'
+import '@babel/register'
 import express from 'express'
 import dotenv from 'dotenv'
 import { connectToDB, syncDatabase } from './config'

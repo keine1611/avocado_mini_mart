@@ -1,9 +1,14 @@
 import { Brand } from '@/model/brand'
 import { createSlug } from '@/utils'
+import { Op } from 'sequelize'
 
-export const getAllBrand = async () => {
-  const listBrands = await Brand.findAll()
-  return listBrands
+export const getAllBrand = async ({ limit, offset, filters }) => {
+  const listBrands = await Brand.findAndCountAll({
+    limit: limit,
+    offset: offset,
+    where: filters,
+  })
+  return listBrands.rows
 }
 
 export const getBrandById = async ({ id }) => {
@@ -11,7 +16,7 @@ export const getBrandById = async ({ id }) => {
   return brand
 }
 
-export const createBrand = async ({ name, description, logo, slug }) => {
-  const brand = await Brand.create({ name, description, slug, logo })
+export const createBrand = async ({ name, description, logo, slug, code }) => {
+  const brand = await Brand.create({ name, description, slug, logo, code })
   return brand
 }

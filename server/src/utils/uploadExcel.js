@@ -1,10 +1,18 @@
-import multer from 'multer'
 import xlsx from 'xlsx'
-
-const upload = multer({ dest: 'uploads/' })
 
 export const readExcelFile = (filePath) => {
   const workbook = xlsx.readFile(filePath)
+  let sheetsData = {}
+  workbook.SheetNames.forEach((sheetName) => {
+    const worksheet = workbook.Sheets[sheetName]
+    sheetsData[sheetName] = xlsx.utils.sheet_to_json(worksheet)
+  })
+  return sheetsData
+}
+
+export const readExcelFromBuffer = async (buffer) => {
+  if (!buffer) throw new Error('Buffer is undefined or null. ')
+  const workbook = xlsx.read(buffer, { type: 'buffer' })
   let sheetsData = {}
   workbook.SheetNames.forEach((sheetName) => {
     const worksheet = workbook.Sheets[sheetName]
@@ -38,11 +46,10 @@ export const filterValidFields = (data, Model) => {
   })
 }
 
-export const saveExcelToDb = async (file, Model) => {
-  const dataSheets = readExcelFile(file.path)
+export const saveExcelToDb = async ({ file, Model }) => {
+  const dataSheets = await readExcelFromBuffer(file.buffer)
   const data = dataSheets[Model.name]
   const filteredData = filterValidFields(data, Model)
-  console.log(filteredData)
   const result = await importDataToDatabase(filteredData, Model)
   return result
 }

@@ -10,10 +10,6 @@ import {
 import bcrypt from 'bcrypt'
 
 export const register = async ({ email, password }) => {
-  const accountExist = await Account.findOne({ where: { email } })
-  if (accountExist) {
-    throw new Error('Email is exist')
-  }
   const hashedPassword = await bcrypt.hash(password, 10)
   const account = await Account.create({ email, password: hashedPassword })
   return account

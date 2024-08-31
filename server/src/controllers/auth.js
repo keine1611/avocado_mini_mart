@@ -7,26 +7,12 @@ import {
   writeRefreshTokens,
 } from '@/utils'
 import { registerValidation } from '@/validation'
+import { sendVerificationEmail } from '@/utils/email'
+import { generateVerificationCode } from '@/utils/verificationCode'
 
 import jwt from 'jsonwebtoken'
 
 export const authController = {
-  register: async (req, res, next) => {
-    const { email, password } = req.body
-    const { error } = registerValidation({ email, password })
-    if (error)
-      return res.status(400).json({
-        message: error.details[0].message,
-        data: {},
-      })
-    try {
-      const account = await register({ email, password })
-      res.status(200).json({ message: 'success', data: account })
-    } catch (error) {
-      res.status(400).json({ message: error.message, data: {} })
-    }
-  },
-
   login: async (req, res, next) => {
     const { email, password } = req.body
     const { error } = registerValidation({ email, password })
@@ -116,5 +102,73 @@ export const authController = {
     res.clearCookie('accessToken')
     res.clearCookie('refreshToken')
     res.status(200).json({ message: 'success' })
+  },
+
+  verifyAndCreateAccount: async (req, res, next) => {
+    const { email, verificationCode } = req.body
+
+    if (
+      !global.pendingRegistrations ||
+      !global.pendingRegistrations.has(email)
+    ) {
+      return res
+        .status(400)
+        .json({ message: 'Invalid or expired registration attempt', data: {} })
+    }
+
+    const pendingRegistration = global.pendingRegistrations.get(email)
+
+    if (pendingRegistration.verificationCode !== verificationCode) {
+      return res
+        .status(400)
+        .json({ message: 'Invalid verification code', data: {} })
+    }
+
+    try {
+      const account = await register({
+        email,
+        password: pendingRegistration.password,
+      })
+      global.pendingRegistrations.delete(email)
+      res
+        .status(200)
+        .json({ message: 'Account created successfully', data: account })
+    } catch (error) {
+      res.status(400).json({ message: error.message, data: null })
+    }
+  },
+  register: async (req, res, next) => {
+    const { email, password } = req.body
+    const { error } = registerValidation({ email, password })
+    if (error)
+      return res.status(400).json({
+        message: error.details[0].message,
+        data: {},
+      })
+    try {
+      const existingUser = await Account.findOne({ where: { email } })
+      if (existingUser) {
+        return res
+          .status(400)
+          .json({ message: 'Email already exists', data: null })
+      }
+
+      // Generate a 6-digit verification code
+      const verificationCode = generateVerificationCode()
+
+      // Store the verification code temporarily (you might want to use Redis or a similar solution for production)
+      // For now, we'll use a simple in-memory storage
+      if (!global.pendingRegistrations) global.pendingRegistrations = new Map()
+      global.pendingRegistrations.set(email, { password, verificationCode })
+
+      // Send verification email
+      await sendVerificationEmail(email, verificationCode)
+
+      res
+        .status(200)
+        .json({ message: 'Verification code sent', data: { email } })
+    } catch (error) {
+      res.status(400).json({ message: error.message, data: null })
+    }
   },
 }

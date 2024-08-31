@@ -15,6 +15,11 @@ export const Brand = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
+    code: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: true,
+    },
     slug: {
       type: DataTypes.STRING(100),
       allowNull: false,

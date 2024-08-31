@@ -19,9 +19,9 @@ export const AdminSideBar: React.FC = () => {
       <div className='drawer-content'>
         <label
           htmlFor='sidebar'
-          className='btn btn-accent drawer-button py-0 px-0'
+          className='btn btn-primary drawer-button py-0 px-0'
         >
-          <SideBarIcon className=' w-8 h-8  fill-neutral' />
+          <SideBarIcon className='w-8 h-8 fill-base-100' />
         </label>
       </div>
       <div className='drawer-side'>
@@ -30,36 +30,36 @@ export const AdminSideBar: React.FC = () => {
           aria-label='close sidebar'
           className='drawer-overlay'
         ></label>
-        <div className=' menu w-72 bg-primary h-screen flex flex-col p-0'>
+        <div className='menu w-72 bg-base-200 h-screen flex flex-col p-0'>
           <img
             src={logo}
-            className=' h-20 object-contain'
+            className='h-20 object-contain'
           />
-          <div className=' flex-1 bg-neutral flex flex-col gap-3 py-1 px-1'>
+          <div className='flex-1 bg-base-100 flex flex-col gap-3 py-1 px-1'>
             <div
               tabIndex={0}
-              className='collapse collapse-arrow border-base-300 bg-primary border-none rounded-md'
+              className='collapse collapse-arrow border-base-300 bg-base-200 border-none rounded-md'
             >
               <div className='collapse-title font-semibold flex flex-row gap-2 items-center'>
-                <DashboardIcon className=' h-6 w-6' />
-                <p className=' font-semibold capitalize'>dashboard</p>
+                <DashboardIcon className='h-6 w-6' />
+                <p className='font-semibold capitalize'>dashboard</p>
               </div>
-              <div className='collapse-content bg-neutral'>
-                <div className=' flex flex-col gap-2 py-2 px-0 m-0'>
+              <div className='collapse-content bg-base-100'>
+                <div className='flex flex-col gap-2 py-2 px-0 m-0'>
                   <Link
-                    className=' w-full rounded-md bg-secondary py-3 px-2 font-medium shadow-md hover:bg-accent transition-all duration-500 hover:cursor-pointer'
+                    className='w-full rounded-md bg-base-300 py-3 px-2 font-medium shadow-md hover:bg-primary hover:text-base-100 transition-all duration-500 hover:cursor-pointer'
                     to={'/dashboard/analytics'}
                   >
                     Analytics
                   </Link>
                   <Link
-                    className=' w-full rounded-md bg-secondary py-3 px-2 font-medium shadow-md hover:bg-accent transition-all duration-500 hover:cursor-pointer'
+                    className='w-full rounded-md bg-base-300 py-3 px-2 font-medium shadow-md hover:bg-primary hover:text-base-100 transition-all duration-500 hover:cursor-pointer'
                     to={'/dashboard/analytics'}
                   >
                     Ecommerce
                   </Link>
                   <Link
-                    className=' w-full rounded-md bg-secondary py-3 px-2 font-medium shadow-md hover:bg-accent transition-all duration-500 hover:cursor-pointer'
+                    className='w-full rounded-md bg-base-300 py-3 px-2 font-medium shadow-md hover:bg-primary hover:text-base-100 transition-all duration-500 hover:cursor-pointer'
                     to={'/dashboard/project'}
                   >
                     Project
@@ -69,16 +69,16 @@ export const AdminSideBar: React.FC = () => {
             </div>
             <div
               tabIndex={0}
-              className='collapse collapse-arrow border-base-300 bg-primary border-none rounded-md'
+              className='collapse collapse-arrow border-base-300 bg-base-200 border-none rounded-md'
             >
               <div className='collapse-title font-semibold flex flex-row gap-2 items-center'>
-                <DatabaseIcon className=' h-6 w-6' />
-                <p className=' font-semibold capitalize'>database</p>
+                <DatabaseIcon className='h-6 w-6' />
+                <p className='font-semibold capitalize'>database</p>
               </div>
-              <div className='collapse-content bg-neutral'>
-                <div className=' flex flex-col gap-2 py-2 px-0 m-0'>
+              <div className='collapse-content bg-base-100'>
+                <div className='flex flex-col gap-2 py-2 px-0 m-0'>
                   <Link
-                    className=' w-full rounded-md bg-secondary py-3 px-2 font-medium shadow-md hover:bg-accent transition-all duration-500 hover:cursor-pointer'
+                    className='w-full rounded-md bg-base-300 py-3 px-2 font-medium shadow-md hover:bg-primary hover:text-base-100 transition-all duration-500 hover:cursor-pointer'
                     to={'/database/brands'}
                   >
                     Brands

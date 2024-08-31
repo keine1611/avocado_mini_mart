@@ -1,6 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { LoginResponse } from '@/types'
 
-const initialState = {
+export interface AuthState {
+  user: LoginResponse | null
+}
+
+const initialState: AuthState = {
   user: null,
 }
 

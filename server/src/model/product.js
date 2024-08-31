@@ -15,7 +15,7 @@ export const Product = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    code: {
+    barcode: {
       type: DataTypes.STRING(10),
       allowNull: false,
     },
@@ -51,7 +51,7 @@ export const Product = sequelize.define(
         throw new Error('SubCategory not found')
       }
     },
-  },
+  }
 )
 Product.afterUpdate(async (product, options) => {
   product.updateAt = getToday()

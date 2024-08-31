@@ -19,6 +19,7 @@ export const uploadFileToFirebase = async ({ file, path }) => {
     const storageRef = ref(storage, path)
     const snapshot = await uploadBytes(storageRef, file.buffer)
     const downloadURL = await getDownloadURL(snapshot.ref)
+
     return downloadURL
   } catch (error) {
     throw new Error('Falied to upload file to Firebase. ')

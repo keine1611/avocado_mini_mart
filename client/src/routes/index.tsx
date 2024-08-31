@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 import { PATH } from '@/constant'
-import { AdminHome, UserHome, UserLogin, AdminBrand } from '@/pages'
+import { AdminHome, UserHome, UserLogin, AdminBrand, UserRegister } from '@/pages'
 import { AdminLayout } from '@/components'
 import { useAppSelector } from '@/hooks'
 
@@ -31,6 +31,10 @@ export const router = createBrowserRouter([
   {
     path: PATH.user.login,
     element: <UserLogin />,
+  },
+  {
+    path: PATH.user.register,
+    element: <UserRegister />,
   },
   {
     path: '/admin',
