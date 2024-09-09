@@ -1,2 +1,3 @@
 export * from './config'
-export * from './connection'
+export * from './initDatabase'
+export * from './database'

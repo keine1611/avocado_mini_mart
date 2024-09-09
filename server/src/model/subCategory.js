@@ -1,5 +1,6 @@
 import { sequelize } from '@/config'
 import { DataTypes } from 'sequelize'
+import { createSlug } from '@/utils'
 
 export const SubCategory = sequelize.define(
   'SubCategory',
@@ -14,13 +15,21 @@ export const SubCategory = sequelize.define(
       allowNull: false,
       unique: true,
     },
-    code: {
-      type: DataTypes.CHAR(2),
+    slug: {
+      type: DataTypes.STRING(100),
       unique: true,
       allowNull: false,
+      defaultValue: '',
     },
   },
   {
     tableName: 'sub_categories',
-  },
+    hooks: {
+      beforeCreate: async (subCategory, options) => {
+        if (!subCategory.slug) {
+          subCategory.slug = await createSlug({ name: subCategory.name })
+        }
+      },
+    },
+  }
 )

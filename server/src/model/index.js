@@ -10,6 +10,9 @@ import { Product } from './product'
 import { Profile } from './profile'
 import { Role } from './role'
 import { SubCategory } from './subCategory'
+import { ProductImage } from './productImage'
+import { PriceHistory } from './priceHistory'
+import { Inventory } from './inventory'
 
 Brand.hasMany(Product, {
   foreignKey: 'brandId',
@@ -28,6 +31,7 @@ BatchDetail.belongsTo(Batch, {
   foreignKey: 'batchId',
   as: 'batch',
 })
+
 Product.hasMany(BatchDetail, {
   foreignKey: 'productId',
   as: 'batchDetails',
@@ -37,9 +41,27 @@ BatchDetail.belongsTo(Product, {
   as: 'product',
 })
 
+Product.hasMany(ProductImage, {
+  foreignKey: 'productId',
+  as: 'productImages',
+})
+ProductImage.belongsTo(Product, {
+  foreignKey: 'productId',
+  as: 'product',
+})
+
+Product.hasMany(PriceHistory, {
+  foreignKey: 'productId',
+  as: 'priceHistories',
+})
+PriceHistory.belongsTo(Product, {
+  foreignKey: 'productId',
+  as: 'product',
+})
+
 Role.hasMany(Account, {
   foreignKey: 'roleId',
-  as: 'account',
+  as: 'accounts',
 })
 Account.belongsTo(Role, {
   foreignKey: 'roleId',
@@ -64,6 +86,24 @@ OrderItem.belongsTo(Product, {
   as: 'product',
 })
 
+Product.hasMany(Inventory, {
+  foreignKey: 'productId',
+  as: 'inventories',
+})
+Inventory.belongsTo(Product, {
+  foreignKey: 'productId',
+  as: 'product',
+})
+
+Batch.hasMany(Inventory, {
+  foreignKey: 'batchId',
+  as: 'inventories',
+})
+Inventory.belongsTo(Batch, {
+  foreignKey: 'batchId',
+  as: 'batch',
+})
+
 Order.hasMany(OrderItem, {
   foreignKey: 'orderId',
   as: 'orderItems',
@@ -71,15 +111,6 @@ Order.hasMany(OrderItem, {
 OrderItem.belongsTo(Order, {
   foreignKey: 'orderId',
   as: 'order',
-})
-
-MainCategory.hasMany(Product, {
-  foreignKey: 'mainCategoryId',
-  as: 'products',
-})
-Product.belongsTo(MainCategory, {
-  foreignKey: 'mainCategoryId',
-  as: 'mainCategory',
 })
 
 SubCategory.hasMany(Product, {
@@ -118,29 +149,45 @@ Cart.belongsTo(Account, {
   as: 'account',
 })
 
+Account.hasMany(Order, {
+  foreignKey: 'accountId',
+  as: 'orders',
+})
+Order.belongsTo(Account, {
+  foreignKey: 'accountId',
+  as: 'account',
+})
+
 export const models = {
-  Brand,
-  Product,
+  Account,
   Batch,
   BatchDetail,
-  Role,
-  Account,
-  Profile,
+  Brand,
+  Cart,
+  Inventory,
+  MainCategory,
   Order,
   OrderItem,
+  PriceHistory,
+  Product,
+  ProductImage,
+  Profile,
+  Role,
   SubCategory,
-  MainCategory,
-  Cart,
 }
+
 export * from './account'
-export * from './brand'
-export * from './product'
 export * from './batch'
 export * from './batchDetail'
-export * from './role'
-export * from './profile'
+export * from './brand'
+export * from './cart'
+export * from './inventory'
+export * from './mainCategory'
 export * from './order'
 export * from './orderItem'
+export * from './priceHistory'
+export * from './product'
+export * from './productImage'
+export * from './profile'
+export * from './role'
 export * from './subCategory'
-export * from './mainCategory'
-export * from './cart'

@@ -5,7 +5,7 @@ export const createBrandValidation = ({ data }) => {
     name: Joi.string().max(50).min(10).required(),
     slug: Joi.string().max(100),
     description: Joi.string().max(500),
-    logo: Joi.string().max(100),
+    logo: Joi.string().max(500),
     code: Joi.string().max(50).required(),
   })
   return schema.validate(data)

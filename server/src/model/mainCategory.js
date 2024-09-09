@@ -22,5 +22,5 @@ export const MainCategory = sequelize.define(
   },
   {
     tableName: 'main_categories',
-  },
+  }
 )

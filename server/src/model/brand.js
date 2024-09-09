@@ -1,7 +1,6 @@
 import { DataTypes } from 'sequelize'
 import { sequelize } from '@/config'
 import { createSlug, getToday } from '@/utils'
-import { options } from 'joi'
 
 export const Brand = sequelize.define(
   'Brand',
@@ -26,19 +25,19 @@ export const Brand = sequelize.define(
       unique: true,
       defaultValue: '',
     },
-    desciption: {
+    description: {
       type: DataTypes.STRING(500),
     },
     logo: {
       type: DataTypes.STRING(500),
     },
     createdAt: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(14),
       allowNull: false,
       defaultValue: () => getToday(),
     },
-    updateAt: {
-      type: DataTypes.STRING,
+    updatedAt: {
+      type: DataTypes.STRING(14),
       allowNull: false,
       defaultValue: () => getToday(),
     },
@@ -49,8 +48,7 @@ export const Brand = sequelize.define(
         if (!brand.slug) brand.slug = await createSlug({ name: brand.name })
       },
       afterUpdate: async (brand, options) => {
-        brand.updateAt = getToday()
-        await brand.save()
+        brand.updatedAt = getToday()
       },
     },
   }

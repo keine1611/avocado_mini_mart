@@ -1,6 +1,12 @@
 import { initializeApp } from 'firebase/app'
 
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from 'firebase/storage'
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -24,4 +30,26 @@ export const uploadFileToFirebase = async ({ file, path }) => {
   } catch (error) {
     throw new Error('Falied to upload file to Firebase. ')
   }
+}
+
+export const deleteFileFromFirebase = async ({ url }) => {
+  try {
+    const storageRef = ref(storage, getStoragePathFromUrl({ url }))
+    await deleteObject(storageRef)
+  } catch (error) {
+    throw new Error('Falied to delete file from Firebase. ')
+  }
+}
+
+export const getStoragePathFromUrl = ({ url }) => {
+  const baseUrlIndex = url.indexOf('/o/')
+  const endIndex = url.indexOf('?alt=media')
+
+  if (baseUrlIndex === -1 || endIndex === -1) {
+    throw new Error('Invalid download URL')
+  }
+
+  const encodedPath = url.substring(baseUrlIndex + 3, endIndex)
+  const storagePath = decodeURIComponent(encodedPath)
+  return storagePath
 }

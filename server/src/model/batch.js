@@ -12,17 +12,21 @@ export const Batch = sequelize.define('Batch', {
     type: DataTypes.STRING(10),
     allowNull: false,
   },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   arrivalDate: {
     type: DataTypes.STRING(14),
     allowNull: false,
   },
   createdAt: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(14),
     allowNull: false,
     defaultValue: () => getToday(),
   },
   updateAt: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(14),
     allowNull: false,
     defaultValue: () => getToday(),
   },

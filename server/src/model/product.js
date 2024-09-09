@@ -1,7 +1,8 @@
 import { DataTypes } from 'sequelize'
 import { sequelize } from '@/config'
 import { SubCategory } from './subCategory'
-import { getToday } from '@/utils'
+import { getToday, createSlug } from '@/utils'
+import { statusProduct } from '@/enum'
 
 export const Product = sequelize.define(
   'Product',
@@ -18,41 +19,49 @@ export const Product = sequelize.define(
     barcode: {
       type: DataTypes.STRING(10),
       allowNull: false,
+      unique: true,
     },
     slug: {
       type: DataTypes.STRING(50),
       allowNull: false,
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
+      unique: true,
+      defaultValue: '',
     },
     standardPrice: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM,
+      allowNull: false,
+      values: Object.values(statusProduct),
+      defaultValue: statusProduct.INACTIVE,
+    },
+    description: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: () => getToday(),
     },
-    updateAt: {
+    updatedAt: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: () => getToday(),
     },
   },
   {
-    hooks: async (product, options) => {
-      const subCategory = await SubCategory.findByPk(product.sub_category_id)
-      if (subCategory) {
-        product.code = `${subCategory.code}${product.id}`
-      } else {
-        throw new Error('SubCategory not found')
-      }
+    hooks: {
+      afterUpdate: async (product, options) => {
+        product.updatedAt = getToday()
+      },
+      beforeCreate: async (product, options) => {
+        if (!product.slug) {
+          product.slug = await createSlug({ name: product.name })
+        }
+      },
     },
   }
 )
-Product.afterUpdate(async (product, options) => {
-  product.updateAt = getToday()
-})

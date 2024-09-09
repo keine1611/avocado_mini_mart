@@ -12,9 +12,8 @@ export const BatchDetail = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    
   },
   {
     tableName: 'batch_details',
-  },
+  }
 )

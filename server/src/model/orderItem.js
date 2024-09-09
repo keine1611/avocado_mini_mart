@@ -22,5 +22,5 @@ export const OrderItem = sequelize.define(
   },
   {
     tableName: 'order_item',
-  },
+  }
 )
