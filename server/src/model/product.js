@@ -28,7 +28,7 @@ export const Product = sequelize.define(
       defaultValue: '',
     },
     standardPrice: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
     status: {

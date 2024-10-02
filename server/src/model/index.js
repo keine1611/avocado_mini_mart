@@ -8,7 +8,6 @@ import { Order } from './order'
 import { OrderItem } from './orderItem'
 import { Product } from './product'
 import { Profile } from './profile'
-import { Role } from './role'
 import { SubCategory } from './subCategory'
 import { ProductImage } from './productImage'
 import { PriceHistory } from './priceHistory'
@@ -59,21 +58,12 @@ PriceHistory.belongsTo(Product, {
   as: 'product',
 })
 
-Role.hasMany(Account, {
-  foreignKey: 'roleId',
-  as: 'accounts',
-})
-Account.belongsTo(Role, {
-  foreignKey: 'roleId',
-  as: 'role',
-})
-
 Account.hasOne(Profile, {
-  foreignKey: 'accountId',
+  foreignKey: { name: 'accountId', unique: true, allowNull: false },
   as: 'profile',
 })
 Profile.belongsTo(Account, {
-  foreignKey: 'accountId',
+  foreignKey: { name: 'accountId', unique: true, allowNull: false },
   as: 'account',
 })
 
@@ -172,7 +162,6 @@ export const models = {
   Product,
   ProductImage,
   Profile,
-  Role,
   SubCategory,
 }
 
@@ -189,5 +178,4 @@ export * from './priceHistory'
 export * from './product'
 export * from './productImage'
 export * from './profile'
-export * from './role'
 export * from './subCategory'

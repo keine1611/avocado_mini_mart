@@ -1,10 +1,33 @@
 import React, { useState } from 'react'
-import { Table, TableProps, Button, Modal, Form, Input, Upload, message, InputRef, Select, Image } from 'antd'
+import {
+  Table,
+  TableProps,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Upload,
+  message,
+  InputRef,
+  Select,
+} from 'antd'
 import type { RcFile, UploadFile } from 'antd/es/upload'
 import { Brand } from '@/types'
-import { useGetAllBrandQuery, useCreateBrandMutation, useUpdateBrandMutation, useDeleteBrandMutation } from '@/services/brand'
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
+import {
+  useGetAllBrandQuery,
+  useCreateBrandMutation,
+  useUpdateBrandMutation,
+  useDeleteBrandMutation,
+} from '@/services/brand'
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+} from '@ant-design/icons'
 import { stringToDateTime } from '@/utils'
+import { loadingActions } from '@/store/loading'
+import { useAppDispatch } from '@/hooks'
 
 const { Option } = Select
 
@@ -18,11 +41,11 @@ const AdminBrand: React.FC = () => {
   let searchInput: InputRef | null = null
   const [previewVisible, setPreviewVisible] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
-
+  const dispatch = useAppDispatch()
   const { data, error, isLoading } = useGetAllBrandQuery()
-  const [createBrand] = useCreateBrandMutation()
-  const [updateBrand] = useUpdateBrandMutation()
-  const [deleteBrand] = useDeleteBrandMutation()
+  const [createBrand, { isLoading: isCreating }] = useCreateBrandMutation()
+  const [updateBrand, { isLoading: isUpdating }] = useUpdateBrandMutation()
+  const [deleteBrand, { isLoading: isDeleting }] = useDeleteBrandMutation()
 
   const handleCreate = () => {
     setEditingBrand(null)
@@ -34,33 +57,47 @@ const AdminBrand: React.FC = () => {
   const handleEdit = (brand: Brand) => {
     setEditingBrand(brand)
     form.setFieldsValue(brand)
-    setFileList(brand.logo ? [{ uid: '-1', name: 'logo', status: 'done', url: brand.logo }] : [])
+    setFileList(
+      brand.logo
+        ? [{ uid: '-1', name: 'logo', status: 'done', url: brand.logo }]
+        : []
+    )
     setIsModalVisible(true)
   }
 
   const handleDelete = async (id: number) => {
+    dispatch(loadingActions.setLoading(true))
     try {
-      await deleteBrand(id).unwrap()
-      message.success('Brand deleted successfully')
-    } catch (err) {
-      message.error('Failed to delete brand')
+      const response = await deleteBrand(id).unwrap()
+      message.success(response.message)
+    } catch (err: any) {
+      message.error(err.data?.message || 'Failed to delete brand')
     }
+    dispatch(loadingActions.setLoading(false))
   }
 
   const handleModalOk = () => {
     form.validateFields().then(async (values) => {
       try {
         const formData = new FormData()
-        Object.keys(values).forEach(key => {
-          if (key === 'logo' && fileList[0]?.originFileObj) {
-            formData.append('logo', fileList[0].originFileObj)
+
+        Object.keys(values).forEach((key) => {
+          if (key === 'logo') {
+            if (fileList.length > 0 && fileList[0].originFileObj) {
+              formData.append('logo', fileList[0].originFileObj)
+            }
           } else {
-            formData.append(key, values[key])
+            if (values[key]) {
+              formData.append(key, values[key])
+            }
           }
         })
 
         if (editingBrand) {
-          await updateBrand({ id: editingBrand.id, data: formData }).unwrap()
+          await updateBrand({
+            id: editingBrand.id,
+            data: formData,
+          }).unwrap()
           message.success('Brand updated successfully')
         } else {
           await createBrand(formData).unwrap()
@@ -69,13 +106,13 @@ const AdminBrand: React.FC = () => {
         setIsModalVisible(false)
         form.resetFields()
         setFileList([])
-      } catch (err) {
-        message.error('Failed to save brand')
+      } catch (err: any) {
+        message.error(err.data?.message || 'Failed to save brand')
       }
     })
   }
 
-  const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any ) => {
+  const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
     confirm()
     setSearchText(selectedKeys[0])
     setSearchedColumn(dataIndex)
@@ -87,36 +124,52 @@ const AdminBrand: React.FC = () => {
   }
 
   const getColumnSearchProps = (dataIndex: string) => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }: any) => (
       <div style={{ padding: 8 }}>
         <Input
-          ref={node => {
+          ref={(node) => {
             searchInput = node
           }}
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
-          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
           style={{ marginBottom: 8, display: 'block' }}
         />
         <Button
-          type="primary"
+          type='primary'
           onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
           icon={<SearchOutlined />}
-          size="small"
+          size='small'
           style={{ width: 90, marginRight: 8 }}
         >
           Search
         </Button>
-        <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+        <Button
+          onClick={() => handleReset(clearFilters)}
+          size='small'
+          style={{ width: 90 }}
+        >
           Reset
         </Button>
       </div>
     ),
-    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    filterIcon: (filtered: boolean) => (
+      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
     onFilter: (value: any, record: any) =>
       record[dataIndex]
-        ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+        ? record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
         : '',
     onFilterDropdownVisibleChange: (visible: any) => {
       if (visible) {
@@ -135,27 +188,33 @@ const AdminBrand: React.FC = () => {
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj as RcFile);
+      file.preview = await getBase64(file.originFileObj as RcFile)
     }
 
-    setPreviewImage(file.url || (file.preview as string));
-    setPreviewVisible(true);
-  };
+    setPreviewImage(file.url || (file.preview as string))
+    setPreviewVisible(true)
+  }
 
   const getBase64 = (file: RcFile): Promise<string> =>
     new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = (error) => reject(error)
+    })
 
   const columns: TableProps<Brand>['columns'] = [
     {
       title: 'Logo',
       dataIndex: 'logo',
       key: 'logo',
-      render: (logo) => <img src={logo} alt="Brand Logo" className="w-12 h-12 object-cover rounded-full" />,
+      render: (logo) => (
+        <img
+          src={logo}
+          alt='Brand Logo'
+          className='w-12 h-12 object-cover rounded-full'
+        />
+      ),
     },
     {
       title: 'Name',
@@ -188,13 +247,13 @@ const AdminBrand: React.FC = () => {
       title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (text: string) => stringToDateTime(text)
+      render: (text: string) => stringToDateTime(text),
     },
     {
       title: 'Updated At',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
-      render: (text: string) => stringToDateTime(text)
+      render: (text: string) => stringToDateTime(text),
     },
     {
       title: 'Actions',
@@ -202,7 +261,12 @@ const AdminBrand: React.FC = () => {
       render: (_, record) => (
         <div className='flex items-center gap-2'>
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+            danger
+            loading={isDeleting}
+          />
         </div>
       ),
     },
@@ -210,7 +274,11 @@ const AdminBrand: React.FC = () => {
 
   return (
     <div className='w-full h-full overflow-y-auto p-4'>
-      <Button icon={<PlusOutlined />} onClick={handleCreate} className="mb-4 bg-primary text-white rounded-md hover:bg-primary-dark px-4 py-2">
+      <Button
+        icon={<PlusOutlined />}
+        onClick={handleCreate}
+        className='mb-4 bg-primary text-white rounded-md hover:bg-primary-dark px-4 py-2'
+      >
         Add Brand
       </Button>
       <Table
@@ -218,57 +286,78 @@ const AdminBrand: React.FC = () => {
         dataSource={data?.data}
         rowKey={(record) => record.id}
         loading={isLoading}
-        className="bg-white shadow-md rounded-lg"
+        className='bg-white shadow-md rounded-lg'
       />
       <Modal
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={() => setIsModalVisible(false)}
         width={800}
-        className="custom-modal"
+        className='custom-modal'
         footer={null}
         centered
       >
-        <div className="bg-white p-4">
-          <h2 className="text-2xl font-bold mb-6 text-primary">
+        <div className='bg-white p-4'>
+          <h2 className='text-2xl font-bold mb-6 text-primary'>
             {editingBrand ? 'Edit Brand' : 'Create Brand'}
           </h2>
-          <Form form={form} layout="vertical" className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please enter a name' }]}>
-                <Input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
+          <Form form={form} layout='vertical' className='space-y-4'>
+            <div className='grid grid-cols-2 gap-4'>
+              <Form.Item
+                name='name'
+                label='Name'
+                rules={[{ required: true, message: 'Please enter a name' }]}
+              >
+                <Input className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary' />
               </Form.Item>
-              <Form.Item name="code" label="Code" rules={[{ required: true, message: 'Please enter a code' }]}>
-                <Input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
+              <Form.Item
+                name='code'
+                label='Code'
+                rules={[{ required: true, message: 'Please enter a code' }]}
+              >
+                <Input className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary' />
               </Form.Item>
             </div>
-            <Form.Item name="slug" label="Slug">
-              <Input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
+            <Form.Item name='slug' label='Slug'>
+              <Input className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary' />
             </Form.Item>
-            <Form.Item name="description" label="Description">
-              <Input.TextArea className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows={4} />
+            <Form.Item name='description' label='Description'>
+              <Input.TextArea
+                className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
+                rows={4}
+              />
             </Form.Item>
-            <Form.Item name="logo" label="Logo">
+            <Form.Item name='logo' label='Logo'>
               <Upload
-                listType="picture-card"
+                listType='picture-card'
                 fileList={fileList}
                 onChange={({ fileList }) => setFileList(fileList)}
                 beforeUpload={() => false}
-                accept="image/*"
+                accept='image/*'
                 maxCount={1}
                 onPreview={handlePreview}
               >
-                {fileList.length < 1 && <div>
-                  <PlusOutlined />
-                  <div style={{ marginTop: 8 }}>Upload</div>
-                </div>}
+                {fileList.length < 1 && (
+                  <div>
+                    <PlusOutlined />
+                    <div style={{ marginTop: 8 }}>Upload</div>
+                  </div>
+                )}
               </Upload>
             </Form.Item>
-            <div className="flex justify-end space-x-4 mt-6">
-              <Button onClick={() => setIsModalVisible(false)} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            <div className='flex justify-end space-x-4 mt-6'>
+              <Button
+                onClick={() => setIsModalVisible(false)}
+                className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
+              >
                 Cancel
               </Button>
-              <Button onClick={handleModalOk} type="primary" className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark">
+              <Button
+                onClick={handleModalOk}
+                type='primary'
+                className='px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark'
+                loading={isCreating || isUpdating}
+              >
                 {editingBrand ? 'Update' : 'Create'}
               </Button>
             </div>
@@ -280,7 +369,7 @@ const AdminBrand: React.FC = () => {
         footer={null}
         onCancel={() => setPreviewVisible(false)}
       >
-        <img alt="preview" style={{ width: '100%' }} src={previewImage} />
+        <img alt='preview' style={{ width: '100%' }} src={previewImage} />
       </Modal>
     </div>
   )

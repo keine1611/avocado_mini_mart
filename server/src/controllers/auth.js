@@ -6,7 +6,7 @@ import {
   setTokenCookie,
   writeRefreshTokens,
 } from '@/utils'
-import { registerValidation } from '@/validation'
+import { authValidation } from '@/validation'
 import { sendVerificationEmail } from '@/utils/email'
 import { generateVerificationCode } from '@/utils/verificationCode'
 
@@ -15,7 +15,7 @@ import jwt from 'jsonwebtoken'
 export const authController = {
   login: async (req, res, next) => {
     const { email, password } = req.body
-    const { error } = registerValidation({ email, password })
+    const { error } = authValidation.login.validate({ email, password })
     if (error)
       return res.status(400).json({
         message: error.details[0].message,
@@ -139,7 +139,7 @@ export const authController = {
   },
   register: async (req, res, next) => {
     const { email, password } = req.body
-    const { error } = registerValidation({ email, password })
+    const { error } = authValidation.register.validate({ email, password })
     if (error)
       return res.status(400).json({
         message: error.details[0].message,

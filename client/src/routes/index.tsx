@@ -1,7 +1,17 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 import { PATH } from '@/constant'
-import { AdminHome, UserHome, UserLogin, AdminBrand, UserRegister, AdminProduct } from '@/pages'
+import {
+  AdminHome,
+  UserHome,
+  UserLogin,
+  AdminBrand,
+  UserRegister,
+  AdminProduct,
+  AdminMainCategory,
+  AdminSubCategory,
+  AdminUser,
+} from '@/pages'
 import { AdminLayout } from '@/components'
 import { useAppSelector } from '@/hooks'
 
@@ -58,6 +68,18 @@ export const router = createBrowserRouter([
           {
             path: 'products',
             element: <AdminProduct />,
+          },
+          {
+            path: 'sub-categories',
+            element: <AdminSubCategory />,
+          },
+          {
+            path: 'main-categories',
+            element: <AdminMainCategory />,
+          },
+          {
+            path: 'users',
+            element: <AdminUser />,
           },
         ],
       },

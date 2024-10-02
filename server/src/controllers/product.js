@@ -8,7 +8,7 @@ import {
   uploadFileToFirebase,
   deleteFileFromFirebase,
 } from '@/utils'
-import { createProductValidation } from '@/validation'
+import { productValidation } from '@/validation'
 import { v4 as uuidv4 } from 'uuid'
 
 export const productController = {
@@ -81,7 +81,7 @@ export const productController = {
       transaction = await sequelize.transaction()
 
       const { ...productData } = req.body
-      const { error } = createProductValidation(productData)
+      const { error } = productValidation.create.validate(productData)
       if (error) {
         await transaction.rollback()
         return res.status(400).json({
@@ -136,6 +136,14 @@ export const productController = {
 
       const { id } = req.params
       const { imagesToDelete, ...productData } = req.body
+      const { error } = productValidation.update.validate(productData)
+      if (error) {
+        await transaction.rollback()
+        return res.status(400).json({
+          message: error.details[0].message,
+          data: null,
+        })
+      }
       const product = await Product.findByPk(id)
       if (!product) {
         await transaction.rollback()

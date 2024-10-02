@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { logo } from '@/constant'
-import { Account } from '@/types'
 import { useLoginMutation } from '@/services'
 import { showToast } from '@/components'
 import { useNavigate } from 'react-router-dom'
@@ -9,13 +8,16 @@ import { useAppDispatch } from '@/hooks'
 import { FiMail, FiLock, FiLogIn } from 'react-icons/fi'
 import { loadingActions } from '@/store/loading'
 
-const initialState: Account = {
-  email: '',
-  password: '',
+export interface LoginAccount {
+  email: string
+  password: string
 }
 
 export const UserLogin = () => {
-  const [account, setAccount] = useState<Account>(initialState)
+  const [account, setAccount] = useState<LoginAccount>({
+    email: '',
+    password: '',
+  })
   const [login] = useLoginMutation()
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({ email: '', password: '' })
@@ -41,7 +43,9 @@ export const UserLogin = () => {
     return isValid
   }
 
-  const handleChangeAccount = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleChangeAccount = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     const { name, value } = e.target
     setAccount((prev) => ({ ...prev, [name]: value }))
     setErrors((prev) => ({ ...prev, [name]: '' }))
@@ -71,12 +75,24 @@ export const UserLogin = () => {
         <div className='text-center'>
           <img src={logo} alt='logo' className='mx-auto h-24 w-auto' />
           <h2 className='mt-6 text-3xl font-bold text-primary'>Welcome Back</h2>
-          <p className='mt-2 text-base text-base-content'>Sign in to your account</p>
+          <p className='mt-2 text-base text-base-content'>
+            Sign in to your account
+          </p>
         </div>
-        <form className='mt-8 space-y-6' onSubmit={(e) => { e.preventDefault(); handleLogin(); }} noValidate>
+        <form
+          className='mt-8 space-y-6'
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleLogin()
+          }}
+          noValidate
+        >
           <div className='space-y-4'>
             <div className='relative'>
-              <FiMail className='absolute top-3 left-3 text-gray-400 z-20' size={20} />
+              <FiMail
+                className='absolute top-3 left-3 text-gray-400 z-20'
+                size={20}
+              />
               <input
                 id='email-address'
                 name='email'
@@ -88,10 +104,15 @@ export const UserLogin = () => {
                 value={account.email}
                 onChange={handleChangeAccount}
               />
-              {errors.email && <p className='mt-2 text-sm text-error'>{errors.email}</p>}
+              {errors.email && (
+                <p className='mt-2 text-sm text-error'>{errors.email}</p>
+              )}
             </div>
             <div className='relative'>
-              <FiLock className='absolute top-3 left-3 text-gray-400 z-20' size={20} />
+              <FiLock
+                className='absolute top-3 left-3 text-gray-400 z-20'
+                size={20}
+              />
               <input
                 id='password'
                 name='password'
@@ -103,7 +124,9 @@ export const UserLogin = () => {
                 value={account.password}
                 onChange={handleChangeAccount}
               />
-              {errors.password && <p className='mt-2 text-sm text-error'>{errors.password}</p>}
+              {errors.password && (
+                <p className='mt-2 text-sm text-error'>{errors.password}</p>
+              )}
             </div>
           </div>
           <div>
@@ -122,7 +145,10 @@ export const UserLogin = () => {
         <div className='text-center'>
           <p className='text-sm text-base-content'>
             Don't have an account?{' '}
-            <a href='/register' className='font-medium text-primary hover:text-primary-focus'>
+            <a
+              href='/register'
+              className='font-medium text-primary hover:text-primary-focus'
+            >
               Register here
             </a>
           </p>

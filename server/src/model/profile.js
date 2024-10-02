@@ -9,10 +9,10 @@ export const Profile = sequelize.define('Profile', {
     autoIncrement: true,
   },
   firstName: {
-    type: DataTypes.STRING(50),
+    type: DataTypes.STRING(30),
   },
   lastName: {
-    type: DataTypes.STRING(50),
+    type: DataTypes.STRING(30),
   },
   dob: {
     type: DataTypes.STRING(14),

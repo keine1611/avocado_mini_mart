@@ -1,44 +1,44 @@
-import { register } from '@/services/auth'
 import Joi from 'joi'
 
-const authValidation = {
-  register: Joi.object({
-    email: Joi.string()
-      .max(320)
+export const mainCategoryValidation = {
+  create: Joi.object({
+    id: Joi.number().optional(),
+    name: Joi.string()
       .required()
-      .email()
+      .min(3)
+      .max(50)
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
-            case 'string.email':
-              error.message = 'Email is invalid'
+            case 'string.min':
+              error.message = 'Name must be at least 3 characters long'
               break
             case 'any.required':
-              error.message = 'Email is required'
+              error.message = 'Name is required'
               break
             case 'string.max':
-              error.message = 'Email must be at most 320 characters long'
+              error.message = 'Name must be at most 50 characters long'
               break
             default:
               break
           }
         })
+        return errors
       }),
-    password: Joi.string()
-      .min(6)
-      .max(15)
-      .required()
+    slug: Joi.string()
+      .min(3)
+      .max(100)
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
             case 'string.min':
-              error.message = 'Password must be at least 6 characters long'
+              error.message = 'Slug must be at least 3 characters long'
               break
             case 'any.required':
-              error.message = 'Password is required'
+              error.message = 'Slug is required'
               break
             case 'string.max':
-              error.message = 'Password must be at most 15 characters long'
+              error.message = 'Slug must be at most 50 characters long'
               break
             default:
               break
@@ -47,22 +47,23 @@ const authValidation = {
         return errors
       }),
   }),
-  login: Joi.object({
-    email: Joi.string()
-      .max(320)
+  update: Joi.object({
+    id: Joi.number().optional(),
+    name: Joi.string()
       .required()
-      .email()
+      .min(3)
+      .max(50)
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
-            case 'string.email':
-              error.message = 'Email is invalid'
+            case 'string.min':
+              error.message = 'Name must be at least 3 characters long'
               break
             case 'any.required':
-              error.message = 'Email is required'
+              error.message = 'Name is required'
               break
             case 'string.max':
-              error.message = 'Email must be at most 320 characters long'
+              error.message = 'Name must be at most 50 characters long'
               break
             default:
               break
@@ -70,21 +71,20 @@ const authValidation = {
         })
         return errors
       }),
-    password: Joi.string()
-      .min(6)
-      .max(15)
-      .required()
+    slug: Joi.string()
+      .min(3)
+      .max(100)
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
             case 'string.min':
-              error.message = 'Password must be at least 6 characters long'
+              error.message = 'Slug must be at least 3 characters long'
               break
             case 'any.required':
-              error.message = 'Password is required'
+              error.message = 'Slug is required'
               break
             case 'string.max':
-              error.message = 'Password must be at most 15 characters long'
+              error.message = 'Slug must be at most 100 characters long'
               break
             default:
               break
@@ -94,5 +94,3 @@ const authValidation = {
       }),
   }),
 }
-
-export { authValidation }

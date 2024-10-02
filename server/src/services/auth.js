@@ -1,6 +1,5 @@
-import { Account } from '@/model/account'
-import { Profile } from '@/model/profile'
-import { Role } from '@/model/role'
+import { Profile, Account } from '@/model'
+
 import {
   createAccessToken,
   createRefreshToken,
@@ -23,10 +22,6 @@ export const login = async ({ email, password }) => {
         model: Profile,
         as: 'profile',
       },
-      {
-        model: Role,
-        as: 'role',
-      },
     ],
   })
   if (!account) {
@@ -45,7 +40,6 @@ export const login = async ({ email, password }) => {
   return {
     email: account.email,
     avatarUrl: account.avatarUrl,
-    role: account.role,
     profile: account.profile,
     refreshToken,
     accessToken,

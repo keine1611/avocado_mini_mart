@@ -1,5 +1,5 @@
 import { Brand } from '@/model'
-import { createBrand } from '@/services'
+import { sequelize } from '@/config'
 import {
   decodeQueryFromBase64,
   getPagination,
@@ -8,8 +8,7 @@ import {
   getSort,
   getSearch,
 } from '@/utils'
-import { createBrandValidation } from '@/validation'
-import { where } from 'sequelize'
+import { brandValidation } from '@/validation'
 import { v4 as uuidv4 } from 'uuid'
 
 export const brandController = {
@@ -56,45 +55,51 @@ export const brandController = {
   },
 
   create: async (req, res) => {
+    let transaction
     try {
+      transaction = await sequelize.transaction()
       let { name, slug, description, code } = req.body
       const logo = req.file
-
-      const { error } = createBrandValidation({
+      const { error } = brandValidation.create.validate({
         name,
         slug,
         description,
-        logo,
         code,
+        logo,
       })
-      if (!logo) {
-        return res.status(400).json({
-          message: 'No logo uploaded.',
-          data: null,
-        })
-      }
-      if (error)
+
+      if (error) {
         return res.status(400).json({
           message: error.details[0].message,
           data: null,
         })
-      const uniqueFilename = `/brands/${uuidv4()}_${logo.originalname}`
-      const logoURL = await uploadFileToFirebase({
-        file: logo,
-        path: uniqueFilename,
-      })
-      const brand = await createBrand({
-        name,
-        code,
-        slug,
-        description,
-        logo: logoURL,
-      })
+      }
+      const brand = await Brand.create(
+        {
+          name,
+          code,
+          slug,
+          description,
+        },
+        { transaction }
+      )
+
+      if (logo) {
+        const uniqueFilename = `/brands/${uuidv4()}_${logo.originalname}`
+        const logoURL = await uploadFileToFirebase({
+          file: logo,
+          path: uniqueFilename,
+        })
+        await brand.update({ logo: logoURL }, { transaction })
+      }
+
+      await transaction.commit()
       res.status(200).json({
-        message: 'success',
+        message: 'Brand created successfully',
         data: brand,
       })
     } catch (error) {
+      await transaction.rollback()
       res.status(500).json({
         message: error.message,
         data: null,
@@ -123,7 +128,7 @@ export const brandController = {
       const logo = req.file
 
       // Validate input
-      const { error } = createBrandValidation(brandData)
+      const { error } = brandValidation.update.validate(brandData)
       if (error) {
         return res.status(400).json({
           message: error.details[0].message,

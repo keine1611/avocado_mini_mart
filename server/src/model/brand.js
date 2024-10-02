@@ -18,12 +18,28 @@ export const Brand = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
       unique: true,
+      validate: {
+        isUnique: async (value) => {
+          const brand = await Brand.findOne({ where: { code: value } })
+          if (brand) {
+            throw new Error('Code already exists')
+          }
+        },
+      },
     },
     slug: {
       type: DataTypes.STRING(100),
       allowNull: false,
       unique: true,
       defaultValue: '',
+      validate: {
+        isUnique: async (value) => {
+          const brand = await Brand.findOne({ where: { slug: value } })
+          if (brand) {
+            throw new Error('Slug already exists')
+          }
+        },
+      },
     },
     description: {
       type: DataTypes.STRING(500),
@@ -45,7 +61,8 @@ export const Brand = sequelize.define(
   {
     hooks: {
       beforeCreate: async (brand, options) => {
-        if (!brand.slug) brand.slug = await createSlug({ name: brand.name })
+        if (!brand.slug || brand.slug == '')
+          brand.slug = await createSlug({ name: brand.name })
       },
       afterUpdate: async (brand, options) => {
         brand.updatedAt = getToday()
@@ -53,13 +70,3 @@ export const Brand = sequelize.define(
     },
   }
 )
-
-// const originalBulkCreate = Brand.bulkCreate
-
-// Brand.bulkCreate(async (brands, options) => {
-//   const brandsWithSlug = brands.map((brand) => ({
-//     ...brand,
-//     slug: brand.slug || createSlug(brand.name),
-//   }))
-//   return originalBulkCreate.call(Brand, brandsWithSlug, options)
-// })

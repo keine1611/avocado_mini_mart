@@ -1,7 +1,7 @@
 import { Account, LoginResponse } from '@/types'
 import { ApiResponse } from '@/types/ApiResponse'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-
+import { LoginAccount } from '@/pages/user/UserLogin'
 const BASE_URL = import.meta.env.VITE_API_URL
 
 export const authApi = createApi({
@@ -12,7 +12,7 @@ export const authApi = createApi({
   }),
   tagTypes: ['authApi'],
   endpoints: (builder) => ({
-    login: builder.mutation<ApiResponse<LoginResponse>, Account>({
+    login: builder.mutation<ApiResponse<LoginResponse>, LoginAccount>({
       query: (body) => ({
         url: '/login',
         method: 'POST',

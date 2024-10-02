@@ -18,7 +18,7 @@ const corsOptions = {
   credentials: true,
 }
 
-connectToDB()
+// connectToDB()
 // syncDatabase()
 
 app.use(cors(corsOptions))
