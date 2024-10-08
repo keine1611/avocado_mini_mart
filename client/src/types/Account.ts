@@ -1,17 +1,27 @@
-import { RoleAccount, StatusAccount } from '@/enum'
+
 import { Profile } from './Profile'
 import { Role } from './Role'
+import { Cart } from './Cart'
+import { Order } from './Order'
 
 export interface Account {
   id: number
   email: string
   password: string
-  status: StatusAccount
-  role: RoleAccount
   avatarUrl: string
+  block: boolean
+  isVerified: boolean
+  verifiedAt: string
+  isDeleted: boolean
+  deletedAt: string
+  deletedBy: string
   createdAt: string
   updatedAt: string
   profile: Profile
+  role: Role
+  carts: Cart[]
+  orders: Order[]
+  
 }
 
 

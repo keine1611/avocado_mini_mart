@@ -1,7 +1,7 @@
 import { Account, LoginResponse } from '@/types'
 import { ApiResponse } from '@/types/ApiResponse'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { LoginAccount } from '@/pages/user/UserLogin'
+
 const BASE_URL = import.meta.env.VITE_API_URL
 
 export const authApi = createApi({
@@ -12,7 +12,10 @@ export const authApi = createApi({
   }),
   tagTypes: ['authApi'],
   endpoints: (builder) => ({
-    login: builder.mutation<ApiResponse<LoginResponse>, LoginAccount>({
+    login: builder.mutation<
+      ApiResponse<Account>,
+      { email: string; password: string; rememberMe: boolean }
+    >({
       query: (body) => ({
         url: '/login',
         method: 'POST',
@@ -20,20 +23,27 @@ export const authApi = createApi({
         credentials: 'include',
       }),
     }),
-    refresh: builder.mutation<ApiResponse<LoginResponse>, void>({
-      query: () => ({
+    refresh: builder.mutation<ApiResponse<Account>, { rememberMe: boolean }>({
+      query: (body) => ({
         method: 'POST',
         url: '/refresh',
+        body,
       }),
     }),
-    register: builder.mutation<{ message: string, data: { email: string } }, { email: string, password: string }>({
+    register: builder.mutation<
+      { message: string; data: { email: string } },
+      { email: string; password: string }
+    >({
       query: (body) => ({
         url: '/register',
         method: 'POST',
         body,
       }),
     }),
-    verifyAndCreateAccount: builder.mutation<{ message: string, data: any }, { email: string, verificationCode: string }>({
+    verifyAndCreateAccount: builder.mutation<
+      { message: string; data: any },
+      { email: string; verificationCode: string }
+    >({
       query: (body) => ({
         url: '/verify',
         method: 'POST',
@@ -43,4 +53,9 @@ export const authApi = createApi({
   }),
 })
 
-export const { useLoginMutation, useRefreshMutation, useRegisterMutation, useVerifyAndCreateAccountMutation } = authApi
+export const {
+  useLoginMutation,
+  useRefreshMutation,
+  useRegisterMutation,
+  useVerifyAndCreateAccountMutation,
+} = authApi

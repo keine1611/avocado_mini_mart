@@ -46,7 +46,7 @@ const accountValidate = {
       }),
     avatarUrl: Joi.string().optional(),
     status: Joi.string()
-      .valid(StatusAccount)
+      .valid(...Object.values(StatusAccount))
       .optional()
       .error((errors) => {
         errors.forEach((error) => {
@@ -64,7 +64,7 @@ const accountValidate = {
         return errors
       }),
     role: Joi.string()
-      .valid(Role)
+      .valid(...Object.values(Role))
       .required()
       .error((errors) => {
         errors.forEach((error) => {

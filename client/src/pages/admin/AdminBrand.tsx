@@ -26,8 +26,6 @@ import {
   SearchOutlined,
 } from '@ant-design/icons'
 import { stringToDateTime } from '@/utils'
-import { loadingActions } from '@/store/loading'
-import { useAppDispatch } from '@/hooks'
 
 const { Option } = Select
 
@@ -41,7 +39,6 @@ const AdminBrand: React.FC = () => {
   let searchInput: InputRef | null = null
   const [previewVisible, setPreviewVisible] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
-  const dispatch = useAppDispatch()
   const { data, error, isLoading } = useGetAllBrandQuery()
   const [createBrand, { isLoading: isCreating }] = useCreateBrandMutation()
   const [updateBrand, { isLoading: isUpdating }] = useUpdateBrandMutation()
@@ -66,14 +63,23 @@ const AdminBrand: React.FC = () => {
   }
 
   const handleDelete = async (id: number) => {
-    dispatch(loadingActions.setLoading(true))
     try {
       const response = await deleteBrand(id).unwrap()
       message.success(response.message)
     } catch (err: any) {
       message.error(err.data?.message || 'Failed to delete brand')
     }
-    dispatch(loadingActions.setLoading(false))
+  }
+
+  const confirmDelete = (id: number) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this brand?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: () => handleDelete(id),
+    })
   }
 
   const handleModalOk = () => {
@@ -263,7 +269,7 @@ const AdminBrand: React.FC = () => {
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           <Button
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
+            onClick={() => confirmDelete(record.id)}
             danger
             loading={isDeleting}
           />

@@ -1,4 +1,4 @@
-import { Profile, Account } from '@/model'
+import { Profile, Account, models } from '@/model'
 
 import {
   createAccessToken,
@@ -17,13 +17,20 @@ export const register = async ({ email, password }) => {
 export const login = async ({ email, password }) => {
   const account = await Account.findOne({
     where: { email },
+    attributes: ['id', 'email', 'avatarUrl', 'password'],
     include: [
       {
-        model: Profile,
+        model: models.Profile,
         as: 'profile',
+      },
+      {
+        model: models.Role,
+        as: 'role',
+        attributes: ['id', 'name'],
       },
     ],
   })
+
   if (!account) {
     throw new Error('User not found')
   }
@@ -32,15 +39,26 @@ export const login = async ({ email, password }) => {
 
   const accessToken = createAccessToken({ email, id: account.id })
   const refreshToken = createRefreshToken({ id: account.id, email })
-
   const refreshTokens = readRefreshTokens()
+  const isExist = refreshTokens.find(
+    (token) => token.email === email && token.id === account.id
+  )
+  if (isExist) {
+    refreshTokens.splice(refreshTokens.indexOf(isExist), 1)
+  }
   refreshTokens.push({ email, id: account.id, refreshToken })
   writeRefreshTokens(refreshTokens)
 
-  return {
+  const accountWithoutPassword = {
+    id: account.id,
     email: account.email,
     avatarUrl: account.avatarUrl,
     profile: account.profile,
+    role: account.role,
+  }
+
+  return {
+    account: accountWithoutPassword,
     refreshToken,
     accessToken,
   }

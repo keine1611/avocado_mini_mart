@@ -1,5 +1,6 @@
 import { Account } from '@/model'
 import { accountValidate } from '@/validation'
+import { formatError } from '@/utils'
 
 export const accountController = {
   getAccount: async (req, res) => {
@@ -21,7 +22,6 @@ export const accountController = {
   getAccounts: async (req, res) => {
     try {
       const accounts = await Account.findAll({ include: ['profile'] })
-      console.log(accounts)
       res.status(200).json({
         message: 'Accounts fetched successfully',
         data: accounts,
@@ -34,8 +34,8 @@ export const accountController = {
     }
   },
   createAccount: async (req, res) => {
+    console.log(req.body)
     try {
-      console.log(req.body)
       const { email, password, role, profile, avatar } = req.body
 
       const { error } = accountValidate.createAccount.validate({
@@ -65,7 +65,7 @@ export const accountController = {
       })
     } catch (error) {
       res.status(500).json({
-        message: 'Failed to create account',
+        message: formatError(error.message),
         data: null,
       })
     }
@@ -96,7 +96,7 @@ export const accountController = {
       })
     } catch (error) {
       res.status(500).json({
-        message: 'Failed to update account',
+        message: formatError(error.message),
         data: null,
       })
     }
@@ -111,7 +111,7 @@ export const accountController = {
       })
     } catch (error) {
       res.status(500).json({
-        message: 'Failed to delete account',
+        message: formatError(error.message),
         data: null,
       })
     }

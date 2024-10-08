@@ -40,12 +40,15 @@ const subCategoryValidation = {
         return errors
       }),
     slug: Joi.string()
-      .required()
+      .optional()
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
-            case 'any.required':
-              error.message = 'Slug is required'
+            case 'string.min':
+              error.message = 'Slug must be at least 3 characters long'
+              break
+            case 'string.max':
+              error.message = 'Slug must be at most 50 characters long'
               break
             default:
               break

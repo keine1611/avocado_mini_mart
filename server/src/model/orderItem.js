@@ -1,26 +1,44 @@
 import { sequelize } from '@/config'
-import { DataTypes } from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 
-export const OrderItem = sequelize.define(
-  'OrderItem',
-  {
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    unitPrice: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    totalPrice: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        return this.getDataValue('quantity') * this.getDataValue('unit_price')
+export class OrderItem extends Model {
+  static init(sequelize) {
+    super.init(
+      {
+        quantity: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+        },
+        unitPrice: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+        },
+        totalPrice: {
+          type: DataTypes.VIRTUAL,
+          get() {
+            return (
+              this.getDataValue('quantity') * this.getDataValue('unit_price')
+            )
+          },
+          set(value) {},
+        },
       },
-      set(value) {},
-    },
-  },
-  {
-    tableName: 'order_item',
+      {
+        sequelize,
+        tableName: 'order_item',
+      }
+    )
   }
-)
+  static associate(models) {
+    OrderItem.belongsTo(models.Product, {
+      foreignKey: 'productId',
+      as: 'product',
+    })
+    OrderItem.belongsTo(models.Order, {
+      foreignKey: 'orderId',
+      as: 'order',
+    })
+  }
+}
+
+OrderItem.init(sequelize)

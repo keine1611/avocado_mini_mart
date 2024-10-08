@@ -30,6 +30,8 @@ import {
   SearchOutlined,
 } from '@ant-design/icons'
 import { stringToDateTime, formatCurrency } from '@/utils'
+import { useAppDispatch } from '@/hooks'
+import { loadingActions } from '@/store/loading'
 
 const { Option } = Select
 
@@ -43,10 +45,13 @@ const AdminProduct: React.FC = () => {
   const [previewVisible, setPreviewVisible] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
   let searchInput: InputRef | null = null
+  const dispatch = useAppDispatch()
 
   const { data, error, isLoading } = useGetAllProductQuery()
-  const [createProduct] = useCreateProductMutation()
-  const [updateProduct] = useUpdateProductMutation()
+  const [createProduct, { isLoading: isLoadingCreateProduct }] =
+    useCreateProductMutation()
+  const [updateProduct, { isLoading: isLoadingUpdateProduct }] =
+    useUpdateProductMutation()
   const [deleteProduct] = useDeleteProductMutation()
   const { data: subCategoriesData, isLoading: isLoadingSubCategory } =
     useGetAllSubCategoryQuery()
@@ -81,12 +86,14 @@ const AdminProduct: React.FC = () => {
   }
 
   const handleDelete = async (id: string) => {
+    dispatch(loadingActions.setLoading(true))
     try {
       await deleteProduct(Number(id)).unwrap()
       message.success('Product deleted successfully')
     } catch (err) {
       message.error('Failed to delete product')
     }
+    dispatch(loadingActions.setLoading(false))
   }
 
   const handleImageDelete = (file: UploadFile) => {
@@ -136,8 +143,8 @@ const AdminProduct: React.FC = () => {
         setIsModalVisible(false)
         form.resetFields()
         setFileList([])
-      } catch (err) {
-        message.error('Failed to save product')
+      } catch (err: any) {
+        message.error(err.data.message || 'Failed to save product')
       }
     })
   }
@@ -495,6 +502,7 @@ const AdminProduct: React.FC = () => {
                 Cancel
               </Button>
               <Button
+                loading={isLoadingCreateProduct || isLoadingUpdateProduct}
                 onClick={handleModalOk}
                 type='primary'
                 className='px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark'

@@ -1,5 +1,5 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
-
+import { createBrowserRouter, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import { PATH } from '@/constant'
 import {
   AdminHome,
@@ -11,10 +11,10 @@ import {
   AdminMainCategory,
   AdminSubCategory,
   AdminUser,
+  NoAccess,
 } from '@/pages'
 import { AdminLayout } from '@/components'
 import { useAppSelector } from '@/hooks'
-
 interface PrivateRouteProps {
   roles?: string[]
   children: React.ReactNode
@@ -22,12 +22,15 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ roles, children }) => {
   const { user } = useAppSelector((state) => state.auth)
+  const navigate = useNavigate()
 
-  if (!roles?.includes('admin')) return <Navigate to='/no-access' />
+  useEffect(() => {
+    if (!roles?.includes(user?.role?.name || '')) navigate('/no-access')
+  }, [user])
   return <>{children}</>
 }
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: '/',
     element: <></>,
@@ -47,9 +50,13 @@ export const router = createBrowserRouter([
     element: <UserRegister />,
   },
   {
+    path: '/no-access',
+    element: <NoAccess />,
+  },
+  {
     path: '/admin',
     element: (
-      <PrivateRoute roles={['admin']}>
+      <PrivateRoute roles={['ADMIN']}>
         <AdminLayout />
       </PrivateRoute>
     ),
@@ -86,3 +93,5 @@ export const router = createBrowserRouter([
     ],
   },
 ])
+
+export { router }

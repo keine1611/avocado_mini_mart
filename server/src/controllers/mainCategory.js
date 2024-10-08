@@ -1,5 +1,6 @@
 import { MainCategory } from '@/model'
 import { mainCategoryValidation } from '@/validation'
+import { formatError } from '@/utils'
 
 export const mainCategoryController = {
   getAll: async (req, res) => {
@@ -27,7 +28,7 @@ export const mainCategoryController = {
         data: mainCategory,
       })
     } catch (error) {
-      res.status(500).json({ message: error.message, data: null })
+      res.status(500).json({ message: formatError(error.message), data: null })
     }
   },
   update: async (req, res) => {
@@ -46,7 +47,7 @@ export const mainCategoryController = {
         data: mainCategory,
       })
     } catch (error) {
-      res.status(500).json({ message: error.message, data: null })
+      res.status(500).json({ message: formatError(error.message), data: null })
     }
   },
   delete: async (req, res) => {
@@ -59,7 +60,7 @@ export const mainCategoryController = {
         data: mainCategory,
       })
     } catch (error) {
-      res.status(500).json({ message: error.message, data: null })
+      res.status(500).json({ message: formatError(error.message), data: null })
     }
   },
 }

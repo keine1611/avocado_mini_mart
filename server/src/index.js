@@ -5,7 +5,7 @@ import { route } from './routes'
 import cookieParser from 'cookie-parser'
 import { connectToDB, syncDatabase } from './config'
 import cors from 'cors'
-import { delayResponse, logRequest } from './middlewares'
+import { delayResponse, logRequest, authenticateToken } from './middlewares'
 
 const port = 1611
 dotenv.config()
@@ -18,16 +18,17 @@ const corsOptions = {
   credentials: true,
 }
 
-// connectToDB()
+connectToDB()
 // syncDatabase()
-
 app.use(cors(corsOptions))
 
 app.use(cookieParser())
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 app.use(logRequest)
 app.use(delayResponse(1000))
+app.use(authenticateToken())
 
 route(app)
 

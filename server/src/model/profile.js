@@ -1,35 +1,58 @@
 import { sequelize } from '@/config'
-import { DataTypes } from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 import { getToday } from '@/utils'
 
-export const Profile = sequelize.define('Profile', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  firstName: {
-    type: DataTypes.STRING(30),
-  },
-  lastName: {
-    type: DataTypes.STRING(30),
-  },
-  dob: {
-    type: DataTypes.STRING(14),
-  },
-  phone: {
-    type: DataTypes.STRING(10),
-  },
-  address: {
-    type: DataTypes.STRING(255),
-  },
-  updateAt: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: () => getToday(),
-  },
-})
+export class Profile extends Model {
+  static init(sequelize) {
+    super.init(
+      {
+        id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+        },
+        firstName: {
+          type: DataTypes.STRING(30),
+        },
+        lastName: {
+          type: DataTypes.STRING(30),
+        },
+        dob: {
+          type: DataTypes.STRING(14),
+        },
+        phone: {
+          type: DataTypes.STRING(10),
+        },
+        address: {
+          type: DataTypes.STRING(255),
+        },
+        updateAt: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          defaultValue: () => getToday(),
+        },
+      },
+      {
+        hooks: {
+          afterUpdate: async (profile, options) => {
+            profile.updateAt = getToday()
+          },
+        },
+        sequelize,
+        tableName: 'profiles',
+      }
+    )
+  }
+  static associate(models) {
+    Profile.belongsTo(models.Account, {
+      foreignKey: {
+        name: 'accountId',
+        allowNull: false,
+        unique: true,
+      },
+      as: 'account',
+    })
+  }
+}
 
-Profile.afterUpdate(async (profile, options) => {
-  profile.updateAt = getToday()
-})
+Profile.init(sequelize)

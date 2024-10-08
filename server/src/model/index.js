@@ -1,3 +1,4 @@
+import { sequelize } from '@/config'
 import { Account } from './account'
 import { Batch } from './batch'
 import { BatchDetail } from './batchDetail'
@@ -12,142 +13,9 @@ import { SubCategory } from './subCategory'
 import { ProductImage } from './productImage'
 import { PriceHistory } from './priceHistory'
 import { Inventory } from './inventory'
-
-Brand.hasMany(Product, {
-  foreignKey: 'brandId',
-  as: 'products',
-})
-Product.belongsTo(Brand, {
-  foreignKey: 'brandId',
-  as: 'brand',
-})
-
-Batch.hasMany(BatchDetail, {
-  foreignKey: 'batchId',
-  as: 'batchDetails',
-})
-BatchDetail.belongsTo(Batch, {
-  foreignKey: 'batchId',
-  as: 'batch',
-})
-
-Product.hasMany(BatchDetail, {
-  foreignKey: 'productId',
-  as: 'batchDetails',
-})
-BatchDetail.belongsTo(Product, {
-  foreignKey: 'productId',
-  as: 'product',
-})
-
-Product.hasMany(ProductImage, {
-  foreignKey: 'productId',
-  as: 'productImages',
-})
-ProductImage.belongsTo(Product, {
-  foreignKey: 'productId',
-  as: 'product',
-})
-
-Product.hasMany(PriceHistory, {
-  foreignKey: 'productId',
-  as: 'priceHistories',
-})
-PriceHistory.belongsTo(Product, {
-  foreignKey: 'productId',
-  as: 'product',
-})
-
-Account.hasOne(Profile, {
-  foreignKey: { name: 'accountId', unique: true, allowNull: false },
-  as: 'profile',
-})
-Profile.belongsTo(Account, {
-  foreignKey: { name: 'accountId', unique: true, allowNull: false },
-  as: 'account',
-})
-
-Product.hasMany(OrderItem, {
-  foreignKey: 'productId',
-  as: 'orderItems',
-})
-OrderItem.belongsTo(Product, {
-  foreignKey: 'productId',
-  as: 'product',
-})
-
-Product.hasMany(Inventory, {
-  foreignKey: 'productId',
-  as: 'inventories',
-})
-Inventory.belongsTo(Product, {
-  foreignKey: 'productId',
-  as: 'product',
-})
-
-Batch.hasMany(Inventory, {
-  foreignKey: 'batchId',
-  as: 'inventories',
-})
-Inventory.belongsTo(Batch, {
-  foreignKey: 'batchId',
-  as: 'batch',
-})
-
-Order.hasMany(OrderItem, {
-  foreignKey: 'orderId',
-  as: 'orderItems',
-})
-OrderItem.belongsTo(Order, {
-  foreignKey: 'orderId',
-  as: 'order',
-})
-
-SubCategory.hasMany(Product, {
-  foreignKey: 'subCategoryId',
-  as: 'products',
-})
-Product.belongsTo(SubCategory, {
-  foreignKey: 'subCategoryId',
-  as: 'subCategory',
-})
-
-MainCategory.hasMany(SubCategory, {
-  foreignKey: 'mainCategoryId',
-  as: 'subCategories',
-})
-SubCategory.belongsTo(MainCategory, {
-  foreignKey: 'mainCategoryId',
-  as: 'mainCategory',
-})
-
-Product.hasMany(Cart, {
-  foreignKey: 'productId',
-  as: 'carts',
-})
-Cart.belongsTo(Product, {
-  foreignKey: 'productId',
-  as: 'product',
-})
-
-Account.hasMany(Cart, {
-  foreignKey: 'accountId',
-  as: 'carts',
-})
-Cart.belongsTo(Account, {
-  foreignKey: 'accountId',
-  as: 'account',
-})
-
-Account.hasMany(Order, {
-  foreignKey: 'accountId',
-  as: 'orders',
-})
-Order.belongsTo(Account, {
-  foreignKey: 'accountId',
-  as: 'account',
-})
-
+import { Role } from './role'
+import { Permission } from './permission'
+import { RolePermission } from './rolePermission'
 export const models = {
   Account,
   Batch,
@@ -163,7 +31,14 @@ export const models = {
   ProductImage,
   Profile,
   SubCategory,
+  Role,
+  Permission,
+  RolePermission,
 }
+
+Object.values(models).forEach((model) => {
+  model.associate(models)
+})
 
 export * from './account'
 export * from './batch'
@@ -179,3 +54,6 @@ export * from './product'
 export * from './productImage'
 export * from './profile'
 export * from './subCategory'
+export * from './role'
+export * from './permission'
+export * from './rolePermission'

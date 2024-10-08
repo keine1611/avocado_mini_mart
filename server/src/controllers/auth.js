@@ -1,5 +1,5 @@
 import { login, register } from '@/services/auth'
-import { Account, Role, Profile } from '@/model'
+import { Account, Role, Profile, models } from '@/model'
 import {
   createAccessToken,
   readRefreshTokens,
@@ -14,7 +14,7 @@ import jwt from 'jsonwebtoken'
 
 export const authController = {
   login: async (req, res, next) => {
-    const { email, password } = req.body
+    const { email, password, rememberMe } = req.body
     const { error } = authValidation.login.validate({ email, password })
     if (error)
       return res.status(400).json({
@@ -22,17 +22,34 @@ export const authController = {
         data: {},
       })
     try {
-      const account = await login({ email, password })
-      setTokenCookie({ res, name: 'accessToken', data: account.accessToken })
-      setTokenCookie({ res, name: 'refreshToken', data: account.refreshToken })
+      const { account, refreshToken, accessToken } = await login({
+        email,
+        password,
+      })
+      setTokenCookie({
+        res,
+        name: 'accessToken',
+        data: accessToken,
+        expiresIn: 10,
+      })
+      if (rememberMe) {
+        setTokenCookie({
+          res,
+          name: 'refreshToken',
+          data: refreshToken,
+          expiresIn: 30,
+        })
+      } else {
+        setTokenCookie({
+          res,
+          name: 'refreshToken',
+          data: refreshToken,
+          isSession: true,
+        })
+      }
       res.status(200).json({
         message: 'success',
-        data: {
-          email: account.email,
-          avatarUrl: account.avatarUrl,
-          role: account.role,
-          profile: account.profile,
-        },
+        data: account,
       })
     } catch (error) {
       res.status(400).json({
@@ -44,6 +61,7 @@ export const authController = {
 
   refresh: async (req, res, next) => {
     const refreshToken = req.cookies.refreshToken
+    const { rememberMe } = req.body
     if (!refreshToken)
       return res.status(401).json({ message: 'Unauthorized', data: {} })
     try {
@@ -63,27 +81,37 @@ export const authController = {
           })
           const account = await Account.findOne({
             where: { id: data.id, email: data.email },
+            attributes: ['id', 'email', 'avatarUrl'],
             include: [
               {
-                model: Profile,
-                as: 'profile',
+                model: models.Role,
+                as: 'role',
+                attributes: ['id', 'name'],
               },
               {
-                model: Role,
-                as: 'role',
+                model: models.Profile,
+                as: 'profile',
               },
             ],
           })
-
-          setTokenCookie({ res, name: 'accessToken', data: accessToken })
+          if (rememberMe) {
+            setTokenCookie({
+              res,
+              name: 'accessToken',
+              data: accessToken,
+              expiresIn: 10,
+            })
+          } else {
+            setTokenCookie({
+              res,
+              name: 'accessToken',
+              data: accessToken,
+              isSession: true,
+            })
+          }
           res.status(200).json({
             message: 'success',
-            data: {
-              email: account.email,
-              avatarUrl: account.avatarUrl,
-              role: account.role,
-              profile: account.profile,
-            },
+            data: account,
           })
         }
       )
@@ -153,7 +181,6 @@ export const authController = {
           .json({ message: 'Email already exists', data: null })
       }
 
-      // Generate a 6-digit verification code
       const verificationCode = generateVerificationCode()
 
       // Store the verification code temporarily (you might want to use Redis or a similar solution for production)

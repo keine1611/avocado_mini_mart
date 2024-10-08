@@ -1,6 +1,8 @@
 import { Account } from '@/model/account'
 import jwt from 'jsonwebtoken'
 import fs from 'fs'
+import { Role } from '@/model/role'
+import { models } from '@/model'
 
 export const createAccessToken = ({ id, email }) => {
   const token = jwt.sign({ id, email }, process.env.ACCESS_TOKEN_SECRET, {
@@ -13,12 +15,22 @@ export const createRefreshToken = ({ id, email }) => {
   return token
 }
 
-export const setTokenCookie = ({ res, name, data }) => {
+export const setTokenCookie = ({
+  res,
+  name,
+  data,
+  expiresIn,
+  isSession = false,
+}) => {
   res.cookie(name, data, {
     path: '/',
     httpOnly: false,
     sameSite: 'none',
-    maxAge: 1 * 24 * 60 * 60 * 1000,
+    maxAge: isSession
+      ? null
+      : expiresIn
+      ? expiresIn * 60 * 1000
+      : 30 * 24 * 60 * 60 * 1000,
     secure: 'development',
   })
 }
@@ -36,7 +48,26 @@ export const verifyAccessToken = ({ accessToken }) => {
         try {
           const account = await Account.findOne({
             where: { id: decoded.id, email: decoded.email },
+            include: [
+              {
+                model: models.Role,
+                as: 'role',
+                include: [
+                  {
+                    model: models.RolePermission,
+                    as: 'rolePermissions',
+                    include: [
+                      {
+                        model: models.Permission,
+                        as: 'permission',
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           })
+
           if (account) {
             return resolve(account)
           } else {
@@ -45,7 +76,7 @@ export const verifyAccessToken = ({ accessToken }) => {
         } catch (error) {
           return reject(error)
         }
-      },
+      }
     )
   })
 }
@@ -59,6 +90,6 @@ export const readRefreshTokens = () => {
 export const writeRefreshTokens = (tokens) => {
   fs.writeFileSync(
     process.env.REFRESH_TOKENS_FILE,
-    JSON.stringify(tokens, null, 2),
+    JSON.stringify(tokens, null, 2)
   )
 }

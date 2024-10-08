@@ -7,6 +7,7 @@ import { authActions } from '@/store/auth'
 import { useAppDispatch } from '@/hooks'
 import { FiMail, FiLock, FiLogIn } from 'react-icons/fi'
 import { loadingActions } from '@/store/loading'
+import Cookies from 'js-cookie'
 
 export interface LoginAccount {
   email: string
@@ -21,6 +22,7 @@ export const UserLogin = () => {
   const [login] = useLoginMutation()
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({ email: '', password: '' })
+  const [rememberMe, setRememberMe] = useState(false)
 
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -57,7 +59,8 @@ export const UserLogin = () => {
     setIsLoading(true)
     dispatch(loadingActions.setLoading(true))
     try {
-      const result = await login(account).unwrap()
+      const result = await login({ ...account, rememberMe }).unwrap()
+      Cookies.set('rememberMe', rememberMe.toString())
       dispatch(authActions.setUser(result.data))
       showToast.success('Login successful')
       setTimeout(() => navigate('/admin'), 2000)
@@ -128,6 +131,17 @@ export const UserLogin = () => {
                 <p className='mt-2 text-sm text-error'>{errors.password}</p>
               )}
             </div>
+          </div>
+          <div>
+            <label className='flex items-center gap-2'>
+              <input
+                type='checkbox'
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+                className='checkbox checkbox-primary checkbox-sm'
+              />
+              Remember me
+            </label>
           </div>
           <div>
             <button

@@ -1,6 +1,6 @@
 import { MainCategory, SubCategory } from '@/model'
 import { subCategoryValidation } from '@/validation'
-
+import { formatError } from '@/utils'
 export const subCategoryController = {
   getAll: async (req, res) => {
     try {
@@ -12,7 +12,7 @@ export const subCategoryController = {
         data: subCategories,
       })
     } catch (error) {
-      res.status(500).json({ message: error.message, data: null })
+      res.status(500).json({ message: formatError(error.message), data: null })
     }
   },
   getById: async (req, res) => {
@@ -23,7 +23,7 @@ export const subCategoryController = {
         data: subCategory,
       })
     } catch (error) {
-      res.status(500).json({ message: error.message, data: null })
+      res.status(500).json({ message: formatError(error.message), data: null })
     }
   },
   create: async (req, res) => {
@@ -38,7 +38,7 @@ export const subCategoryController = {
         data: subCategory,
       })
     } catch (error) {
-      res.status(500).json({ message: error.message, data: null })
+      res.status(500).json({ message: formatError(error.message), data: null })
     }
   },
   update: async (req, res) => {
@@ -55,7 +55,7 @@ export const subCategoryController = {
         data: subCategory,
       })
     } catch (error) {
-      res.status(500).json({ message: error.message, data: null })
+      res.status(500).json({ message: formatError(error.message), data: null })
     }
   },
   delete: async (req, res) => {
@@ -65,7 +65,7 @@ export const subCategoryController = {
         .status(200)
         .json({ message: 'SubCategory deleted successfully', data: null })
     } catch (error) {
-      res.status(500).json({ message: error.message, data: null })
+      res.status(500).json({ message: formatError(error.message), data: null })
     }
   },
 }

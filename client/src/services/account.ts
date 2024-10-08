@@ -8,7 +8,7 @@ export const accountApi = createApi({
     reducerPath: 'accountApi',
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL+ '/accounts',
-        credentials: 'include'
+        credentials: 'include',
     }),
     tagTypes: ['accountApi'],
     endpoints: (builder)=>({

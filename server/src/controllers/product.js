@@ -70,7 +70,7 @@ export const productController = {
       })
     } catch (error) {
       res.status(500).json({
-        message: error.message,
+        message: formatError(error.message),
         data: null,
       })
     }
@@ -124,7 +124,7 @@ export const productController = {
     } catch (error) {
       if (transaction) await transaction.rollback()
       res.status(500).json({
-        message: error.message,
+        message: formatError(error.message),
         data: null,
       })
     }
@@ -192,7 +192,7 @@ export const productController = {
     } catch (error) {
       if (transaction) await transaction.rollback()
       res.status(500).json({
-        message: error.message,
+        message: formatError(error.message),
         data: null,
       })
     }
@@ -220,7 +220,7 @@ export const productController = {
     } catch (error) {
       if (transaction) await transaction.rollback()
       res.status(500).json({
-        message: error.message,
+        message: formatError(error.message),
         data: null,
       })
     }

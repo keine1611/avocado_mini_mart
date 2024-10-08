@@ -7,6 +7,7 @@ import {
   uploadFileToFirebase,
   getSort,
   getSearch,
+  formatError,
 } from '@/utils'
 import { brandValidation } from '@/validation'
 import { v4 as uuidv4 } from 'uuid'
@@ -101,7 +102,7 @@ export const brandController = {
     } catch (error) {
       await transaction.rollback()
       res.status(500).json({
-        message: error.message,
+        message: formatError(error.message),
         data: null,
       })
     }
@@ -163,7 +164,7 @@ export const brandController = {
       })
     } catch (error) {
       res.status(500).json({
-        message: error.message,
+        message: formatError(error.message),
         data: null,
       })
     }
@@ -178,7 +179,7 @@ export const brandController = {
       })
     } catch (error) {
       res.status(500).json({
-        message: error.message,
+        message: formatError(error.message),
         data: null,
       })
     }

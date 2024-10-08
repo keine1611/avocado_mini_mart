@@ -25,9 +25,13 @@ import {
   useDeleteSubCategoryMutation,
 } from '@/services'
 import { useGetAllMainCategoryQuery } from '@/services'
+import { useAppDispatch } from '@/hooks'
+import { loadingActions } from '@/store/loading'
 
 const AdminSubCategory: React.FC = () => {
   const [form] = Form.useForm()
+  const dispatch = useAppDispatch()
+
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [editingSubCategory, setEditingSubCategory] =
     useState<SubCategory | null>(null)
@@ -36,9 +40,12 @@ const AdminSubCategory: React.FC = () => {
   const { data, isLoading } = useGetAllSubCategoryQuery()
   const { data: mainCategories, isLoading: isLoadingMainCategory } =
     useGetAllMainCategoryQuery()
-  const [createSubCategory] = useCreateSubCategoryMutation()
-  const [updateSubCategory] = useUpdateSubCategoryMutation()
-  const [deleteSubCategory] = useDeleteSubCategoryMutation()
+  const [createSubCategory, { isLoading: isLoadingCreateSubCategory }] =
+    useCreateSubCategoryMutation()
+  const [updateSubCategory, { isLoading: isLoadingUpdateSubCategory }] =
+    useUpdateSubCategoryMutation()
+  const [deleteSubCategory, { isLoading: isLoadingDeleteSubCategory }] =
+    useDeleteSubCategoryMutation()
 
   const handleCreate = () => {
     setEditingSubCategory(null)
@@ -53,12 +60,14 @@ const AdminSubCategory: React.FC = () => {
   }
 
   const handleDelete = async (id: number) => {
+    dispatch(loadingActions.setLoading(true))
     try {
       await deleteSubCategory(id).unwrap()
       message.success('Sub-category deleted successfully')
     } catch (error) {
       message.error('Failed to delete sub-category')
     }
+    dispatch(loadingActions.setLoading(false))
   }
 
   const handleModalOk = () => {
@@ -76,8 +85,8 @@ const AdminSubCategory: React.FC = () => {
         }
         setIsModalVisible(false)
         form.resetFields()
-      } catch (error) {
-        message.error('Failed to save sub-category')
+      } catch (error: any) {
+        message.error(error.data.message || 'Failed to save sub-category')
       }
     })
   }
@@ -181,6 +190,13 @@ const AdminSubCategory: React.FC = () => {
       ...getColumnSearchProps('name'),
     },
     {
+      title: 'Slug',
+      dataIndex: 'slug',
+      key: 'slug',
+      ...getColumnSearchProps('slug'),
+      sorter: (a, b) => a.slug.localeCompare(b.slug),
+    },
+    {
       title: 'Main Category',
       dataIndex: ['mainCategory', 'name'],
       key: 'mainCategory',
@@ -239,17 +255,15 @@ const AdminSubCategory: React.FC = () => {
               >
                 <Input />
               </Form.Item>
-              {editingSubCategory && (
-                <Form.Item
-                  name='slug'
-                  label='Slug'
-                  rules={[
-                    { required: true, message: 'Please input the slug!' },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-              )}
+
+              <Form.Item
+                name='slug'
+                label='Slug'
+                rules={[{ required: false, message: 'Please input the slug!' }]}
+              >
+                <Input />
+              </Form.Item>
+
               <Form.Item
                 name='mainCategoryId'
                 label='Main Category'
@@ -277,6 +291,9 @@ const AdminSubCategory: React.FC = () => {
                 onClick={handleModalOk}
                 type='primary'
                 className='px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark'
+                loading={
+                  isLoadingCreateSubCategory || isLoadingUpdateSubCategory
+                }
               >
                 {editingSubCategory ? 'Update' : 'Create'}
               </Button>

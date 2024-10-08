@@ -24,6 +24,9 @@ import { Account } from '@/types'
 import { RoleAccount } from '@/enum'
 import dayjs from 'dayjs'
 import { UploadOutlined } from '@ant-design/icons'
+import { useAppDispatch } from '@/hooks'
+import { loadingActions } from '@/store/loading'
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
 const { VITE_DATE_FORMAT_API, VITE_DATE_FORMAT_DISPLAY } = import.meta.env
 
@@ -32,12 +35,15 @@ type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 const AdminUser: React.FC = () => {
   const [form] = Form.useForm()
   const { data: accounts, refetch } = useGetAllAccountQuery()
-  const [createAccount] = useCreateAccountMutation()
-  const [updateAccount] = useUpdateAccountMutation()
+  const [createAccount, { isLoading: isLoadingCreateAccount }] =
+    useCreateAccountMutation()
+  const [updateAccount, { isLoading: isLoadingUpdateAccount }] =
+    useUpdateAccountMutation()
   const [deleteAccount] = useDeleteAccountMutation()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [editingAccount, setEditingAccount] = useState<Account | null>(null)
   const [fileList, setFileList] = useState<UploadFile[]>([])
+  const dispatch = useAppDispatch()
 
   const handleCreateOrUpdate = async () => {
     form.validateFields().then(async (values: Account) => {
@@ -59,15 +65,14 @@ const AdminUser: React.FC = () => {
         }
 
         if (editingAccount) {
-          await updateAccount({ ...editingAccount, ...formData })
+          await updateAccount({ ...editingAccount, ...formData }).unwrap()
         } else {
           await createAccount(formData).unwrap()
           message.success('User created successfully')
         }
         setIsModalVisible(false)
-        refetch()
-      } catch (error) {
-        message.error('Failed to create or update user')
+      } catch (error: any) {
+        message.error(error.data.message || 'Failed to create or update user')
       }
     })
   }
@@ -78,8 +83,9 @@ const AdminUser: React.FC = () => {
   }
 
   const handleDelete = async (id: number) => {
-    await deleteAccount(id)
-    refetch()
+    dispatch(loadingActions.setLoading(true))
+    await deleteAccount(id).unwrap()
+    dispatch(loadingActions.setLoading(false))
   }
 
   const beforeUpload = (file: FileType) => {
@@ -108,18 +114,17 @@ const AdminUser: React.FC = () => {
       title: 'Actions',
       render: (_, account: Account) => (
         <div className='flex items-center gap-2'>
-          <Button
-            onClick={() => handleEdit(account)}
-            className='bg-blue-500 text-white rounded-md hover:bg-blue-600 px-4 py-2'
-          >
-            Edit
-          </Button>
-          <Button
-            onClick={() => handleDelete(account.id)}
-            className='bg-red-500 text-white rounded-md hover:bg-red-600 px-4 py-2'
-          >
-            Delete
-          </Button>
+          <div className='flex items-center gap-2'>
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(account)}
+            />
+            <Button
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(account.id)}
+              danger
+            />
+          </div>
         </div>
       ),
     },
@@ -308,6 +313,7 @@ const AdminUser: React.FC = () => {
                 type='primary'
                 htmlType='submit'
                 className='px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark'
+                loading={isLoadingCreateAccount || isLoadingUpdateAccount}
               >
                 Submit
               </Button>
