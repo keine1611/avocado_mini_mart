@@ -1,4 +1,4 @@
-import { Brand } from '@/model'
+import { Brand } from '@/models'
 import { sequelize } from '@/config'
 import {
   decodeQueryFromBase64,
@@ -128,8 +128,7 @@ export const brandController = {
       const { ...brandData } = req.body
       const logo = req.file
 
-      // Validate input
-      const { error } = brandValidation.update.validate(brandData)
+      const { error } = brandValidation.update.validate({ ...brandData, logo })
       if (error) {
         return res.status(400).json({
           message: error.details[0].message,
@@ -137,7 +136,6 @@ export const brandController = {
         })
       }
 
-      // Handle logo upload if a new file is provided
       if (logo) {
         const uniqueFilename = `/brands/${uuidv4()}_${logo.originalname}`
         const logoURL = await uploadFileToFirebase({
@@ -147,7 +145,7 @@ export const brandController = {
         brandData.logo = logoURL
       }
 
-      await Brand.update(brandData, { where: { id } })
+      await Brand.update({ ...brandData, id }, { where: { id } })
 
       const updatedBrand = await Brand.findByPk(id)
 

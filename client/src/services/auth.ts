@@ -1,5 +1,6 @@
-import { Account, LoginResponse } from '@/types'
+import { Account, Cart, Favorite, LoginResponse, Product } from '@/types'
 import { ApiResponse } from '@/types/ApiResponse'
+import { decodeBase64, encodeBase64 } from '@/utils'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const BASE_URL = import.meta.env.VITE_API_URL
@@ -50,6 +51,48 @@ export const authApi = createApi({
         body,
       }),
     }),
+    logout: builder.mutation<ApiResponse<Account>, void>({
+      query: () => ({
+        url: '/logout',
+        method: 'POST',
+      }),
+    }),
+    syncFavorites: builder.mutation<ApiResponse<Favorite[]>, Favorite[]>({
+      query: (body) => ({
+        url: '/sync-favorites',
+        method: 'POST',
+        body,
+      }),
+    }),
+    getUserFavoriteProducts: builder.query<ApiResponse<Product[]>, void>({
+      query: () => ({
+        url: '/user-favorites',
+        method: 'GET',
+      }),
+    }),
+    syncCart: builder.mutation<ApiResponse<Cart[]>, Cart[]>({
+      query: (body) => ({
+        url: '/sync-cart',
+        method: 'POST',
+        body,
+      }),
+    }),
+    getUserCartProducts: builder.query<ApiResponse<Product[]>, void>({
+      query: () => ({
+        url: '/user-cart',
+        method: 'GET',
+      }),
+    }),
+    getListCartProductsByIds: builder.query<
+      ApiResponse<Cart[]>,
+      number[] | void
+    >({
+      query: (ids) => ({
+        url: '/user-cart/products/product-ids',
+        method: 'GET',
+        params: { param: encodeBase64(JSON.stringify(ids)) },
+      }),
+    }),
   }),
 })
 
@@ -58,4 +101,9 @@ export const {
   useRefreshMutation,
   useRegisterMutation,
   useVerifyAndCreateAccountMutation,
+  useSyncFavoritesMutation,
+  useGetUserFavoriteProductsQuery,
+  useSyncCartMutation,
+  useGetUserCartProductsQuery,
+  useGetListCartProductsByIdsQuery,
 } = authApi

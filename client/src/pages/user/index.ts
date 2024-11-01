@@ -1,4 +1,8 @@
 export * from './UserHome'
 export * from './UserLogin'
 export * from './UserRegister'
-
+export * from './UserProductDetail'
+export * from './UserCart'
+export * from './UserCheckout'
+export * from './UserProduct'
+export * from './UserFavorite'

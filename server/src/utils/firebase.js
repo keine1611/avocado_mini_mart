@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   getStorage,
@@ -52,4 +53,9 @@ export const getStoragePathFromUrl = ({ url }) => {
   const encodedPath = url.substring(baseUrlIndex + 3, endIndex)
   const storagePath = decodeURIComponent(encodedPath)
   return storagePath
+}
+
+export const getUniqueFilename = ({ originalname, path }) => {
+  const uniqueFilename = `${path}/${uuidv4()}_${originalname}`
+  return uniqueFilename
 }

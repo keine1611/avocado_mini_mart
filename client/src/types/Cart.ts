@@ -1,10 +1,12 @@
-import { Product } from './Product'
+import { Account, Product } from '@/types'
 
 interface Cart {
-  id: number
-  product: Product
+  id?: number
+  product?: Product
+  productId: number
   quantity: number
-  accountId: number
+  accountId?: number
+  account?: Account
 }
 
 export type { Cart }

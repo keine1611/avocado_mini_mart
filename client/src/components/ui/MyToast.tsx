@@ -1,5 +1,3 @@
-import { message } from 'antd'
-import { error } from 'console'
 import React from 'react'
 import { ToastContainer, ToastOptions, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -30,7 +28,7 @@ export const showToast = {
   },
   promise: (
     promise: any,
-    message: { pending: string; success: string; error: string },
+    message: { pending: string; success: string; error: string }
   ) => {
     toast.promise(
       promise,
@@ -39,7 +37,7 @@ export const showToast = {
         success: message.success,
         error: message.error,
       },
-      toastOption,
+      toastOption
     )
   },
 }

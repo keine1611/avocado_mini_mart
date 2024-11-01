@@ -25,13 +25,13 @@ const productValidation = {
         return errors
       }),
     barcode: Joi.string()
-      .max(10)
+      .max(50)
       .required()
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
             case 'string.max':
-              error.message = 'Barcode must be at most 10 characters long'
+              error.message = 'Barcode must be at most 50 characters long'
               break
             case 'any.required':
               error.message = 'Barcode is required'
@@ -158,12 +158,12 @@ const productValidation = {
         return errors
       }),
     barcode: Joi.string()
-      .max(10)
+      .max(50)
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
             case 'string.max':
-              error.message = 'Barcode must be at most 10 characters long'
+              error.message = 'Barcode must be at most 50 characters long'
               break
             default:
               break

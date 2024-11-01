@@ -30,8 +30,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons'
 import { stringToDateTime, formatCurrency } from '@/utils'
-import { useAppDispatch } from '@/hooks'
-import { loadingActions } from '@/store/loading'
+import { loadingActions, useAppDispatch } from '@/store'
 
 const { Option } = Select
 
@@ -40,6 +39,7 @@ const AdminProduct: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [fileList, setFileList] = useState<UploadFile[]>([])
+  const [mainImage, setMainImage] = useState<UploadFile | null>(null)
 
   const [searchedColumn, setSearchedColumn] = useState('')
   const [previewVisible, setPreviewVisible] = useState(false)
@@ -82,6 +82,13 @@ const AdminProduct: React.FC = () => {
           }))
         : []
     )
+    setMainImage({
+      uid: product.mainImage,
+      name: 'main',
+      status: 'done',
+      url: product.mainImage,
+      thumbUrl: product.mainImage,
+    })
     setIsModalVisible(true)
   }
 
@@ -100,7 +107,6 @@ const AdminProduct: React.FC = () => {
     const newFileList = fileList.filter((item) => item.uid !== file.uid)
     setFileList(newFileList)
 
-    // If the file has an ID (existing image), add it to a list of images to be deleted
     if (file.uid.toString().match(/^\d+$/)) {
       form.setFieldsValue({
         imagesToDelete: [
@@ -116,14 +122,17 @@ const AdminProduct: React.FC = () => {
       try {
         const formData = new FormData()
         Object.keys(values).forEach((key) => {
-          if (key === 'images') {
+          if (key === 'mainImage') {
+            if (mainImage?.originFileObj) {
+              formData.append('mainImage', mainImage.originFileObj)
+            }
+          } else if (key === 'images') {
             fileList.forEach((file) => {
               if (file.originFileObj) {
                 formData.append(`images`, file.originFileObj)
               }
             })
           } else if (key === 'imagesToDelete' && editingProduct) {
-            // Only include imagesToDelete when updating
             formData.append('imagesToDelete', JSON.stringify(values[key] || []))
           } else {
             formData.append(key, values[key])
@@ -143,6 +152,7 @@ const AdminProduct: React.FC = () => {
         setIsModalVisible(false)
         form.resetFields()
         setFileList([])
+        setMainImage(null)
       } catch (err: any) {
         message.error(err.data.message || 'Failed to save product')
       }
@@ -151,7 +161,6 @@ const AdminProduct: React.FC = () => {
 
   const handleSearch = (confirm: any, dataIndex: any) => {
     confirm()
-
     setSearchedColumn(dataIndex)
   }
 
@@ -160,6 +169,7 @@ const AdminProduct: React.FC = () => {
   }
 
   const getColumnSearchProps = (
+    title: string,
     dataIndex: string,
     isSelect: boolean = false,
     options: any[] = []
@@ -174,7 +184,7 @@ const AdminProduct: React.FC = () => {
         {isSelect ? (
           <Select
             style={{ width: 188, marginBottom: 8, display: 'block' }}
-            placeholder={`Select ${dataIndex}`}
+            placeholder={`Select ${title}`}
             value={selectedKeys[0]}
             onChange={(value) => setSelectedKeys(value ? [value] : [])}
           >
@@ -189,18 +199,18 @@ const AdminProduct: React.FC = () => {
             ref={(node) => {
               searchInput = node
             }}
-            placeholder={`Search ${dataIndex}`}
+            placeholder={`Search ${title}`}
             value={selectedKeys[0]}
             onChange={(e) =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
-            onPressEnter={() => handleSearch(confirm, dataIndex)}
+            onPressEnter={() => handleSearch(confirm, title)}
             style={{ marginBottom: 8, display: 'block' }}
           />
         )}
         <Button
           type='primary'
-          onClick={() => handleSearch(confirm, dataIndex)}
+          onClick={() => handleSearch(confirm, title)}
           icon={<SearchOutlined />}
           size='small'
           style={{ width: 90, marginRight: 8 }}
@@ -219,49 +229,40 @@ const AdminProduct: React.FC = () => {
     filterIcon: (filtered: boolean) => (
       <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
-    onFilter: (value: any, record: any) =>
-      isSelect
-        ? record[dataIndex]?.id === value
-        : record[dataIndex]
-        ? record[dataIndex]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase())
-        : '',
+    onFilter: (value: any, record: any) => {
+      const recordValue = record[dataIndex]
+      return isSelect
+        ? Number(recordValue) === Number(value)
+        : record?.toString().toLowerCase().includes(value.toLowerCase()) || ''
+    },
     onFilterDropdownOpenChange: (visible: any) => {
       if (visible) {
         setTimeout(() => searchInput?.select(), 100)
       }
     },
-    render: (text: any, record: any) => {
-      const value = isSelect
-        ? dataIndex === 'brand'
-          ? record.brand?.name
-          : record.subCategory?.name
-        : text
-      return searchedColumn === dataIndex ? (
-        <span style={{ backgroundColor: '#ffc069', padding: 0 }}>
-          {value ? value.toString() : ''}
-        </span>
-      ) : (
-        value
-      )
-    },
   })
 
   const columns: TableProps<Product>['columns'] = [
+    {
+      title: 'Image',
+      dataIndex: 'mainImage',
+      key: 'mainImage',
+      render: (url: string) => (
+        <img src={url} alt='product' className='w-16 h-16 object-cover' />
+      ),
+    },
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
-      ...getColumnSearchProps('name'),
+      ...getColumnSearchProps('Name', 'name'),
     },
     {
       title: 'Barcode',
       dataIndex: 'barcode',
       key: 'barcode',
-      ...getColumnSearchProps('barcode'),
+      ...getColumnSearchProps('Barcode', 'barcode'),
     },
     {
       title: 'Standard Price',
@@ -271,20 +272,38 @@ const AdminProduct: React.FC = () => {
       render: (price: number) => formatCurrency(price),
     },
     {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text: any) =>
+        text === statusProduct.ACTIVE ? 'Active' : 'Inactive',
+    },
+    {
       title: 'Brand',
-      dataIndex: ['brand', 'id'],
-      key: 'brand',
-      ...getColumnSearchProps('brand', true, brandsData?.data || []),
+      dataIndex: 'brandId',
+      key: 'brandId',
+      ...getColumnSearchProps('Brand', 'brandId', true, brandsData?.data || []),
+      render: (id: number) => {
+        const name = brandsData?.data.find((brand) => brand.id === id)?.name
+        return name
+      },
     },
     {
       title: 'Sub Category',
-      dataIndex: ['subCategory', 'id'],
-      key: 'subCategory',
+      dataIndex: 'subCategoryId',
+      key: 'subCategoryId',
       ...getColumnSearchProps(
-        'subCategory',
+        'Sub Category',
+        'subCategoryId',
         true,
         subCategoriesData?.data || []
       ),
+      render: (id: number) => {
+        const name = subCategoriesData?.data.find(
+          (subCategory) => subCategory.id === id
+        )?.name
+        return name
+      },
     },
     {
       title: 'Status',
@@ -349,6 +368,7 @@ const AdminProduct: React.FC = () => {
         rowKey={(record) => record.id}
         loading={isLoading && isLoadingBrand && isLoadingSubCategory}
         className='bg-white shadow-md rounded-lg'
+        scroll={{ x: 'max-content' }}
       />
       <Modal
         open={isModalVisible}
@@ -364,25 +384,49 @@ const AdminProduct: React.FC = () => {
             {editingProduct ? 'Edit Product' : 'Create Product'}
           </h2>
           <Form form={form} layout='vertical' className='space-y-4'>
+            <Form.Item
+              name='mainImage'
+              label='Main Image'
+              rules={[{ required: true, message: 'Please enter a main image' }]}
+            >
+              <div className='flex items-center gap-2 justify-center'>
+                <Upload
+                  listType='picture-circle'
+                  fileList={mainImage ? [mainImage] : []}
+                  onChange={({ fileList }) => setMainImage(fileList[0])}
+                  beforeUpload={() => false}
+                  accept='image/*'
+                  maxCount={1}
+                  className='upload-list-inline'
+                >
+                  {mainImage ? null : (
+                    <div className='flex flex-col items-center justify-center'>
+                      <PlusOutlined className='text-2xl text-primary' />
+                      <div className='mt-2'>Upload</div>
+                    </div>
+                  )}
+                </Upload>
+              </div>
+            </Form.Item>
             <div className='grid grid-cols-2 gap-4'>
               <Form.Item
                 name='name'
                 label='Name'
                 rules={[{ required: true, message: 'Please enter a name' }]}
               >
-                <Input className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary' />
+                <Input className='w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary' />
               </Form.Item>
               <Form.Item
                 name='barcode'
                 label='Barcode'
                 rules={[{ required: true, message: 'Please enter a barcode' }]}
               >
-                <Input className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary' />
+                <Input className='w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary' />
               </Form.Item>
             </div>
             <Form.Item name='description' label='Description'>
               <Input.TextArea
-                className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
+                className='w-full  h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
                 rows={4}
               />
             </Form.Item>
@@ -396,11 +440,26 @@ const AdminProduct: React.FC = () => {
               >
                 <Input
                   type='number'
-                  className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
+                  className='w-full h-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
                   prefix='$'
                   step='0.01'
                 />
               </Form.Item>
+              <Form.Item
+                name='status'
+                label='Status'
+                rules={[{ required: true, message: 'Please select a status' }]}
+              >
+                <Select className='w-full h-10 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'>
+                  {Object.values(statusProduct).map((status) => (
+                    <Option key={status} value={status}>
+                      {status}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+            <div className='grid grid-cols-2 gap-4'>
               <Form.Item
                 name='brandId'
                 label='Brand'
@@ -408,7 +467,7 @@ const AdminProduct: React.FC = () => {
               >
                 <Select
                   showSearch
-                  className='w-full'
+                  className='w-full h-10'
                   placeholder='Search to Select Brand'
                   optionFilterProp='children'
                   filterOption={(input, option) =>
@@ -424,8 +483,6 @@ const AdminProduct: React.FC = () => {
                   ))}
                 </Select>
               </Form.Item>
-            </div>
-            <div className='grid grid-cols-2 gap-4'>
               <Form.Item
                 name='subCategoryId'
                 label='Sub Category'
@@ -435,7 +492,7 @@ const AdminProduct: React.FC = () => {
               >
                 <Select
                   showSearch
-                  className='w-full'
+                  className='w-full h-10'
                   placeholder='Search to Select Sub Category'
                   optionFilterProp='children'
                   filterOption={(input, option) =>
@@ -451,23 +508,6 @@ const AdminProduct: React.FC = () => {
                   ))}
                 </Select>
               </Form.Item>
-              {editingProduct && (
-                <Form.Item
-                  name='status'
-                  label='Status'
-                  rules={[
-                    { required: true, message: 'Please select a status' },
-                  ]}
-                >
-                  <Select className='w-full'>
-                    {Object.values(statusProduct).map((status) => (
-                      <Option key={status} value={status}>
-                        {status}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              )}
             </div>
             <Form.Item name='images' label='Images'>
               <Upload

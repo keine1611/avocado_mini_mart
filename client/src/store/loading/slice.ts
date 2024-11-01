@@ -5,16 +5,17 @@ export interface LoadingState {
 }
 
 const initialState: LoadingState = {
-  isLoading: false
+  isLoading: false,
 }
 
-export const { reducer: loadingReducer, actions: loadingActions } = createSlice({
-  name: 'loading',
-  initialState,
-  reducers: {
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload
-    }
+export const { reducer: loadingReducer, actions: loadingActions } = createSlice(
+  {
+    name: 'loading',
+    initialState,
+    reducers: {
+      setLoading: (state, action: PayloadAction<boolean>) => {
+        state.isLoading = action.payload
+      },
+    },
   }
-})
-
+)

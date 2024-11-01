@@ -5,7 +5,6 @@ import { encodeBase64 } from '@/utils'
 
 const BASE_URL = import.meta.env.VITE_API_URL
 
-
 export const productApi = createApi({
   reducerPath: 'productApi',
   baseQuery: fetchBaseQuery({
@@ -14,7 +13,28 @@ export const productApi = createApi({
   }),
   tagTypes: ['productApi'],
   endpoints: (builder) => ({
-    getAllProduct: builder.query<ApiResponse<Product[]>, {page: number, limit: number, name: string} | void>({
+    getAllProduct: builder.query<
+      {
+        message: string
+        data: {
+          data: Product[]
+          totalItems: number
+          totalPages: number
+          currentPage: number
+        }
+      },
+      {
+        page?: number
+        limit?: number
+        search?: string
+        maxprice?: number
+        minprice?: number
+        maincategory?: string
+        subcategory?: string
+        order?: string
+        sort?: string
+      } | void
+    >({
       query: (params) => {
         if (params) {
           const encodedParams = encodeBase64(JSON.stringify(params))
@@ -32,7 +52,10 @@ export const productApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.data.map(({ id }) => ({ type: 'productApi' as const, id })),
+              ...result.data.data.map(({ id }) => ({
+                type: 'productApi' as const,
+                id,
+              })),
               { type: 'productApi' as const, id: 'LIST' },
             ]
           : [{ type: 'productApi' as const, id: 'LIST' }],
@@ -45,7 +68,10 @@ export const productApi = createApi({
       }),
       invalidatesTags: [{ type: 'productApi', id: 'LIST' }],
     }),
-    updateProduct: builder.mutation<ApiResponse<Product>, { id: number; data: FormData }>({
+    updateProduct: builder.mutation<
+      ApiResponse<Product>,
+      { id: number; data: FormData }
+    >({
       query: ({ id, data }) => ({
         url: `/${id}`,
         method: 'PUT',
@@ -60,6 +86,21 @@ export const productApi = createApi({
       }),
       invalidatesTags: ['productApi'],
     }),
+    getProductDetail: builder.query<ApiResponse<Product>, string>({
+      query: (slug: string) => ({
+        url: `/${slug}`,
+        method: 'GET',
+      }),
+    }),
+    getListProductByIds: builder.query<ApiResponse<Product[]>, number[] | void>(
+      {
+        query: (ids) => ({
+          url: `/ids`,
+          method: 'GET',
+          params: { ids },
+        }),
+      }
+    ),
   }),
 })
 
@@ -68,4 +109,5 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useGetProductDetailQuery,
 } = productApi

@@ -1,11 +1,14 @@
 import { Brand, SubCategory } from '@/types'
 
 export interface Product {
-  id: string
+  id: number
   name: string
   barcode: string
   description: string
+  slug: string
   standardPrice: number
+  mainImage: string
+  maxDiscount: number
   brandId: number
   subCategoryId: number
   createdAt: string

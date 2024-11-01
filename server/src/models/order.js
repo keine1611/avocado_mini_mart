@@ -1,0 +1,115 @@
+import { sequelize } from '@/config'
+import { DataTypes, Model } from 'sequelize'
+import { getToday } from '@/utils'
+import { ORDER_STATUS } from '@/enum'
+
+export class Order extends Model {
+  static init(sequelize) {
+    super.init(
+      {
+        id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+        },
+        code: {
+          type: DataTypes.STRING(10),
+          allowNull: false,
+          unique: true,
+        },
+        fullName: {
+          type: DataTypes.STRING(50),
+          allowNull: false,
+        },
+        phone: {
+          type: DataTypes.STRING(10),
+          allowNull: false,
+        },
+        email: {
+          type: DataTypes.STRING(50),
+          allowNull: false,
+        },
+        address: {
+          type: DataTypes.STRING(100),
+          allowNull: false,
+        },
+        provinceCode: {
+          type: DataTypes.STRING(5),
+          allowNull: false,
+        },
+        districtCode: {
+          type: DataTypes.STRING(5),
+          allowNull: false,
+        },
+        wardCode: {
+          type: DataTypes.STRING(5),
+          allowNull: false,
+        },
+        orderStatus: {
+          type: DataTypes.ENUM,
+          values: Object.values(ORDER_STATUS),
+          allowNull: false,
+        },
+        totalAmount: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+        },
+        paymentMethod: {
+          type: DataTypes.STRING(10),
+          allowNull: false,
+        },
+        paymentStatus: {
+          type: DataTypes.STRING(10),
+          allowNull: false,
+        },
+        paymentId: {
+          type: DataTypes.STRING(100),
+          allowNull: true,
+        },
+        shippingMethod: {
+          type: DataTypes.STRING(50),
+          allowNull: false,
+        },
+        notes: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        discount: {
+          type: DataTypes.FLOAT,
+          allowNull: false,
+        },
+        createdAt: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          defaultValue: () => getToday(),
+        },
+        updateAt: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          defaultValue: () => getToday(),
+        },
+      },
+      {
+        sequelize,
+        tableName: 'orders',
+        hooks: {
+          afterUpdate: async (order, options) => {
+            order.updateAt = getToday()
+          },
+        },
+      }
+    )
+  }
+  static associate(models) {
+    Order.hasMany(models.OrderItem, {
+      foreignKey: 'orderId',
+      as: 'orderItems',
+    })
+    Order.belongsTo(models.Account, {
+      foreignKey: 'accountId',
+      as: 'account',
+    })
+  }
+}
+
+Order.init(sequelize)

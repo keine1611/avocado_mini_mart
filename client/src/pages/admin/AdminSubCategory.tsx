@@ -25,8 +25,7 @@ import {
   useDeleteSubCategoryMutation,
 } from '@/services'
 import { useGetAllMainCategoryQuery } from '@/services'
-import { useAppDispatch } from '@/hooks'
-import { loadingActions } from '@/store/loading'
+import { loadingActions, useAppDispatch } from '@/store'
 
 const AdminSubCategory: React.FC = () => {
   const [form] = Form.useForm()
@@ -232,6 +231,7 @@ const AdminSubCategory: React.FC = () => {
         rowKey={(record) => record.id}
         loading={isLoading && isLoadingMainCategory}
         className='bg-white shadow-md rounded-lg'
+        scroll={{ x: 'max-content' }}
       />
       <Modal
         open={isModalVisible}

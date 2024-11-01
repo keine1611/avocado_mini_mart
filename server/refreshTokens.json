@@ -2,16 +2,6 @@
   {
     "email": "admin@gmail.com",
     "id": 1,
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3Mjg0MTcxMTB9.o2x566eEpGkq75BaPfEoLgEhlmrh6uYlRVKNqrzNJFg"
-  },
-  {
-    "email": "admin@gmail.com",
-    "id": 1,
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3Mjg0MTc0NTR9.8zTak__wGFZw0Tk0TA3OEPdghxSgIzSJ5dhCeto_vH8"
-  },
-  {
-    "email": "admin@gmail.com",
-    "id": 1,
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3Mjg0MTk1NTB9.j3biRzdtu8oR9eva1K1KWi-XklfoAplEExmiiGUUcC0"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzA0MjUyMTd9.HQgqArsisOEbtIzYd6323BPH6OnzankZMmpgpMOZWb0"
   }
 ]

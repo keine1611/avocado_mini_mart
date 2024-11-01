@@ -1,10 +1,13 @@
+import { Op } from 'sequelize'
 import { login, register } from '@/services/auth'
-import { Account, Role, Profile, models } from '@/model'
+import { sequelize } from '@/config'
+import { Account, models, Favorite, Product, Cart } from '@/models'
 import {
   createAccessToken,
   readRefreshTokens,
   setTokenCookie,
   writeRefreshTokens,
+  decodeQueryFromBase64,
 } from '@/utils'
 import { authValidation } from '@/validation'
 import { sendVerificationEmail } from '@/utils/email'
@@ -91,6 +94,15 @@ export const authController = {
               {
                 model: models.Profile,
                 as: 'profile',
+              },
+              {
+                model: models.Favorite,
+                as: 'favorites',
+              },
+              {
+                model: models.Cart,
+                as: 'carts',
+                include: [{ model: Product, as: 'product' }],
               },
             ],
           })
@@ -194,6 +206,122 @@ export const authController = {
       res
         .status(200)
         .json({ message: 'Verification code sent', data: { email } })
+    } catch (error) {
+      res.status(400).json({ message: error.message, data: null })
+    }
+  },
+  syncFavorites: async (req, res, next) => {
+    let transaction
+    try {
+      transaction = await sequelize.transaction()
+      const favorites = req.body
+      const account = req.account
+      const favoriteRequestIds = favorites.map((favorite) => favorite.productId)
+      const favoriteProducts = await Favorite.findAll({
+        where: { accountId: account.id },
+      })
+      const favoriteProductsIds = favoriteProducts.map(
+        (favorite) => favorite.productId
+      )
+      let newFavoriteProducts = favorites.filter(
+        (favorite) => !favoriteProductsIds.includes(favorite.productId)
+      )
+      newFavoriteProducts = newFavoriteProducts.map((favorite) => ({
+        ...favorite,
+        accountId: account.id,
+      }))
+      await Favorite.bulkCreate(newFavoriteProducts, { transaction })
+
+      const deletedFavoriteProducts = favoriteProductsIds.filter(
+        (productId) => !favoriteRequestIds.includes(productId)
+      )
+
+      await Favorite.destroy({
+        where: {
+          productId: {
+            [Op.in]: deletedFavoriteProducts,
+          },
+          accountId: account.id,
+        },
+        transaction,
+      })
+      await transaction.commit()
+      const favoriteProductsResult = await Favorite.findAll({
+        where: { accountId: account.id },
+        attributes: ['productId'],
+      })
+      res.status(200).json({ message: 'success', data: favoriteProductsResult })
+    } catch (error) {
+      if (transaction) await transaction.rollback()
+      res.status(400).json({ message: error.message, data: null })
+    }
+  },
+  getUserFavoriteProducts: async (req, res, next) => {
+    try {
+      const account = req.account
+      const favoriteProducts = await Favorite.findAll({
+        where: { accountId: account.id },
+        include: [{ model: Product, as: 'product' }],
+      })
+      const favoriteProductsData = favoriteProducts.map((favorite) => ({
+        ...favorite.product,
+      }))
+      res.status(200).json({ message: 'success', data: favoriteProductsData })
+    } catch (error) {
+      res.status(400).json({ message: error.message, data: null })
+    }
+  },
+  syncCart: async (req, res, next) => {
+    const cart = req.body
+    const account = req.account
+    let transaction
+    try {
+      transaction = await sequelize.transaction()
+      await Cart.destroy({
+        where: { accountId: account.id },
+        transaction,
+      })
+
+      const cartData = cart.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        accountId: account.id,
+      }))
+      await Cart.bulkCreate(cartData, { transaction })
+      await transaction.commit()
+      const cartResult = await Cart.findAll({
+        where: { accountId: account.id },
+        attributes: ['productId', 'quantity'],
+        include: [{ model: Product, as: 'product' }],
+      })
+      res.status(200).json({ message: 'success', data: cartResult })
+    } catch (error) {
+      if (transaction) await transaction.rollback()
+      res.status(400).json({ message: error.message, data: null })
+    }
+  },
+  getUserCart: async (req, res, next) => {
+    try {
+      const account = req.account
+      const cart = await Cart.findAll({
+        where: { accountId: account.id },
+        include: [{ model: Product, as: 'product' }],
+      })
+      res.status(200).json({ message: 'success', data: cart })
+    } catch (error) {
+      res.status(400).json({ message: error.message, data: null })
+    }
+  },
+  getListCartProductsByIds: async (req, res, next) => {
+    try {
+      const { param } = req.query
+      const account = req.account
+      const ids = await decodeQueryFromBase64({ param })
+      const cart = await Cart.findAll({
+        where: { productId: { [Op.in]: ids }, accountId: account.id },
+        include: [{ model: Product, as: 'product' }],
+      })
+      res.status(200).json({ message: 'success', data: cart })
     } catch (error) {
       res.status(400).json({ message: error.message, data: null })
     }

@@ -14,8 +14,12 @@ export const mainCategoryApi = createApi({
     getAllMainCategory: builder.query<ApiResponse<MainCategory[]>, void>({
       query: () => '',
       providesTags: ['mainCategoryApi'],
+      keepUnusedDataFor: 1 * 60 * 60,
     }),
-    createMainCategory: builder.mutation<ApiResponse<MainCategory>, MainCategory>({
+    createMainCategory: builder.mutation<
+      ApiResponse<MainCategory>,
+      MainCategory
+    >({
       query: (mainCategory) => ({
         url: '',
         method: 'POST',
@@ -23,7 +27,10 @@ export const mainCategoryApi = createApi({
       }),
       invalidatesTags: ['mainCategoryApi'],
     }),
-    updateMainCategory: builder.mutation<ApiResponse<MainCategory>, MainCategory>({
+    updateMainCategory: builder.mutation<
+      ApiResponse<MainCategory>,
+      MainCategory
+    >({
       query: (mainCategory) => ({
         url: `/${mainCategory.id}`,
         method: 'PUT',

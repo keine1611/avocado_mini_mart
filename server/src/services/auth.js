@@ -1,4 +1,4 @@
-import { Profile, Account, models } from '@/model'
+import { Profile, Account, models } from '@/models'
 
 import {
   createAccessToken,
@@ -28,6 +28,17 @@ export const login = async ({ email, password }) => {
         as: 'role',
         attributes: ['id', 'name'],
       },
+      {
+        model: models.Cart,
+        as: 'carts',
+        attributes: ['productId', 'quantity'],
+        include: [{ model: models.Product, as: 'product' }],
+      },
+      {
+        model: models.Favorite,
+        as: 'favorites',
+        attributes: ['productId'],
+      },
     ],
   })
 
@@ -55,6 +66,8 @@ export const login = async ({ email, password }) => {
     avatarUrl: account.avatarUrl,
     profile: account.profile,
     role: account.role,
+    carts: account.carts,
+    favorites: account.favorites,
   }
 
   return {

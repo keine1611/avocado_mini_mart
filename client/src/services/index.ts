@@ -5,4 +5,7 @@ export * from './product'
 export * from './brand'
 export * from './mainCategory'
 export * from './account'
-
+export * from './helper'
+export * from './role'
+export * from './order'
+export * from './payment'

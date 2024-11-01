@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { LoginResponse } from '@/types'
+import { Account } from '@/types'
 
 export interface AuthState {
-  user: LoginResponse | null
+  user: Account | null
 }
 
 const initialState: AuthState = {
@@ -20,7 +20,5 @@ export const { actions: authActions, reducer: authReducer } = createSlice({
       state.user = null
     },
   },
-  extraReducers: (builder) => {
-    builder
-  },
+  extraReducers: (builder) => {},
 })

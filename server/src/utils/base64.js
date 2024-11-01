@@ -6,7 +6,7 @@ export const decodeQueryFromBase64 = async ({ param }) => {
     const decodedObject = JSON5.parse(decodeString)
     return decodedObject
   } catch (error) {
-    throw new Error('Invalid query. Please check again.')
+    return null
   }
 }
 

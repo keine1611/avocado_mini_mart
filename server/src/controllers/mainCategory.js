@@ -1,11 +1,13 @@
-import { MainCategory } from '@/model'
+import { MainCategory } from '@/models'
 import { mainCategoryValidation } from '@/validation'
 import { formatError } from '@/utils'
 
 export const mainCategoryController = {
   getAll: async (req, res) => {
     try {
-      const mainCategories = await MainCategory.findAll()
+      const mainCategories = await MainCategory.findAll({
+        include: ['subCategories'],
+      })
       res.status(200).json({
         message: 'MainCategories retrieved successfully',
         data: mainCategories,

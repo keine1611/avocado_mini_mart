@@ -177,7 +177,7 @@ const AdminBrand: React.FC = () => {
             .toLowerCase()
             .includes(value.toLowerCase())
         : '',
-    onFilterDropdownVisibleChange: (visible: any) => {
+    onFilterDropdownOpenChange: (visible: any) => {
       if (visible) {
         setTimeout(() => searchInput?.select(), 100)
       }
@@ -293,12 +293,12 @@ const AdminBrand: React.FC = () => {
         rowKey={(record) => record.id}
         loading={isLoading}
         className='bg-white shadow-md rounded-lg'
+        scroll={{ x: 'max-content' }}
       />
       <Modal
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={() => setIsModalVisible(false)}
-        width={800}
         className='custom-modal'
         footer={null}
         centered
@@ -329,7 +329,7 @@ const AdminBrand: React.FC = () => {
             </Form.Item>
             <Form.Item name='description' label='Description'>
               <Input.TextArea
-                className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
+                className='w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
                 rows={4}
               />
             </Form.Item>

@@ -1,4 +1,4 @@
-import { Brand } from '@/model/brand'
+import { Brand } from '@/models/brand'
 import { createSlug } from '@/utils'
 import { Op } from 'sequelize'
 

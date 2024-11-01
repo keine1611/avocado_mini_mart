@@ -1,5 +1,5 @@
 import React from 'react'
-import { useAppSelector } from '@/hooks'
+import { useAppSelector } from '@/store'
 import { Loading } from './Loading'
 
 export const LoadingOverlay: React.FC = () => {
@@ -8,8 +8,8 @@ export const LoadingOverlay: React.FC = () => {
   if (!isLoading) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <Loading size="large" color="text-white" />
+    <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'>
+      <Loading size='large' color='text-white' />
     </div>
   )
 }

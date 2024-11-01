@@ -1,4 +1,4 @@
-import { createBrowserRouter, useNavigate } from 'react-router-dom'
+import { createBrowserRouter, Outlet, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { PATH } from '@/constant'
 import {
@@ -12,9 +12,15 @@ import {
   AdminSubCategory,
   AdminUser,
   NoAccess,
+  AdminOrder,
+  UserProductDetail,
+  UserProduct,
+  UserCart,
+  UserCheckout,
+  UserFavorite,
 } from '@/pages'
-import { AdminLayout } from '@/components'
-import { useAppSelector } from '@/hooks'
+import { AdminLayout, UserLayout } from '@/components'
+import { useAppSelector } from '@/store'
 interface PrivateRouteProps {
   roles?: string[]
   children: React.ReactNode
@@ -25,7 +31,12 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ roles, children }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!roles?.includes(user?.role?.name || '')) navigate('/no-access')
+    if (user) {
+      if (!roles?.includes(user?.role?.name || '')) navigate('/no-access')
+    } else {
+      if (roles && roles.length > 0) navigate('/login')
+      else navigate('/no-access')
+    }
   }, [user])
   return <>{children}</>
 }
@@ -33,13 +44,48 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ roles, children }) => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <></>,
+    element: <UserLayout />,
     children: [
       {
         index: true,
         element: <UserHome />,
       },
+      {
+        path: 'products',
+        element: <Outlet />,
+        children: [
+          {
+            path: '',
+            element: <UserProduct />,
+          },
+          {
+            path: ':slugmaincategory',
+            element: <UserProduct />,
+          },
+          {
+            path: ':slugmaincategory/:slugsubcategory',
+            element: <UserProduct />,
+          },
+          {
+            path: ':slugmaincategory/:slugsubcategory/:slugproduct',
+            element: <UserProductDetail />,
+          },
+        ],
+      },
+
+      {
+        path: 'cart',
+        element: <UserCart />,
+      },
+      {
+        path: 'favorites',
+        element: <UserFavorite />,
+      },
     ],
+  },
+  {
+    path: 'checkout',
+    element: <UserCheckout />,
   },
   {
     path: PATH.user.login,
@@ -87,6 +133,10 @@ const router = createBrowserRouter([
           {
             path: 'users',
             element: <AdminUser />,
+          },
+          {
+            path: 'orders',
+            element: <AdminOrder />,
           },
         ],
       },

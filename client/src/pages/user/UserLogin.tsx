@@ -1,12 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { logo } from '@/constant'
 import { useLoginMutation } from '@/services'
 import { showToast } from '@/components'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { authActions } from '@/store/auth'
-import { useAppDispatch } from '@/hooks'
 import { FiMail, FiLock, FiLogIn } from 'react-icons/fi'
 import { loadingActions } from '@/store/loading'
+import {
+  cartActions,
+  favoriteActions,
+  useAppDispatch,
+  useAppSelector,
+} from '@/store'
 import Cookies from 'js-cookie'
 
 export interface LoginAccount {
@@ -15,6 +20,9 @@ export interface LoginAccount {
 }
 
 export const UserLogin = () => {
+  const dispatch = useAppDispatch()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [account, setAccount] = useState<LoginAccount>({
     email: '',
     password: '',
@@ -23,9 +31,23 @@ export const UserLogin = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({ email: '', password: '' })
   const [rememberMe, setRememberMe] = useState(false)
+  const { user } = useAppSelector((state) => state.auth)
 
-  const navigate = useNavigate()
-  const dispatch = useAppDispatch()
+  const from = location.state?.from
+
+  useEffect(() => {
+    if (user) {
+      if (from) {
+        navigate(from, { replace: true })
+      } else {
+        if (user.role.name.toLowerCase() === 'admin') {
+          navigate('/admin')
+        } else {
+          navigate('/')
+        }
+      }
+    }
+  }, [user])
 
   const validateForm = () => {
     let isValid = true
@@ -62,10 +84,11 @@ export const UserLogin = () => {
       const result = await login({ ...account, rememberMe }).unwrap()
       Cookies.set('rememberMe', rememberMe.toString())
       dispatch(authActions.setUser(result.data))
-      showToast.success('Login successful')
-      setTimeout(() => navigate('/admin'), 2000)
+      dispatch(cartActions.setCarts(result.data?.carts || []))
+      dispatch(favoriteActions.setFavorites(result.data?.favorites || []))
+      navigate(from, { replace: true })
     } catch (error: any) {
-      showToast.error(error.data.message)
+      showToast.error(error.data?.message || 'Something went wrong')
     } finally {
       setIsLoading(false)
       dispatch(loadingActions.setLoading(false))

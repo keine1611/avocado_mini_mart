@@ -1,12 +1,19 @@
-import { Account } from '@/model'
+import { Account } from '@/models'
 import { accountValidate } from '@/validation'
-import { formatError } from '@/utils'
+import {
+  formatError,
+  uploadFileToFirebase,
+  getUniqueFilename,
+  getToday,
+} from '@/utils'
+
+const { AVARTAR_DEFAULT, FIREBASE_PATH_AVATAR } = process.env
 
 export const accountController = {
   getAccount: async (req, res) => {
     try {
       const account = await Account.findById(req.params.id, {
-        include: ['profile'],
+        include: ['profile', 'role'],
       })
       res.status(200).json({
         message: 'Account fetched successfully',
@@ -21,7 +28,9 @@ export const accountController = {
   },
   getAccounts: async (req, res) => {
     try {
-      const accounts = await Account.findAll({ include: ['profile'] })
+      const accounts = await Account.findAll({
+        include: ['profile', 'role'],
+      })
       res.status(200).json({
         message: 'Accounts fetched successfully',
         data: accounts,
@@ -34,14 +43,13 @@ export const accountController = {
     }
   },
   createAccount: async (req, res) => {
-    console.log(req.body)
     try {
-      const { email, password, role, profile, avatar } = req.body
-
+      const { email, password, roleId, profile } = req.body
+      const avatar = req.file
       const { error } = accountValidate.createAccount.validate({
         email,
         password,
-        role,
+        roleId,
         profile,
       })
       if (error) {
@@ -50,12 +58,25 @@ export const accountController = {
           data: null,
         })
       }
+
+      let avatarUrl = AVARTAR_DEFAULT
+      if (avatar) {
+        const url = await uploadFileToFirebase({
+          file: avatar,
+          path: getUniqueFilename({
+            originalname: avatar.originalname,
+            path: FIREBASE_PATH_AVATAR,
+          }),
+        })
+        avatarUrl = url
+      }
       const account = await Account.create(
         {
           email,
           password,
-          role,
-          profile,
+          avatarUrl,
+          roleId,
+          ...(profile && { profile }),
         },
         { include: ['profile'] }
       )
@@ -73,12 +94,11 @@ export const accountController = {
   updateAccount: async (req, res) => {
     try {
       const { id } = req.params
-      const { email, password, role, profile } = req.body
+      const { roleId, profile, block } = req.body
       const { error } = accountValidate.updateAccount.validate({
-        email,
-        password,
-        role,
+        roleId,
         profile,
+        block,
       })
       if (error) {
         return res.status(400).json({
@@ -86,10 +106,35 @@ export const accountController = {
           data: null,
         })
       }
-      const account = await Account.update(
-        { email, password, role, profile },
-        { where: { id } }
-      )
+      let avatarUrl = null
+      if (req.file) {
+        const url = await uploadFileToFirebase({
+          file: req.file,
+          path: getUniqueFilename({
+            originalname: req.file.originalname,
+            path: FIREBASE_PATH_AVATAR,
+          }),
+        })
+        avatarUrl = url
+      }
+      const account = await Account.findByPk(id, {
+        include: ['profile'],
+      })
+      if (!account) {
+        return res.status(404).json({
+          message: 'Account not found',
+          data: null,
+        })
+      }
+      await account.update({
+        roleId,
+        ...(block && { block }),
+        ...(avatarUrl && { avatarUrl }),
+      })
+      if (profile) {
+        await account.profile.update({ ...profile })
+      }
+      await account.save()
       res.status(200).json({
         message: 'Account updated successfully',
         data: account,
@@ -104,7 +149,19 @@ export const accountController = {
   deleteAccount: async (req, res) => {
     try {
       const { id } = req.params
-      await Account.destroy({ where: { id } })
+      const account = await Account.findByPk(id)
+      if (!account) {
+        return res.status(404).json({
+          message: 'Account not found',
+          data: null,
+        })
+      }
+      await account.update({
+        isDeleted: true,
+        deletedAt: getToday(),
+        deletedBy: req.account.email,
+      })
+      await account.save()
       res.status(200).json({
         message: 'Account deleted successfully',
         data: null,

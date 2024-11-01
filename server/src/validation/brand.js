@@ -142,14 +142,11 @@ const brandValidation = {
         })
         return errors
       }),
-    logo: Joi.binary()
-      .required()
+    logo: Joi.object()
+      .optional()
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
-            case 'any.required':
-              error.message = 'Logo is required'
-              break
             default:
               break
           }

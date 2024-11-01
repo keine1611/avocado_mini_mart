@@ -1,8 +1,8 @@
-import { Account } from '@/model/account'
+import { Account } from '@/models/account'
 import jwt from 'jsonwebtoken'
 import fs from 'fs'
-import { Role } from '@/model/role'
-import { models } from '@/model'
+import { Role } from '@/models/role'
+import { models } from '@/models'
 
 export const createAccessToken = ({ id, email }) => {
   const token = jwt.sign({ id, email }, process.env.ACCESS_TOKEN_SECRET, {

@@ -138,7 +138,7 @@ const AdminMainCategory: React.FC = () => {
             .toLowerCase()
             .includes(value.toLowerCase())
         : '',
-    onFilterDropdownVisibleChange: (visible: any) => {
+    onFilterDropdownOpenChange: (visible: any) => {
       if (visible) {
         setTimeout(() => searchInput?.select(), 100)
       }
@@ -194,6 +194,7 @@ const AdminMainCategory: React.FC = () => {
         rowKey={(record) => record.id}
         loading={isLoading}
         className='bg-white shadow-md rounded-lg'
+        scroll={{ x: 'max-content' }}
       />
       <Modal
         open={isModalVisible}

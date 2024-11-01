@@ -1,4 +1,4 @@
-import { MainCategory, SubCategory } from '@/model'
+import { MainCategory, SubCategory } from '@/models'
 import { subCategoryValidation } from '@/validation'
 import { formatError } from '@/utils'
 export const subCategoryController = {
