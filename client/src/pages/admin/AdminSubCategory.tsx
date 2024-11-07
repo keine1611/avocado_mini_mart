@@ -231,7 +231,7 @@ const AdminSubCategory: React.FC = () => {
         rowKey={(record) => record.id}
         loading={isLoading && isLoadingMainCategory}
         className='bg-white shadow-md rounded-lg'
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 'max-content', y: 'calc(100vh - 300px)' }}
       />
       <Modal
         open={isModalVisible}

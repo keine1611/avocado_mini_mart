@@ -1,68 +1,34 @@
 import { cartActions, useAppDispatch, useAppSelector } from '@/store'
-import { useSyncCartMutation } from '@/services'
-import { useEffect } from 'react'
-import {
-  getLastCartFromLocalStorage,
-  setLastCartFromLocalStorage,
-  setCartToLocalStorage,
-} from '@/utils'
+import { useEffect, useLayoutEffect } from 'react'
 import { Cart } from '@/types'
-import { useLocation } from 'react-router-dom'
-
-const areCartsEqual = (cart1: Cart[], cart2: Cart[]): boolean => {
-  if (cart1.length !== cart2.length) return false
-
-  const cart1Map = new Map(cart1.map((item) => [item.productId, item.quantity]))
-  const cart2Map = new Map(cart2.map((item) => [item.productId, item.quantity]))
-
-  for (const [key, value] of cart1Map) {
-    if (cart2Map.get(key) !== value) {
-      return false
-    }
-  }
-
-  for (const [key, value] of cart2Map) {
-    if (cart1Map.get(key) !== value) {
-      return false
-    }
-  }
-
-  return true
-}
+import { socket } from '@/socket'
 
 const useAutoSyncCart = () => {
-  const location = useLocation()
-  const cart = useAppSelector((state) => state.cart.cart)
-  const [syncCartMutation] = useSyncCartMutation()
   const dispatch = useAppDispatch()
+  const user = useAppSelector((state) => state.auth.user)
+  const cart = useAppSelector((state) => state.cart.cart)
 
   useEffect(() => {
-    const handleBeforeUnload = async () => {
-      const lastCart: Cart[] = getLastCartFromLocalStorage()
-      if (!areCartsEqual(cart, lastCart)) {
-        const response = await syncCartMutation(cart).unwrap()
-        setLastCartFromLocalStorage(response.data)
-        setCartToLocalStorage(response.data)
-        dispatch(cartActions.setCarts(response.data))
-      }
+    socket.on('cartUpdated', (data) => {
+      dispatch(cartActions.setCarts(data))
+    })
+    return () => {
+      socket.off('cartUpdated')
     }
-    handleBeforeUnload()
-  }, [dispatch, location.pathname])
+  }, [dispatch, user])
 }
 
 const useSyncCart = () => {
-  const [syncCartMutation] = useSyncCartMutation()
-  const dispatch = useAppDispatch()
+  const user = useAppSelector((state) => state.auth.user)
   const cart = useAppSelector((state) => state.cart.cart)
-  const syncCart = async () => {
-    if (!areCartsEqual(cart, getLastCartFromLocalStorage())) {
-      const response = await syncCartMutation(cart).unwrap()
-      setLastCartFromLocalStorage(response.data)
-      setCartToLocalStorage(response.data)
-      dispatch(cartActions.setCarts(response.data))
+  const isCartUpdated = useAppSelector((state) => state.cart.isCartUpdated)
+  const dispatch = useAppDispatch()
+  useEffect(() => {
+    if (isCartUpdated) {
+      socket.emit('syncCart', cart)
+      dispatch(cartActions.setIsCartUpdated(false))
     }
-  }
-  return { syncCart }
+  }, [dispatch, isCartUpdated])
 }
 
-export { useAutoSyncCart, useSyncCart }
+export { useSyncCart, useAutoSyncCart }

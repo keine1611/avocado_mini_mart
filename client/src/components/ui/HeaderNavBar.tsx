@@ -44,6 +44,7 @@ const HeaderNavBar: React.FC = () => {
       if (action === 'increase') {
         const cartItem = cart.find((item) => item.productId === productId)
         dispatch(cartActions.plusCart({ productId }))
+
         if (cartItem) {
           setCheckedCartItems((prev) => [
             ...prev.filter((item) => item.productId !== productId),
@@ -52,6 +53,7 @@ const HeaderNavBar: React.FC = () => {
         }
       } else if (action === 'decrease') {
         dispatch(cartActions.minusCart({ productId }))
+
         const cartItem = cart.find((item) => item.productId === productId)
         if (cartItem) {
           setCheckedCartItems((prev) => [

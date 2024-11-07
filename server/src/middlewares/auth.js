@@ -29,7 +29,9 @@ export const authenticateToken = () => async (req, res, next) => {
     if (!account) throw new Error()
     const permissions = account.role.rolePermissions.map((p) => p.permission)
     const permission = permissions.find(
-      (p) => checkPath(p.path, path) && p.method === method
+      (p) =>
+        checkPath(p.path, path) &&
+        p.method.toLowerCase() == method.toLowerCase()
     )
     if (!permission)
       return res.status(403).json({ message: 'Access forbidden', data: null })

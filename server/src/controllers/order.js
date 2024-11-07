@@ -1,9 +1,14 @@
-import { Order } from '@/models'
+import { models, Order } from '@/models'
+import { formatError } from '@/utils'
 
 const orderController = {
   getOrders: async (req, res) => {
     try {
-      const orders = await Order.findAll()
+      const orders = await Order.findAll({
+        include: [
+          { model: models.OrderItem, as: 'orderItems', include: ['product'] },
+        ],
+      })
       res.json({
         message: 'Get orders successfully',
         data: orders,

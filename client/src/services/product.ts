@@ -49,16 +49,6 @@ export const productApi = createApi({
           method: 'GET',
         }
       },
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.data.data.map(({ id }) => ({
-                type: 'productApi' as const,
-                id,
-              })),
-              { type: 'productApi' as const, id: 'LIST' },
-            ]
-          : [{ type: 'productApi' as const, id: 'LIST' }],
     }),
     createProduct: builder.mutation<ApiResponse<Product>, FormData>({
       query: (product) => ({
@@ -101,6 +91,15 @@ export const productApi = createApi({
         }),
       }
     ),
+    getAllProductWithoutPagination: builder.query<ApiResponse<Product[]>, void>(
+      {
+        query: () => ({
+          url: '/all',
+          method: 'GET',
+        }),
+        providesTags: [{ type: 'productApi', id: 'LIST' }],
+      }
+    ),
   }),
 })
 
@@ -110,4 +109,5 @@ export const {
   useUpdateProductMutation,
   useDeleteProductMutation,
   useGetProductDetailQuery,
+  useGetAllProductWithoutPaginationQuery,
 } = productApi

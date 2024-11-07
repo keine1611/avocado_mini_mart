@@ -18,6 +18,9 @@ import {
   UserCart,
   UserCheckout,
   UserFavorite,
+  AdminDiscountCode,
+  AdminBatch,
+  UserMyOrder,
 } from '@/pages'
 import { AdminLayout, UserLayout } from '@/components'
 import { useAppSelector } from '@/store'
@@ -81,6 +84,10 @@ const router = createBrowserRouter([
         path: 'favorites',
         element: <UserFavorite />,
       },
+      {
+        path: 'my-orders',
+        element: <UserMyOrder />,
+      },
     ],
   },
   {
@@ -137,6 +144,14 @@ const router = createBrowserRouter([
           {
             path: 'orders',
             element: <AdminOrder />,
+          },
+          {
+            path: 'discount-codes',
+            element: <AdminDiscountCode />,
+          },
+          {
+            path: 'batches',
+            element: <AdminBatch />,
           },
         ],
       },

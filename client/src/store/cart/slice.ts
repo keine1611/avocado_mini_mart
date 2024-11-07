@@ -1,17 +1,15 @@
+import { useSyncCart } from '@/hooks'
 import { Cart, Product } from '@/types'
-import {
-  clearCartFromLocalStorage,
-  getCartFromLocalStorage,
-  setCartToLocalStorage,
-} from '@/utils'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface CartState {
   cart: Cart[]
+  isCartUpdated: boolean
 }
 
 const initialState: CartState = {
-  cart: getCartFromLocalStorage(),
+  cart: [],
+  isCartUpdated: false,
 }
 
 export const { actions: cartActions, reducer: cartReducer } = createSlice({
@@ -36,13 +34,13 @@ export const { actions: cartActions, reducer: cartReducer } = createSlice({
       } else {
         state.cart.push(payload)
       }
-      setCartToLocalStorage(state.cart)
+      state.isCartUpdated = true
     },
     removeCart: (state, { payload }: PayloadAction<{ productId: number }>) => {
       state.cart = state.cart.filter(
         (cart) => cart.productId !== payload.productId
       )
-      setCartToLocalStorage(state.cart)
+      state.isCartUpdated = true
     },
     minusCart: (state, { payload }: PayloadAction<{ productId: number }>) => {
       const existingCartItem = state.cart.find(
@@ -57,7 +55,7 @@ export const { actions: cartActions, reducer: cartReducer } = createSlice({
           existingCartItem.quantity -= 1
         }
       }
-      setCartToLocalStorage(state.cart)
+      state.isCartUpdated = true
     },
     plusCart: (state, { payload }: PayloadAction<{ productId: number }>) => {
       const existingCartItem = state.cart.find(
@@ -65,15 +63,23 @@ export const { actions: cartActions, reducer: cartReducer } = createSlice({
       )
       if (existingCartItem) {
         existingCartItem.quantity += 1
+      } else {
+        state.cart.push({
+          productId: payload.productId,
+          quantity: 1,
+        })
       }
-      setCartToLocalStorage(state.cart)
+      state.isCartUpdated = true
     },
     clearCart: (state) => {
       state.cart = []
-      clearCartFromLocalStorage()
     },
     setCarts: (state, { payload }: PayloadAction<Cart[]>) => {
       state.cart = payload
     },
+    setIsCartUpdated: (state, { payload }: PayloadAction<boolean>) => {
+      state.isCartUpdated = payload
+    },
   },
+  extraReducers: (builder) => {},
 })

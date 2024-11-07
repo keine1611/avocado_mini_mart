@@ -3,9 +3,8 @@ import { Product } from './Product'
 export interface OrderItem {
   id: string
   quantity: number
-  unitPrice: number
-  totalPrice: number
+  price: number
   productId: string
   orderId: string
-  product: Product[]
+  product: Product
 }

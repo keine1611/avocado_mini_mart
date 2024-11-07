@@ -4,12 +4,18 @@ import {
   cities,
   findDistricts,
   findWards,
+  formatCurrency,
   getCheckedCartFromLocalStorage,
 } from '@/utils'
 import { Cart } from '@/types'
-import { useGetListCartProductsByIdsQuery } from '@/services'
+import {
+  useGetListCartProductsByIdsQuery,
+  useGetDiscountCodeByCodeQuery,
+  useLazyGetDiscountCodeByCodeQuery,
+} from '@/services'
 import { PayPalButton } from '@/components'
-
+import { SearchOutlined } from '@ant-design/icons'
+import { DISCOUNT_TYPE } from '@/enum'
 const { Option } = Select
 
 const UserCheckout: React.FC = () => {
@@ -17,10 +23,16 @@ const UserCheckout: React.FC = () => {
 
   const [shippingMethod, setShippingMethod] = useState('standard')
   const [paymentMethod, setPaymentMethod] = useState('creditCard')
+  const [discountCode, setDiscountCode] = useState<string>('')
   const cartChecked = getCheckedCartFromLocalStorage()
   const { data: cartItems } = useGetListCartProductsByIdsQuery(
     cartChecked.map((item: Cart) => item.productId)
   )
+  const [
+    getDiscountCodeByCode,
+    { data: discountCodeData, isLoading: isLoadingDiscountCode },
+  ] = useLazyGetDiscountCodeByCodeQuery()
+
   const items = cartChecked.map((item: Cart) => ({
     quantity: item.quantity,
     productId: item.productId,
@@ -31,6 +43,12 @@ const UserCheckout: React.FC = () => {
   const [wards, setWards] = useState<any[]>([])
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null)
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null)
+
+  const provisional = cartItems?.data?.reduce(
+    (acc: number, item: Cart) =>
+      acc + (item.product?.standardPrice || 0) * item.quantity,
+    0
+  )
 
   const handleFinish = (values: any) => {
     const formData = {
@@ -44,6 +62,7 @@ const UserCheckout: React.FC = () => {
       shippingMethod: shippingMethod,
       paymentMethod: paymentMethod,
       cartItems: cartItems?.data,
+      discountCode: discountCode,
     }
 
     return formData
@@ -87,10 +106,26 @@ const UserCheckout: React.FC = () => {
     },
   ]
 
+  const [discountInfo, setDiscountInfo] = useState<any>(null)
+  const [errorMessage, setErrorMessage] = useState<string>('')
+
+  const handleApplyDiscount = async () => {
+    if (discountCode) {
+      const res = await getDiscountCodeByCode(discountCode)
+      if (res.data?.data) {
+        setDiscountInfo(res.data.data)
+        setErrorMessage('')
+      } else {
+        setErrorMessage('Mã giảm giá không hợp lệ')
+        setDiscountInfo(null)
+      }
+    }
+  }
+
   return (
     <div className='w-screen h-screen flex'>
-      <div className='w-full h-full bg-white md:px-24 px-2 md:py-10 py-2 grid grid-cols-3'>
-        <div className='col-span-2 flex flex-col items-center justify-center'>
+      <div className='w-full bg-white md:px-24 px-4 md:py-10 py-2 grid lg:grid-cols-3 gap-10'>
+        <div className='lg:col-span-2 flex flex-col items-center justify-center'>
           <Form
             form={form}
             layout='vertical'
@@ -99,7 +134,7 @@ const UserCheckout: React.FC = () => {
               shippingMethod: 'standard',
             }}
           >
-            <div className='grid grid-cols-2 gap-10'>
+            <div className='lg:grid lg:grid-cols-2 gap-10'>
               <div className='col-span-1 space-y-2'>
                 <h2 className='text-2xl font-bold mb-4'>Order Information</h2>
                 {inputFields.map((field) => (
@@ -205,8 +240,10 @@ const UserCheckout: React.FC = () => {
             </div>
           </Form>
         </div>
-        <div className='col-span-1'>
-          <h2 className='text-2xl font-bold mb-4'>Your Cart</h2>
+        <div className='lg:col-span-1'>
+          <h2 className='text-2xl font-bold mb-4 text-primary'>
+            Your Products
+          </h2>
           <div className='space-y-4'>
             {cartItems?.data?.map((item: Cart) => (
               <div key={item.productId}>
@@ -231,15 +268,67 @@ const UserCheckout: React.FC = () => {
               </div>
             ))}
             <Divider />
-            <div className='flex justify-between font-bold'>
-              <span>Total</span>
-              <span>$25.00</span>
+            <div className='mt-4'>
+              <div className='flex flex-row items-center gap-2 justify-between'>
+                <span>Provisional</span>
+                <span>{formatCurrency(provisional || 0)}</span>
+              </div>
+              <div className='flex flex-row items-center gap-2 justify-between'>
+                <span>Shipping fee</span>
+                <span>
+                  {shippingMethod === 'standard' ? '$10.00' : '$20.00'}
+                </span>
+              </div>
+              {discountInfo && (
+                <>
+                  <Divider />
+                  <div className='flex flex-row items-center gap-2 justify-between font-bold'>
+                    <span>Total</span>
+                    <span>
+                      {formatCurrency(
+                        (provisional || 0) +
+                          (shippingMethod === 'standard' ? 10 : 20)
+                      )}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
-            <Form.Item>
-              <Input placeholder='Enter discount code' />
-            </Form.Item>
+            <div className='flex flex-row items-center gap-2'>
+              <input
+                className='input input-bordered w-full'
+                placeholder='Enter discount code'
+                value={discountCode}
+                onChange={(e) => setDiscountCode(e.target.value)}
+              />
+              <Button
+                className='btn btn-primary text-white'
+                onClick={handleApplyDiscount}
+                loading={isLoadingDiscountCode}
+                disabled={!discountCode}
+              >
+                Apply
+              </Button>
+            </div>
+            {errorMessage && <div className='text-red-500'>{errorMessage}</div>}
+            {discountInfo && (
+              <div className='mt-2'>
+                <span className='font-bold text-primary'>Giảm giá:</span>{' '}
+                {discountInfo.discountType === DISCOUNT_TYPE.PERCENTAGE
+                  ? `${discountInfo.discountValue}%`
+                  : formatCurrency(discountInfo.discountValue)}
+              </div>
+            )}
           </div>
-          <PayPalButton form={form} items={items} />
+          <div className='mt-4'>
+            {paymentMethod === 'paypal' ? (
+              <PayPalButton form={form} items={items} />
+            ) : (
+              <button className='btn btn-secondary w-full text-white'>
+                Order now
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

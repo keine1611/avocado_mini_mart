@@ -1,5 +1,8 @@
+import { authController, cartController } from '@/controllers'
 import { Server } from 'socket.io'
-
+import cookie from 'cookie'
+import { verifyAccessToken } from '@/utils'
+import { cartService } from '@/services/cart'
 const setupWebSocket = (server) => {
   const io = new Server(server, {
     cors: {
@@ -10,10 +13,30 @@ const setupWebSocket = (server) => {
     },
   })
 
+  io.use(async (socket, next) => {
+    const cookies = cookie.parse(socket.handshake.headers.cookie || '')
+    const accessToken = cookies.accessToken
+    if (!accessToken) {
+      return next(new Error('Authentication error: No access token provided'))
+    }
+    try {
+      const account = await verifyAccessToken({ accessToken })
+      socket.account = account
+      next()
+    } catch (error) {
+      return next(new Error('Authentication error: Invalid access token')) // Từ chối kết nối
+    }
+  })
   io.on('connection', (socket) => {
-    console.log('A user connected')
+    const account = socket.account
 
-    // Lắng nghe sự kiện đồng bộ favorites
+    if (!account) return socket.disconnect()
+    socket.join(`user-${account.id}`)
+
+    socket.on('registerUser', (email) => {
+      socket.userEmail = email
+    })
+
     socket.on('syncFavorites', (favorites) => {
       console.log('Received favorites:', favorites)
       socket.emit('favoritesUpdated', {
@@ -21,39 +44,16 @@ const setupWebSocket = (server) => {
       })
     })
 
-    // Lắng nghe sự kiện thêm favorite
-    socket.on('addFavorite', (favorite) => {
-      console.log('Added favorite:', favorite)
-      socket.emit('favoriteAdded', { data: favorite })
+    socket.on('syncCart', async (cart) => {
+      const cartCreated = await cartService.syncCart({
+        cartItems: cart,
+        accountId: account.id,
+      })
+      io.to(`user-${account.id}`).emit('cartUpdated', cartCreated)
     })
 
-    // Lắng nghe sự kiện xóa favorite
-    socket.on('removeFavorite', (favoriteId) => {
-      console.log('Removed favorite with ID:', favoriteId)
-      socket.emit('favoriteRemoved', { id: favoriteId })
-    })
-
-    // Lắng nghe sự kiện đồng bộ cart
-    socket.on('syncCart', (cartItems) => {
-      console.log('Received cart items:', cartItems)
-      socket.emit('cartUpdated', { message: 'Cart synced successfully' })
-    })
-
-    // Lắng nghe sự kiện thêm cart item
-    socket.on('addCartItem', (cartItem) => {
-      console.log('Added cart item:', cartItem)
-      socket.emit('cartItemAdded', { data: cartItem })
-    })
-
-    // Lắng nghe sự kiện xóa cart item
-    socket.on('removeCartItem', (cartItemId) => {
-      console.log('Removed cart item with ID:', cartItemId)
-      socket.emit('cartItemRemoved', { id: cartItemId })
-    })
-
-    // Khi người dùng ngắt kết nối
     socket.on('disconnect', () => {
-      console.log('User disconnected')
+      socket.leave(`user-${account.id}`)
     })
   })
 

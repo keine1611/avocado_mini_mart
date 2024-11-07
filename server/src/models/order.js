@@ -1,7 +1,10 @@
 import { sequelize } from '@/config'
 import { DataTypes, Model } from 'sequelize'
 import { getToday } from '@/utils'
-import { ORDER_STATUS } from '@/enum'
+import { ORDER_STATUS, PAYMENT_METHOD, PAYMENT_STATUS } from '@/enum'
+import { checkProductQuantity } from '@/services'
+import { Batch } from '@/models'
+import { Sequelize } from 'sequelize'
 
 export class Order extends Model {
   static init(sequelize) {
@@ -54,12 +57,15 @@ export class Order extends Model {
           type: DataTypes.INTEGER,
           allowNull: false,
         },
+
         paymentMethod: {
-          type: DataTypes.STRING(10),
+          type: DataTypes.ENUM,
+          values: Object.values(PAYMENT_METHOD),
           allowNull: false,
         },
         paymentStatus: {
-          type: DataTypes.STRING(10),
+          type: DataTypes.ENUM,
+          values: Object.values(PAYMENT_STATUS),
           allowNull: false,
         },
         paymentId: {
@@ -70,9 +76,9 @@ export class Order extends Model {
           type: DataTypes.STRING(50),
           allowNull: false,
         },
-        notes: {
-          type: DataTypes.STRING,
-          allowNull: true,
+        shippingFee: {
+          type: DataTypes.FLOAT,
+          allowNull: false,
         },
         discount: {
           type: DataTypes.FLOAT,

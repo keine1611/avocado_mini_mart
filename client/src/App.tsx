@@ -3,7 +3,12 @@ import { router } from './routes'
 import './index.css'
 import { MyToast } from './components'
 import { LoadingOverlay } from './components/ui/LoadingOverlay'
-import { loadingActions, useAppDispatch, authActions } from './store'
+import {
+  loadingActions,
+  useAppDispatch,
+  authActions,
+  cartActions,
+} from './store'
 import { useRefreshMutation } from '@/services'
 import Cookies from 'js-cookie'
 import { useEffect, useState } from 'react'
@@ -12,6 +17,7 @@ import {
   useAutoSyncFavorites,
   useSyncCart,
   useSyncFavorites,
+  useWebSocket,
 } from './hooks'
 import {
   setLastFavoriteFromLocalStorage,
@@ -24,8 +30,6 @@ const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
   const [refresh] = useRefreshMutation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(true)
-  const { syncFavorites } = useSyncFavorites()
-  const { syncCart } = useSyncCart()
 
   useEffect(() => {
     const refreshToken = async () => {
@@ -38,10 +42,7 @@ const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
           }).unwrap()
           if (res.data) {
             dispatch(authActions.setUser(res.data))
-            syncFavorites()
-            syncCart()
-            setLastFavoriteFromLocalStorage(res.data.favorites || [])
-            setLastCartFromLocalStorage(res.data.carts || [])
+            dispatch(cartActions.setCarts(res.data.carts))
           }
         } else {
           dispatch(authActions.clear())
@@ -72,6 +73,9 @@ const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
 }
 
 function App() {
+  // useWebSocket()
+  useSyncCart()
+  useAutoSyncCart()
   return (
     <RefreshToken>
       <RouterProvider router={router} />

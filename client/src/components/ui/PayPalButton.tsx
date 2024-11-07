@@ -3,7 +3,7 @@ import {
   usePaypalVerifyOrderMutation,
 } from '@/services'
 import { FormInstance } from 'antd'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
 import { showToast } from './MyToast'
 
@@ -23,6 +23,13 @@ const initialOptions = {
 const PayPalButton: React.FC<PayPalButtonProps> = ({ form, items }) => {
   const [createPaypalOrder] = usePaypalCreateOrderMutation()
   const [verifyPaypalOrder] = usePaypalVerifyOrderMutation()
+  const orderCodeRef = useRef<string | null>(null)
+
+  const [orderCode, setOrderCode] = useState<string | null>(null)
+
+  useEffect(() => {
+    orderCodeRef.current = orderCode
+  }, [orderCode])
 
   const validateForm = async () => {
     try {
@@ -41,32 +48,34 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({ form, items }) => {
     return action.resolve()
   }
 
-  const createOrder = async () => {
-    const data = form.getFieldsValue()
-    const formData = new FormData()
-    formData.append('items', JSON.stringify(items))
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value as string)
-    })
-    const res = await createPaypalOrder(formData)
-    return res.data.orderID
-  }
-
-  const onApprove = async (data: any, actions: any) => {
-    console.log(data)
+  const createOrder = async (data: any, actions: any) => {
     try {
-      const capture = await actions.order.capture()
-      const res = await verifyPaypalOrder({ orderID: capture.id })
-      if (res.data) {
-        showToast.success(res.data.message || 'Order verified')
-      }
+      const data = await form.getFieldsValue()
+      const itemString = JSON.stringify(items)
+      const reqData = { items: itemString, ...data, discount: 0 }
+      const res = await createPaypalOrder(reqData).unwrap()
+      setOrderCode(res.orderCode)
+      return res.paymentOrderID
     } catch (error: any) {
-      showToast.error(error.data.message || 'Failed to verify order')
+      showToast.error(error.message || 'Failed to create order')
     }
   }
 
-  const onError = (err: any) => {
-    showToast.error(err.data.message || 'Failed to create order')
+  const onApprove = async (data: any, actions: any) => {
+    try {
+      const capture = await actions.order.capture()
+      const res = await verifyPaypalOrder({
+        paypalOrderID: capture.id,
+        orderCode: orderCodeRef.current,
+      }).unwrap()
+      showToast.success(res.message || 'Order completed')
+    } catch (error: any) {
+      showToast.error(error.message || 'Failed to verify order')
+    }
+  }
+
+  const onCancel = () => {
+    showToast.error('Order cancelled')
   }
 
   return (
@@ -75,7 +84,8 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({ form, items }) => {
         onClick={onClick}
         createOrder={createOrder}
         onApprove={onApprove}
-        onError={onError}
+        onCancel={onCancel}
+        forceReRender={['commit-order']}
       />
     </PayPalScriptProvider>
   )

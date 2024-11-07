@@ -9,6 +9,7 @@ import {
   deleteFileFromFirebase,
   formatError,
 } from '@/utils'
+import { Op } from 'sequelize'
 import { productValidation } from '@/validation'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -16,7 +17,6 @@ export const productController = {
   getAll: async (req, res) => {
     try {
       const { param } = req.query
-
       let { page, size, sort, order, search, maincategory, subcategory } =
         (subcategory = await decodeQueryFromBase64({
           param,
@@ -303,6 +303,25 @@ export const productController = {
       const { ids } = req.params
       const products = await Product.findAll({
         where: { id: { [Op.in]: ids } },
+      })
+      res.status(200).json({
+        message: 'Products retrieved successfully',
+        data: products,
+      })
+    } catch (error) {
+      res.status(500).json({
+        message: formatError(error.message),
+        data: null,
+      })
+    }
+  },
+  getAllProductWithoutPagination: async (req, res) => {
+    try {
+      const products = await Product.findAll({
+        include: [
+          { model: models.Brand, as: 'brand' },
+          { model: models.ProductImage, as: 'productImages' },
+        ],
       })
       res.status(200).json({
         message: 'Products retrieved successfully',

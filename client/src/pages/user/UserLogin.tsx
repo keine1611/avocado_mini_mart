@@ -13,6 +13,7 @@ import {
   useAppSelector,
 } from '@/store'
 import Cookies from 'js-cookie'
+import { setLastCartFromLocalStorage } from '@/utils'
 
 export interface LoginAccount {
   email: string
@@ -85,6 +86,7 @@ export const UserLogin = () => {
       Cookies.set('rememberMe', rememberMe.toString())
       dispatch(authActions.setUser(result.data))
       dispatch(cartActions.setCarts(result.data?.carts || []))
+      setLastCartFromLocalStorage(result.data?.carts || [])
       dispatch(favoriteActions.setFavorites(result.data?.favorites || []))
       navigate(from, { replace: true })
     } catch (error: any) {

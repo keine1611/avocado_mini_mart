@@ -9,8 +9,11 @@ import {
 import bcrypt from 'bcrypt'
 
 export const register = async ({ email, password }) => {
-  const hashedPassword = await bcrypt.hash(password, 10)
-  const account = await Account.create({ email, password: hashedPassword })
+  const account = await Account.create({
+    email,
+    password,
+    roleId: 2,
+  })
   return account
 }
 

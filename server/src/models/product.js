@@ -2,6 +2,7 @@ import { DataTypes, Model } from 'sequelize'
 import { getToday, createSlug } from '@/utils'
 import { statusProduct } from '@/enum'
 import { sequelize } from '@/config'
+import { models } from '@/models'
 
 export class Product extends Model {
   static init(sequelize) {
@@ -20,12 +21,32 @@ export class Product extends Model {
           type: DataTypes.STRING(50),
           allowNull: false,
           unique: true,
+          validate: {
+            isUnique: async function (value) {
+              const product = await Product.findOne({
+                where: { barcode: value, id: { [Op.ne]: this.id } },
+              })
+              if (product) {
+                throw new Error('Barcode must be unique')
+              }
+            },
+          },
         },
         slug: {
           type: DataTypes.STRING(50),
           allowNull: false,
           unique: true,
           defaultValue: '',
+          validate: {
+            isUnique: async function (value) {
+              const product = await Product.findOne({
+                where: { slug: value, id: { [Op.ne]: this.id } },
+              })
+              if (product) {
+                throw new Error('Slug must be unique')
+              }
+            },
+          },
         },
         standardPrice: {
           type: DataTypes.FLOAT(10, 2),
@@ -68,6 +89,19 @@ export class Product extends Model {
               product.slug = await createSlug({ name: product.name })
             }
           },
+          beforeUpdate: async (product, options) => {
+            const productData = await Product.findOne({
+              where: { id: product.id },
+            })
+            if (product.standardPrice !== productData.standardPrice) {
+              await models.PriceHistory.create({
+                productId: product.id,
+                oldPrice: productData.standardPrice,
+                newPrice: product.standardPrice,
+                changeDate: getToday(),
+              })
+            }
+          },
         },
       }
     )
@@ -76,10 +110,6 @@ export class Product extends Model {
     Product.belongsTo(models.Brand, {
       foreignKey: 'brandId',
       as: 'brand',
-    })
-    Product.hasMany(models.BatchDetail, {
-      foreignKey: 'productId',
-      as: 'batchDetails',
     })
     Product.hasMany(models.ProductImage, {
       foreignKey: 'productId',
@@ -92,10 +122,6 @@ export class Product extends Model {
     Product.hasMany(models.OrderItem, {
       foreignKey: 'productId',
       as: 'orderItems',
-    })
-    Product.hasMany(models.Inventory, {
-      foreignKey: 'productId',
-      as: 'inventories',
     })
     Product.belongsTo(models.SubCategory, {
       foreignKey: 'subCategoryId',

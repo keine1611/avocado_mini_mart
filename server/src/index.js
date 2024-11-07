@@ -22,13 +22,14 @@ const corsOptions = {
 }
 
 app.use(cookieParser())
-app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 app.use(cors(corsOptions))
 
 connectToDB()
-syncDatabase()
-// const io = setupWebSocket(server)
+// syncDatabase()
+
+const io = setupWebSocket(server)
 
 app.use(logRequest)
 app.use(delayResponse(1000))

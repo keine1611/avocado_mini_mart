@@ -4,14 +4,21 @@ import { OrderItem } from './OrderItem'
 interface Order {
   id: number
   code: string
+  fullName: string
+  phone: string
+  address: string
+  email: string
+  provinceCode: string
+  districtCode: string
+  wardCode: string
   orderStatus: string
   totalAmount: number
-  shippingAddress: string
   paymentMethod: string
+  paymentStatus: string
+  paymentId: string
   shippingMethod: string
-  notes: string
+  shippingFee: number
   discount: number
-  accountId: number
   createdAt: string
   updatedAt: string
   orderItems: OrderItem[]

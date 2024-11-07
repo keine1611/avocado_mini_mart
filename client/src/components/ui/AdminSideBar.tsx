@@ -105,14 +105,14 @@ export const AdminSideBar: React.FC = () => {
                 isActive={isActiveLink('/admin/databases/orders')}
               />
               <SidebarSubItem
-                to='/admin/databases/reviews'
-                title='Reviews'
-                isActive={isActiveLink('/admin/databases/reviews')}
+                to='/admin/databases/batches'
+                title='Batches'
+                isActive={isActiveLink('/admin/databases/batches')}
               />
               <SidebarSubItem
-                to='/admin/databases/coupons'
-                title='Coupons'
-                isActive={isActiveLink('/admin/databases/coupons')}
+                to='/admin/databases/discount-codes'
+                title='Discount Codes'
+                isActive={isActiveLink('/admin/databases/discount-codes')}
               />
               <SidebarSubItem
                 to='/admin/databases/shippings'

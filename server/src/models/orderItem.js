@@ -9,18 +9,9 @@ export class OrderItem extends Model {
           type: DataTypes.INTEGER,
           allowNull: false,
         },
-        unitPrice: {
-          type: DataTypes.INTEGER,
+        price: {
+          type: DataTypes.FLOAT(10, 2),
           allowNull: false,
-        },
-        totalPrice: {
-          type: DataTypes.VIRTUAL,
-          get() {
-            return (
-              this.getDataValue('quantity') * this.getDataValue('unit_price')
-            )
-          },
-          set(value) {},
         },
       },
       {

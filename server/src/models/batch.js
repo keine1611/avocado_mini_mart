@@ -1,5 +1,5 @@
 import { sequelize } from '@/config'
-import { DataTypes, Model } from 'sequelize'
+import { DataTypes, Model, Op } from 'sequelize'
 import { getToday } from '@/utils'
 
 export class Batch extends Model {
@@ -13,15 +13,26 @@ export class Batch extends Model {
         },
         code: {
           type: DataTypes.STRING(10),
-          allowNull: false,
+          allowNull: true,
+          unique: true,
+          validate: {
+            isUnique: async function (value) {
+              const batch = await Batch.findOne({
+                where: { code: value, id: { [Op.ne]: this.id } },
+              })
+              if (batch) {
+                throw new Error('Code must be unique')
+              }
+            },
+          },
         },
-        status: {
+        createdBy: {
           type: DataTypes.STRING,
           allowNull: false,
         },
         arrivalDate: {
           type: DataTypes.STRING(14),
-          allowNull: false,
+          allowNull: true,
         },
         createdAt: {
           type: DataTypes.STRING(14),
@@ -46,13 +57,9 @@ export class Batch extends Model {
     )
   }
   static associate(models) {
-    Batch.hasMany(models.BatchDetail, {
+    Batch.hasMany(models.BatchProduct, {
       foreignKey: 'batchId',
-      as: 'batchDetails',
-    })
-    Batch.hasMany(models.Inventory, {
-      foreignKey: 'batchId',
-      as: 'inventories',
+      as: 'batchProducts',
     })
   }
 }

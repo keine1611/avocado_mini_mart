@@ -14,12 +14,12 @@ import {
 import type { RcFile, UploadFile } from 'antd/es/upload'
 import { Product, SubCategory } from '@/types'
 import {
-  useGetAllProductQuery,
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
   useGetAllSubCategoryQuery,
   useGetAllBrandQuery,
+  useGetAllProductWithoutPaginationQuery,
 } from '@/services'
 import { statusProduct } from '@/enum'
 
@@ -47,7 +47,8 @@ const AdminProduct: React.FC = () => {
   let searchInput: InputRef | null = null
   const dispatch = useAppDispatch()
 
-  const { data, error, isLoading } = useGetAllProductQuery()
+  const { data, isLoading: isLoadingAllProduct } =
+    useGetAllProductWithoutPaginationQuery()
   const [createProduct, { isLoading: isLoadingCreateProduct }] =
     useCreateProductMutation()
   const [updateProduct, { isLoading: isLoadingUpdateProduct }] =
@@ -332,7 +333,7 @@ const AdminProduct: React.FC = () => {
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           <Button
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
+            onClick={() => handleDelete(record.id.toString())}
             danger
           />
         </div>
@@ -366,9 +367,9 @@ const AdminProduct: React.FC = () => {
         columns={columns}
         dataSource={data?.data}
         rowKey={(record) => record.id}
-        loading={isLoading && isLoadingBrand && isLoadingSubCategory}
+        loading={isLoadingAllProduct && isLoadingBrand && isLoadingSubCategory}
         className='bg-white shadow-md rounded-lg'
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 'max-content', y: 'calc(100vh - 300px)' }}
       />
       <Modal
         open={isModalVisible}
@@ -379,11 +380,15 @@ const AdminProduct: React.FC = () => {
         footer={null}
         centered
       >
-        <div className='bg-white p-4'>
+        <div className='bg-white'>
           <h2 className='text-2xl font-bold mb-6 text-primary'>
             {editingProduct ? 'Edit Product' : 'Create Product'}
           </h2>
-          <Form form={form} layout='vertical' className='space-y-4'>
+          <Form
+            form={form}
+            layout='vertical'
+            className='space-y-4 overflow-y-auto max-h-[600px] px-5'
+          >
             <Form.Item
               name='mainImage'
               label='Main Image'

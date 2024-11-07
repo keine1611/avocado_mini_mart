@@ -83,6 +83,12 @@ const productPath = [
     method: 'DELETE',
     isPublic: false,
   },
+  {
+    name: 'GET_ALL_PRODUCTS',
+    path: '/api/products/all',
+    method: 'GET',
+    isPublic: true,
+  },
 ]
 
 const subCategoryPath = [
@@ -261,6 +267,12 @@ const authPath = [
     isPublic: true,
   },
   {
+    name: 'VERIFY_EMAIL',
+    path: '/api/auth/verify',
+    method: 'POST',
+    isPublic: true,
+  },
+  {
     name: 'GET_USER_FAVORITE_PRODUCTS',
     path: '/api/auth/user-favorites',
     method: 'GET',
@@ -287,6 +299,12 @@ const authPath = [
   {
     name: 'GET_LIST_CART_PRODUCTS_BY_IDS',
     path: '/api/auth/user-cart/products/product-ids',
+    method: 'GET',
+    isPublic: false,
+  },
+  {
+    name: 'GET_USER_ORDERS',
+    path: '/api/auth/user-orders',
     method: 'GET',
     isPublic: false,
   },
@@ -336,6 +354,66 @@ const paymentPath = [
     name: 'PAYMENT_PAYPAL_VERIFY_ORDER',
     path: '/api/payment/paypal/verify-order',
     method: 'POST',
+    isPublic: false,
+  },
+]
+
+const discountCodePath = [
+  {
+    name: 'GET_DISCOUNT_CODES',
+    path: '/api/discount-codes',
+    method: 'GET',
+    isPublic: false,
+  },
+  {
+    name: 'CREATE_DISCOUNT_CODE',
+    path: '/api/discount-codes',
+    method: 'POST',
+    isPublic: false,
+  },
+  {
+    name: 'UPDATE_DISCOUNT_CODE',
+    path: '/api/discount-codes/:id',
+    method: 'PUT',
+    isPublic: false,
+  },
+  {
+    name: 'DELETE_DISCOUNT_CODE',
+    path: '/api/discount-codes/:id',
+    method: 'DELETE',
+    isPublic: false,
+  },
+  {
+    name: 'GET_DISCOUNT_CODE_BY_CODE',
+    path: '/api/discount-codes/:code',
+    method: 'GET',
+    isPublic: false,
+  },
+]
+
+const batchPath = [
+  {
+    name: 'GET_BATCHES',
+    path: '/api/batches',
+    method: 'GET',
+    isPublic: false,
+  },
+  {
+    name: 'CREATE_BATCH',
+    path: '/api/batches',
+    method: 'POST',
+    isPublic: false,
+  },
+  {
+    name: 'UPDATE_BATCH',
+    path: '/api/batches/:id',
+    method: 'PUT',
+    isPublic: false,
+  },
+  {
+    name: 'DELETE_BATCH',
+    path: '/api/batches/:id',
+    method: 'DELETE',
     isPublic: false,
   },
 ]
@@ -601,6 +679,8 @@ export const syncDatabase = async () => {
       ...authPath,
       ...orderPath,
       ...paymentPath,
+      ...discountCodePath,
+      ...batchPath,
     ])
 
     const adminRolePermission = await models.RolePermission.bulkCreate(

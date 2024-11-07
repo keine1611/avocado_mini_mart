@@ -16,7 +16,6 @@ const auth = () => {
     dispatch(cartActions.clearCart())
     dispatch(favoriteActions.clearFavorite())
     clearFavoriteFromLocalStorage()
-    clearCartFromLocalStorage()
     Cookies.remove('refreshToken')
     Cookies.remove('accessToken')
   }

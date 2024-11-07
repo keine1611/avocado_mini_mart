@@ -16,3 +16,4 @@ authRouter.get(
   '/user-cart/products/product-ids',
   authController.getListCartProductsByIds
 )
+authRouter.get('/user-orders', authController.getUserOrders)

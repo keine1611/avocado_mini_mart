@@ -1,4 +1,4 @@
-import { Account, Cart, Favorite, LoginResponse, Product } from '@/types'
+import { Account, Cart, Favorite, LoginResponse, Order, Product } from '@/types'
 import { ApiResponse } from '@/types/ApiResponse'
 import { decodeBase64, encodeBase64 } from '@/utils'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
@@ -93,6 +93,12 @@ export const authApi = createApi({
         params: { param: encodeBase64(JSON.stringify(ids)) },
       }),
     }),
+    getUserOrders: builder.query<ApiResponse<Order[]>, void>({
+      query: () => ({
+        url: '/user-orders',
+        method: 'GET',
+      }),
+    }),
   }),
 })
 
@@ -106,4 +112,5 @@ export const {
   useSyncCartMutation,
   useGetUserCartProductsQuery,
   useGetListCartProductsByIdsQuery,
+  useGetUserOrdersQuery,
 } = authApi

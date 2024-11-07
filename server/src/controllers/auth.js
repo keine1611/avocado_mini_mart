@@ -1,7 +1,15 @@
 import { Op } from 'sequelize'
 import { login, register } from '@/services/auth'
 import { sequelize } from '@/config'
-import { Account, models, Favorite, Product, Cart } from '@/models'
+import {
+  Account,
+  models,
+  Favorite,
+  Product,
+  Cart,
+  Order,
+  OrderItem,
+} from '@/models'
 import {
   createAccessToken,
   readRefreshTokens,
@@ -322,6 +330,24 @@ export const authController = {
         include: [{ model: Product, as: 'product' }],
       })
       res.status(200).json({ message: 'success', data: cart })
+    } catch (error) {
+      res.status(400).json({ message: error.message, data: null })
+    }
+  },
+  getUserOrders: async (req, res, next) => {
+    try {
+      const account = req.account
+      const orders = await Order.findAll({
+        where: { accountId: account.id },
+        include: [
+          {
+            model: OrderItem,
+            as: 'orderItems',
+            include: [{ model: Product, as: 'product' }],
+          },
+        ],
+      })
+      res.status(200).json({ message: 'success', data: orders })
     } catch (error) {
       res.status(400).json({ message: error.message, data: null })
     }

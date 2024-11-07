@@ -6,6 +6,7 @@ const productRouter = Router()
 const upload = multer({ storage: multer.memoryStorage() })
 
 productRouter.get('/', productController.getAll)
+productRouter.get('/all', productController.getAllProductWithoutPagination)
 productRouter.post(
   '/',
   upload.fields([

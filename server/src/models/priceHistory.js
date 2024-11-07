@@ -11,15 +11,15 @@ export class PriceHistory extends Model {
           primaryKey: true,
         },
         oldPrice: {
-          type: DataTypes.FLOAT,
+          type: DataTypes.FLOAT(10, 2),
           allowNull: false,
         },
         newPrice: {
-          type: DataTypes.FLOAT,
+          type: DataTypes.FLOAT(10, 2),
           allowNull: false,
         },
         changeDate: {
-          type: DataTypes.DATE,
+          type: DataTypes.STRING(14),
           allowNull: false,
         },
       },

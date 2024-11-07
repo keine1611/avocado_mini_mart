@@ -8,6 +8,8 @@ import { accountRouter } from './account'
 import { roleRouter } from './role'
 import { orderRouter } from './order'
 import { paymentRouter } from './payment'
+import { discountCodeRouter } from './discountCode'
+import { batchRouter } from './batch'
 
 export const route = (app) => {
   app.use('/api/brands', brandRouter)
@@ -20,4 +22,6 @@ export const route = (app) => {
   app.use('/api/roles', roleRouter)
   app.use('/api/orders', orderRouter)
   app.use('/api/payment', paymentRouter)
+  app.use('/api/discount-codes', discountCodeRouter)
+  app.use('/api/batches', batchRouter)
 }
