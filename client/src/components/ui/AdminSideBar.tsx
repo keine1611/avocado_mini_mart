@@ -22,7 +22,7 @@ export const AdminSideBar: React.FC = () => {
         checked={isOpen}
         onChange={() => setIsOpen(!isOpen)}
       />
-      <div className='drawer-content'>
+      <div className='drawer-content z-50'>
         <label
           htmlFor='sidebar'
           className='btn btn-primary drawer-button p-2 m-2 rounded-full hover:bg-primary-focus'

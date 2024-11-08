@@ -207,12 +207,18 @@ const AdminDiscountCode: React.FC = () => {
       key: 'actions',
       render: (_, record) => (
         <div className='flex items-center gap-2'>
-          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Button
-            icon={<DeleteOutlined />}
+          <button
+            onClick={() => handleEdit(record)}
+            className=' btn btn-square btn-sm border border-primary text-primary hover:border hover:border-primary hover:text-primary'
+          >
+            <EditOutlined className='text-primary' />
+          </button>
+          <button
             onClick={() => handleDelete(record.id)}
-            danger
-          />
+            className=' btn btn-square btn-sm border border-red-500 text-red-500 hover:border hover:border-red-500 hover:text-red-500'
+          >
+            <DeleteOutlined className='text-red-500' />
+          </button>
         </div>
       ),
     },

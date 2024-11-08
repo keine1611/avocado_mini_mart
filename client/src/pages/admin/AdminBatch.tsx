@@ -9,11 +9,13 @@ import {
   Table,
   message,
 } from 'antd'
+import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Batch, BatchProduct, Product } from '@/types'
 import {
   useCreateBatchMutation,
   useGetAllBatchQuery,
   useGetAllProductWithoutPaginationQuery,
+  useUpdateBatchMutation,
 } from '@/services'
 import dayjs from 'dayjs'
 import { ColumnsType } from 'antd/es/table'
@@ -28,33 +30,75 @@ const AdminBatch: React.FC = () => {
   const [form] = Form.useForm()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const { data: batches, isLoading: isLoadingBatch } = useGetAllBatchQuery()
+  const [updateBatch, { isLoading: isUpdating }] = useUpdateBatchMutation()
+  const [editBatch, setEditBatch] = useState<Batch | null>(null)
   const [batchProducts, setBatchProducts] = useState<BatchProduct[]>([])
 
   const { data: products } = useGetAllProductWithoutPaginationQuery()
-  const [createBatch] = useCreateBatchMutation()
+  const [createBatch, { isLoading: isCreating }] = useCreateBatchMutation()
+
+  const handleAddBatch = () => {
+    setBatchProducts([])
+    setEditBatch(null)
+    form.resetFields()
+    setIsModalVisible(true)
+  }
 
   const handleModalOk = async () => {
     const values = await form.validateFields()
+    if (!batchProducts.length) {
+      showToast.error('Batch Product is required')
+      return
+    }
     const newBatch: Batch = {
       code: values.code,
       arrivalDate: dayjs(values.arrivalDate).format(VITE_DATE_FORMAT_API),
       batchProducts: batchProducts.map((item) => ({
         productId: item.productId,
         initialQuantity: item.initialQuantity,
-        expiredDate: dayjs(item.expiredDate).format(VITE_DATE_FORMAT_API),
+        expiredDate: item.expiredDate,
         price: item.price,
       })),
     } as Batch
 
     try {
-      await createBatch(newBatch).unwrap()
-      message.success('Batch created successfully')
+      if (editBatch) {
+        const updatedBatch = {
+          arrivalDate: newBatch.arrivalDate,
+          id: editBatch.id,
+          batchProducts: newBatch.batchProducts,
+        }
+        await updateBatch(updatedBatch).unwrap()
+        message.success('Batch updated successfully')
+      } else {
+        await createBatch(newBatch).unwrap()
+        message.success('Batch created successfully')
+      }
       setIsModalVisible(false)
       form.resetFields()
       setBatchProducts([])
-    } catch (error) {
-      message.error('Failed to create batch')
+      setEditBatch(null)
+    } catch (error: any) {
+      message.error(error.data?.message || 'Failed to save batch')
     }
+  }
+
+  const handleEditBatch = (batch: Batch) => {
+    form.setFieldsValue({
+      code: batch.code,
+      arrivalDate: dayjs(batch.arrivalDate, VITE_DATE_FORMAT_API),
+    })
+    setEditBatch(batch)
+    setBatchProducts(batch.batchProducts)
+    setIsModalVisible(true)
+  }
+
+  const handleDeleteBatch = (id: number) => {
+    console.log(id)
+  }
+
+  const handleViewBatch = (id: number) => {
+    console.log(id)
   }
 
   const handleAddBatchProduct = (product: Product | undefined) => {
@@ -76,6 +120,7 @@ const AdminBatch: React.FC = () => {
       setBatchProducts([...batchProducts, newBatchProduct])
     }
   }
+
   const handleDeleteBatchProduct = (index: number) => {
     const updatedBatchProducts = batchProducts.filter((_, i) => i !== index)
     setBatchProducts(updatedBatchProducts)
@@ -104,6 +149,31 @@ const AdminBatch: React.FC = () => {
     {
       title: 'Created By',
       dataIndex: 'createdBy',
+    },
+    {
+      title: 'Action',
+      render: (text: string, record: Batch) => (
+        <div className='flex flex-row items-center gap-2'>
+          <button
+            onClick={() => handleViewBatch(record)}
+            className=' btn btn-square btn-sm border border-primary text-primary hover:border hover:border-primary hover:text-primary'
+          >
+            <EyeOutlined className='text-primary' />
+          </button>
+          <button
+            onClick={() => handleEditBatch(record)}
+            className=' btn btn-square btn-sm border border-primary text-primary hover:border hover:border-primary hover:text-primary'
+          >
+            <EditOutlined className='text-primary' />
+          </button>
+          <button
+            onClick={() => handleDeleteBatch(record.id)}
+            className=' btn btn-square btn-sm border border-red-500 text-red-500 hover:border hover:border-red-500 hover:text-red-500'
+          >
+            <DeleteOutlined className='text-red-500' />
+          </button>
+        </div>
+      ),
     },
   ]
 
@@ -184,7 +254,6 @@ const AdminBatch: React.FC = () => {
       dataIndex: 'expiredDate',
       render: (text: string, record: BatchProduct, index: number) => (
         <Form.Item
-          name={`batchProducts[${index}].expiredDate`}
           rules={[{ required: true, message: 'Expired Date is required' }]}
           className=' my-auto'
         >
@@ -212,7 +281,7 @@ const AdminBatch: React.FC = () => {
 
   return (
     <div className='bg-white w-full'>
-      <Button onClick={() => setIsModalVisible(true)}>Add Batch</Button>
+      <Button onClick={handleAddBatch}>Add Batch</Button>
       <Table
         dataSource={batches?.data}
         columns={batchColumns}
@@ -223,27 +292,33 @@ const AdminBatch: React.FC = () => {
       />
       <Modal
         open={isModalVisible}
-        onOk={handleModalOk}
         onCancel={() => setIsModalVisible(false)}
         width={1000}
+        footer={null}
         centered
       >
-        <h1 className='text-2xl font-bold text-primary mb-7'>Create Batch</h1>
+        <h1 className='text-2xl font-bold text-primary mb-7'>
+          {editBatch ? 'Edit Batch' : 'Create Batch'}
+        </h1>
         <Form form={form} layout='vertical'>
-          <Form.Item
-            label='Code'
-            name='code'
-            rules={[{ required: true, message: 'Code is required' }]}
-          >
-            <Input />
-          </Form.Item>
+          {!editBatch && (
+            <Form.Item
+              label='Code'
+              name='code'
+              rules={[{ required: true, message: 'Code is required' }]}
+            >
+              <Input />
+            </Form.Item>
+          )}
           <Form.Item
             label='Arrival Date'
             name='arrivalDate'
             rules={[{ required: true, message: 'Arrival Date is required' }]}
-            getValueProps={(value) => ({
-              value: value ? dayjs(value, VITE_DATE_FORMAT_API) : null,
-            })}
+            getValueProps={(value) => {
+              return {
+                value: value ? dayjs(value, VITE_DATE_FORMAT_API) : null,
+              }
+            }}
           >
             <DatePicker format={'DD-MM-YYYY'} className='w-full' />
           </Form.Item>
@@ -293,6 +368,19 @@ const AdminBatch: React.FC = () => {
             pagination={false}
             scroll={{ y: 250 }}
           />
+          <div className='flex flex-row justify-end gap-2 mt-5'>
+            <Button
+              className=' bg-primary text-white'
+              onClick={handleModalOk}
+              disabled={isUpdating || isCreating}
+              loading={isUpdating || isCreating}
+            >
+              {isUpdating || isCreating ? 'Loading...' : 'Save'}
+            </Button>
+            <Button className='' onClick={() => setIsModalVisible(false)}>
+              Cancel
+            </Button>
+          </div>
         </Form>
       </Modal>
     </div>

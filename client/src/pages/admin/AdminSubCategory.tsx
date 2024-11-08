@@ -137,20 +137,18 @@ const AdminSubCategory: React.FC = () => {
             style={{ marginBottom: 8, display: 'block' }}
           />
         )}
-        <Button
-          type='primary'
+        <button
           onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          icon={<SearchOutlined />}
-          size='small'
-          style={{ width: 90, marginRight: 8 }}
-        />
-        <Button
+          className=' btn btn-square btn-sm border border-primary text-primary hover:border hover:border-primary hover:text-primary'
+        >
+          <SearchOutlined className='text-primary' />
+        </button>
+        <button
           onClick={() => handleReset(clearFilters)}
-          size='small'
-          style={{ width: 90 }}
+          className=' btn btn-square btn-sm border border-primary text-primary hover:border hover:border-primary hover:text-primary'
         >
           Reset
-        </Button>
+        </button>
       </div>
     ),
     filterIcon: (filtered: boolean) => (

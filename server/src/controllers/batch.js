@@ -1,11 +1,21 @@
-import { Batch, BatchProduct } from '@/models'
+import { Batch, BatchProduct, Product } from '@/models'
 import { formatError } from '@/utils'
 import { batchValidation } from '@/validation'
+import { sequelize } from '@/config'
 
 const batchController = {
   getAllBatch: async (req, res) => {
     try {
-      const batches = await Batch.findAll()
+      const batches = await Batch.findAll({
+        include: [
+          {
+            model: BatchProduct,
+            as: 'batchProducts',
+            include: [{ model: Product, as: 'product' }],
+          },
+        ],
+        order: [['id', 'DESC']],
+      })
       res
         .status(200)
         .json({ message: 'Get all batches successfully', data: batches })
@@ -44,14 +54,32 @@ const batchController = {
     }
   },
   updateBatch: async (req, res) => {
+    let transaction
     try {
+      transaction = await sequelize.transaction()
       const batch = await Batch.update(req.body, {
         where: { id: req.params.id },
+        transaction,
       })
+
+      if (req.body.batchProducts) {
+        await Promise.all(
+          req.body.batchProducts.map(async (product) => {
+            await BatchProduct.update(product, {
+              where: { productId: product.productId, batchId: req.params.id },
+              transaction,
+            })
+          })
+        )
+      }
+      await transaction.commit()
       res
         .status(200)
         .json({ message: 'Update batch successfully', data: batch })
     } catch (error) {
+      if (transaction) {
+        await transaction.rollback()
+      }
       res.status(500).json({ message: error.message })
     }
   },

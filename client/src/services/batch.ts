@@ -1,4 +1,4 @@
-import { ApiResponse } from '@/types'
+import { ApiResponse, BatchProduct } from '@/types'
 import { Batch } from '@/types'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
@@ -37,7 +37,9 @@ export const batchApi = createApi({
     }),
     updateBatch: builder.mutation<
       ApiResponse<Batch>,
-      Pick<Batch, 'status' | 'id' | 'expirationDate' | 'arrivalDate'>
+      Pick<Batch, 'id' | 'arrivalDate'> & {
+        batchProducts: BatchProduct[]
+      }
     >({
       query: (body) => ({
         url: `/${body.id}`,

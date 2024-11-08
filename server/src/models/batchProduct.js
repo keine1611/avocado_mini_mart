@@ -47,8 +47,8 @@ export class BatchProduct extends Model {
     )
   }
   static associate(models) {
-    this.belongsTo(models.Batch, { foreignKey: 'batchId' })
-    this.belongsTo(models.Product, { foreignKey: 'productId' })
+    this.belongsTo(models.Batch, { foreignKey: 'batchId', as: 'batch' })
+    this.belongsTo(models.Product, { foreignKey: 'productId', as: 'product' })
   }
 }
 
