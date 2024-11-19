@@ -18,8 +18,12 @@ export class PriceHistory extends Model {
           type: DataTypes.FLOAT(10, 2),
           allowNull: false,
         },
-        changeDate: {
+        changedAt: {
           type: DataTypes.STRING(14),
+          allowNull: false,
+        },
+        changedBy: {
+          type: DataTypes.STRING(320),
           allowNull: false,
         },
       },

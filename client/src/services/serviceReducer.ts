@@ -9,6 +9,8 @@ import { orderApi } from './order'
 import { paymentService } from './payment'
 import { discountCodeApi } from './discountCode'
 import { batchApi } from './batch'
+import { discountApi } from './discount'
+
 export const serviceReducer = {
   [brandApi.reducerPath]: brandApi.reducer,
   [authApi.reducerPath]: authApi.reducer,
@@ -21,6 +23,7 @@ export const serviceReducer = {
   [paymentService.reducerPath]: paymentService.reducer,
   [discountCodeApi.reducerPath]: discountCodeApi.reducer,
   [batchApi.reducerPath]: batchApi.reducer,
+  [discountApi.reducerPath]: discountApi.reducer,
 }
 
 export const serviceMiddleware = [
@@ -35,4 +38,5 @@ export const serviceMiddleware = [
   paymentService.middleware,
   discountCodeApi.middleware,
   batchApi.middleware,
+  discountApi.middleware,
 ]

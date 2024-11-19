@@ -57,7 +57,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({ form, items }) => {
       setOrderCode(res.orderCode)
       return res.paymentOrderID
     } catch (error: any) {
-      showToast.error(error.message || 'Failed to create order')
+      showToast.error(error.data.message || 'Failed to create order')
     }
   }
 
@@ -70,7 +70,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({ form, items }) => {
       }).unwrap()
       showToast.success(res.message || 'Order completed')
     } catch (error: any) {
-      showToast.error(error.message || 'Failed to verify order')
+      showToast.error(error.data.message || 'Failed to verify order')
     }
   }
 

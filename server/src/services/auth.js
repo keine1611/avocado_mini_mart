@@ -42,6 +42,10 @@ export const login = async ({ email, password }) => {
         as: 'favorites',
         attributes: ['productId'],
       },
+      {
+        model: models.OrderInfo,
+        as: 'orderInfos',
+      },
     ],
   })
 
@@ -71,6 +75,7 @@ export const login = async ({ email, password }) => {
     role: account.role,
     carts: account.carts,
     favorites: account.favorites,
+    orderInfos: account.orderInfos,
   }
 
   return {

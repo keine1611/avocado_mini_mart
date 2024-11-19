@@ -2,6 +2,7 @@ import { logo } from '@/constant'
 import { DashboardIcon, DatabaseIcon, SideBarIcon } from '@/resources'
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { FaTasks } from 'react-icons/fa'
 
 export const AdminSideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -10,120 +11,154 @@ export const AdminSideBar: React.FC = () => {
   const isActiveLink = (path: string) => location.pathname.startsWith(path)
 
   return (
-    <div
-      className={`drawer z-50 transition-all duration-300 ${
-        isOpen ? ' w-80' : ' w-20'
-      }`}
-    >
-      <input
-        id='sidebar'
-        type='checkbox'
-        className='drawer-toggle'
-        checked={isOpen}
-        onChange={() => setIsOpen(!isOpen)}
-      />
-      <div className='drawer-content z-50'>
-        <label
-          htmlFor='sidebar'
-          className='btn btn-primary drawer-button p-2 m-2 rounded-full hover:bg-primary-focus'
-        >
-          <SideBarIcon className='w-6 h-6 fill-base-100' />
-        </label>
-      </div>
-      <div className={`drawer-side ${isOpen ? '' : ' w-20'}`}>
-        <label
-          htmlFor='sidebar'
-          aria-label='close sidebar'
-          className='drawer-overlay'
-        ></label>
-        <div className='menu bg-base-200 h-screen flex flex-col p-0 shadow-lg w-80'>
-          <div className='p-4 flex items-center justify-center'>
-            <img src={logo} className='h-12 object-contain' alt='Logo' />
-          </div>
-          <div className='flex-1 bg-base-100 flex flex-col gap-2 py-4 px-2 overflow-y-auto'>
-            <SidebarItem
-              icon={<DashboardIcon className='h-6 w-6' />}
-              title='Dashboard'
-              isOpen={isOpen}
-              isActive={isActiveLink('/dashboard')}
-            >
-              <SidebarSubItem
-                to='/dashboard/analytics'
-                title='Analytics'
-                isActive={isActiveLink('/dashboard/analytics')}
-              />
-              <SidebarSubItem
-                to='/dashboard/ecommerce'
-                title='Ecommerce'
-                isActive={isActiveLink('/dashboard/ecommerce')}
-              />
-              <SidebarSubItem
-                to='/dashboard/project'
-                title='Project'
-                isActive={isActiveLink('/dashboard/project')}
-              />
-              <SidebarSubItem
-                to='/dashboard/report'
-                title='Report'
-                isActive={isActiveLink('/dashboard/report')}
-              />
-            </SidebarItem>
-            <SidebarItem
-              icon={<DatabaseIcon className='h-6 w-6' />}
-              title='Database'
-              isOpen={isOpen}
-              isActive={isActiveLink('/database')}
-            >
-              <SidebarSubItem
-                to='/admin/databases/brands'
-                title='Brands'
-                isActive={isActiveLink('/admin/databases/brands')}
-              />
-              <SidebarSubItem
-                to='/admin/databases/products'
-                title='Products'
-                isActive={isActiveLink('/admin/databases/products')}
-              />
-              <SidebarSubItem
-                to='/admin/databases/main-categories'
-                title='Main Categories'
-                isActive={isActiveLink('/admin/databases/main-categories')}
-              />
-              <SidebarSubItem
-                to='/admin/databases/sub-categories'
-                title='Sub Categories'
-                isActive={isActiveLink('/admin/databases/sub-categories')}
-              />
-              <SidebarSubItem
-                to='/admin/databases/users'
-                title='Users'
-                isActive={isActiveLink('/admin/databases/users')}
-              />
-              <SidebarSubItem
-                to='/admin/databases/orders'
-                title='Orders'
-                isActive={isActiveLink('/admin/databases/orders')}
-              />
-              <SidebarSubItem
-                to='/admin/databases/batches'
-                title='Batches'
-                isActive={isActiveLink('/admin/databases/batches')}
-              />
-              <SidebarSubItem
-                to='/admin/databases/discount-codes'
-                title='Discount Codes'
-                isActive={isActiveLink('/admin/databases/discount-codes')}
-              />
-              <SidebarSubItem
-                to='/admin/databases/shippings'
-                title='Shippings'
-                isActive={isActiveLink('/admin/databases/shippings')}
-              />
-            </SidebarItem>
+    <>
+      <div
+        className={`drawer z-50 transition-all duration-300 ${
+          isOpen ? ' w-80' : ' w-20'
+        }`}
+      >
+        <input
+          id='sidebar'
+          type='checkbox'
+          className='drawer-toggle'
+          checked={isOpen}
+          onChange={() => setIsOpen(!isOpen)}
+        />
+        <div className='drawer-content z-50'>
+          <label
+            htmlFor='sidebar'
+            className='btn btn-primary drawer-button p-2 m-2 rounded-full hover:bg-primary-focus'
+          >
+            <SideBarIcon className='w-6 h-6 fill-base-100' />
+          </label>
+        </div>
+        <div className={`drawer-side ${isOpen ? '' : ' w-20'}`}>
+          <label
+            htmlFor='sidebar'
+            aria-label='close sidebar'
+            className={`drawer-overlay ${isOpen ? 'block' : 'hidden'}`}
+          ></label>
+          <div className='menu bg-base-200 h-screen flex flex-col p-0 shadow-lg w-80'>
+            <div className='p-4 flex items-center justify-center'>
+              <img src={logo} className='h-12 object-contain' alt='Logo' />
+            </div>
+            <div className='flex-1 bg-base-100 flex flex-col gap-2 py-4 px-2 overflow-y-auto'>
+              <SidebarItem
+                icon={<DashboardIcon className='h-6 w-6' />}
+                title='Dashboard'
+                isOpen={isOpen}
+                isActive={isActiveLink('/dashboard')}
+              >
+                <SidebarSubItem
+                  to='/dashboard/analytics'
+                  title='Analytics'
+                  isActive={isActiveLink('/dashboard/analytics')}
+                />
+                <SidebarSubItem
+                  to='/dashboard/ecommerce'
+                  title='Ecommerce'
+                  isActive={isActiveLink('/dashboard/ecommerce')}
+                />
+                <SidebarSubItem
+                  to='/dashboard/project'
+                  title='Project'
+                  isActive={isActiveLink('/dashboard/project')}
+                />
+                <SidebarSubItem
+                  to='/dashboard/report'
+                  title='Report'
+                  isActive={isActiveLink('/dashboard/report')}
+                />
+              </SidebarItem>
+              <SidebarItem
+                icon={<DatabaseIcon className='h-6 w-6' />}
+                title='Database'
+                isOpen={isOpen}
+                isActive={isActiveLink('/database')}
+              >
+                <SidebarSubItem
+                  to='/admin/databases/brands'
+                  title='Brands'
+                  isActive={isActiveLink('/admin/databases/brands')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/products'
+                  title='Products'
+                  isActive={isActiveLink('/admin/databases/products')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/main-categories'
+                  title='Main Categories'
+                  isActive={isActiveLink('/admin/databases/main-categories')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/sub-categories'
+                  title='Sub Categories'
+                  isActive={isActiveLink('/admin/databases/sub-categories')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/users'
+                  title='Users'
+                  isActive={isActiveLink('/admin/databases/users')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/orders'
+                  title='Orders'
+                  isActive={isActiveLink('/admin/databases/orders')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/batches'
+                  title='Batches'
+                  isActive={isActiveLink('/admin/databases/batches')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/batch-product'
+                  title='Batch Product'
+                  isActive={isActiveLink('/admin/databases/batch-product')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/discounts'
+                  title='Discounts Event'
+                  isActive={isActiveLink('/admin/databases/discounts')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/discount-codes'
+                  title='Discount Codes'
+                  isActive={isActiveLink('/admin/databases/discount-codes')}
+                />
+                <SidebarSubItem
+                  to='/admin/databases/shippings'
+                  title='Shippings'
+                  isActive={isActiveLink('/admin/databases/shippings')}
+                />
+              </SidebarItem>
+              <SidebarItem
+                icon={<FaTasks className='h-6 w-6 text-secondary' />}
+                title='Tasks'
+                isOpen={isOpen}
+                isActive={isActiveLink('/tasks')}
+              >
+                <SidebarSubItem
+                  to='/admin/tasks/check-orders'
+                  title='Check Order'
+                  isActive={isActiveLink('/admin/tasks/check-orders')}
+                />
+                <SidebarSubItem
+                  to='/admin/tasks/check-reviews'
+                  title='Check Review'
+                  isActive={isActiveLink('/admin/tasks/check-reviews')}
+                />
+                <SidebarSubItem
+                  to='/admin/tasks/supports'
+                  title='Support'
+                  isActive={isActiveLink('/admin/tasks/supports')}
+                />
+              </SidebarItem>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

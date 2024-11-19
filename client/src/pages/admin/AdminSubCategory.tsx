@@ -36,9 +36,16 @@ const AdminSubCategory: React.FC = () => {
     useState<SubCategory | null>(null)
   const [searchedColumn, setSearchedColumn] = useState('')
   let searchInput: InputRef | null = null
-  const { data, isLoading } = useGetAllSubCategoryQuery()
-  const { data: mainCategories, isLoading: isLoadingMainCategory } =
-    useGetAllMainCategoryQuery()
+  const {
+    data,
+    isLoading: isLoadingSubCategory,
+    isFetching: isFetchingSubCategory,
+  } = useGetAllSubCategoryQuery()
+  const {
+    data: mainCategories,
+    isLoading: isLoadingMainCategory,
+    isFetching: isFetchingMainCategory,
+  } = useGetAllMainCategoryQuery()
   const [createSubCategory, { isLoading: isLoadingCreateSubCategory }] =
     useCreateSubCategoryMutation()
   const [updateSubCategory, { isLoading: isLoadingUpdateSubCategory }] =
@@ -58,15 +65,22 @@ const AdminSubCategory: React.FC = () => {
     setIsModalVisible(true)
   }
 
-  const handleDelete = async (id: number) => {
-    dispatch(loadingActions.setLoading(true))
-    try {
-      await deleteSubCategory(id).unwrap()
-      message.success('Sub-category deleted successfully')
-    } catch (error) {
-      message.error('Failed to delete sub-category')
-    }
-    dispatch(loadingActions.setLoading(false))
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this sub-category?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          await deleteSubCategory(id).unwrap()
+          message.success('Sub-category deleted successfully')
+        } catch (error) {
+          message.error('Failed to delete sub-category')
+        }
+      },
+    })
   }
 
   const handleModalOk = () => {
@@ -227,7 +241,7 @@ const AdminSubCategory: React.FC = () => {
         columns={columns}
         dataSource={data?.data}
         rowKey={(record) => record.id}
-        loading={isLoading && isLoadingMainCategory}
+        loading={isLoadingSubCategory || isFetchingSubCategory}
         className='bg-white shadow-md rounded-lg'
         scroll={{ x: 'max-content', y: 'calc(100vh - 300px)' }}
       />

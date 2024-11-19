@@ -3,7 +3,7 @@ import { Role } from './Role'
 import { Cart } from './Cart'
 import { Order } from './Order'
 import { Favorite } from './Favorite'
-
+import { OrderInfo } from './OrderInfo'
 export interface Account {
   id: number
   email: string
@@ -22,6 +22,7 @@ export interface Account {
   carts: Cart[]
   orders: Order[]
   favorites: Favorite[]
+  orderInfos: OrderInfo[]
 }
 
 export interface LoginResponse {

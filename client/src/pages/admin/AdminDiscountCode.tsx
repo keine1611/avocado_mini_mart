@@ -41,7 +41,12 @@ const AdminDiscountCode: React.FC = () => {
   const [searchedColumn, setSearchedColumn] = useState('')
   let searchInput: InputRef | null = null
 
-  const { data, error, isLoading } = useGetDiscountCodesQuery()
+  const {
+    data,
+    error,
+    isLoading: isLoadingDiscountCodes,
+    isFetching: isFetchingDiscountCodes,
+  } = useGetDiscountCodesQuery()
   const [createDiscountCode, { isLoading: isCreating }] =
     useCreateDiscountCodeMutation()
   const [updateDiscountCode, { isLoading: isUpdating }] =
@@ -61,15 +66,22 @@ const AdminDiscountCode: React.FC = () => {
     setIsModalVisible(true)
   }
 
-  const handleDelete = async (id: number) => {
-    try {
-      dispatch(loadingActions.setLoading(true))
-      await deleteDiscountCode(id).unwrap()
-      message.success('Discount Code deleted successfully')
-    } catch (err) {
-      message.error('Failed to delete Discount Code')
-    }
-    dispatch(loadingActions.setLoading(false))
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this discount code?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          await deleteDiscountCode(id).unwrap()
+          message.success('Discount Code deleted successfully')
+        } catch (err) {
+          message.error('Failed to delete Discount Code')
+        }
+      },
+    })
   }
 
   const handleModalOk = () => {
@@ -233,7 +245,7 @@ const AdminDiscountCode: React.FC = () => {
         columns={columns}
         dataSource={data?.data}
         rowKey={(record) => record.id}
-        loading={isLoading}
+        loading={isLoadingDiscountCodes || isFetchingDiscountCodes}
         className='bg-white shadow-md rounded-lg'
         scroll={{ x: 'max-content' }}
       />

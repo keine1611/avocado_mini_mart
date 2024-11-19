@@ -663,11 +663,24 @@ export const syncDatabase = async () => {
       { id: 2, name: 'USER' },
       { id: 3, name: 'STAFF' },
     ])
-    await models.Account.create({
-      email: 'admin@gmail.com',
-      password: '123456',
-      roleId: 1,
-    })
+    await models.Account.create(
+      {
+        email: 'admin@gmail.com',
+        password: '123456',
+        roleId: 1,
+        profile: {
+          firstName: 'Admin',
+          lastName: 'Admin',
+          phone: '0909090909',
+          dob: '16112002000000',
+          address: '123 Main St, Anytown, USA',
+          gender: 'male',
+        },
+      },
+      {
+        include: ['profile'],
+      }
+    )
 
     const permissions = await models.Permission.bulkCreate([
       ...brandPath,

@@ -4,6 +4,7 @@ import { HeartOutlined, EyeOutlined } from '@ant-design/icons'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { favoriteActions, useAppDispatch, useAppSelector } from '@/store'
 import { FaHeartCircleCheck } from 'react-icons/fa6'
+import { formatCurrency } from '@/utils/currency'
 
 interface ProductCardProps {
   product: Product
@@ -95,17 +96,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </p>
           <div className='flex items-center justify-center gap-2'>
             <p className='text-lg text-accent cursor-auto my-3'>
-              ${product.standardPrice}
+              {product.maxDiscount > 0 ? (
+                <span>
+                  {formatCurrency(
+                    product.standardPrice -
+                      (product.standardPrice * product.maxDiscount) / 100
+                  )}
+                </span>
+              ) : (
+                <span>{formatCurrency(product.standardPrice)}</span>
+              )}
             </p>
-            <del>
-              <p className='text-sm text-gray-600 cursor-auto ml-2'>$199</p>
-            </del>
+            {product.maxDiscount > 0 && (
+              <del>
+                <p className='text-sm text-gray-600 cursor-auto ml-2'>
+                  {formatCurrency(product.standardPrice)}
+                </p>
+              </del>
+            )}
           </div>
         </div>
       </Link>
-      <div className='absolute top-0 left-0 bg-secondary/80 text-white px-2 rounded-br-lg rounded-tl-lg'>
-        <span className='text-sm'>-20%</span>
-      </div>
+      {product.maxDiscount > 0 && (
+        <div className='absolute top-0 left-0 bg-secondary/80 text-white px-2 rounded-br-lg rounded-tl-lg'>
+          <span className='text-sm'>-{product.maxDiscount}%</span>
+        </div>
+      )}
     </div>
   )
 }

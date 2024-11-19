@@ -10,6 +10,7 @@ import {
   message,
   InputRef,
   Select,
+  Tag,
 } from 'antd'
 import type { RcFile, UploadFile } from 'antd/es/upload'
 import { Product, SubCategory } from '@/types'
@@ -28,15 +29,19 @@ import {
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
+  EyeOutlined,
 } from '@ant-design/icons'
 import { stringToDateTime, formatCurrency } from '@/utils'
 import { loadingActions, useAppDispatch } from '@/store'
+import { ProductViewModal } from '@/components'
 
 const { Option } = Select
 
 const AdminProduct: React.FC = () => {
   const [form] = Form.useForm()
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false)
+  const [viewProduct, setViewProduct] = useState<Product | null>(null)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [mainImage, setMainImage] = useState<UploadFile | null>(null)
@@ -47,8 +52,11 @@ const AdminProduct: React.FC = () => {
   let searchInput: InputRef | null = null
   const dispatch = useAppDispatch()
 
-  const { data, isLoading: isLoadingAllProduct } =
-    useGetAllProductWithoutPaginationQuery()
+  const {
+    data,
+    isLoading: isLoadingAllProduct,
+    isFetching: isFetchingAllProduct,
+  } = useGetAllProductWithoutPaginationQuery()
   const [createProduct, { isLoading: isLoadingCreateProduct }] =
     useCreateProductMutation()
   const [updateProduct, { isLoading: isLoadingUpdateProduct }] =
@@ -58,9 +66,15 @@ const AdminProduct: React.FC = () => {
     useGetAllSubCategoryQuery()
   const { data: brandsData, isLoading: isLoadingBrand } = useGetAllBrandQuery()
 
+  const handleView = (product: Product) => {
+    setViewProduct(product)
+    setIsViewModalVisible(true)
+  }
+
   const handleCreate = () => {
     setEditingProduct(null)
     form.resetFields()
+    setMainImage(null)
     setFileList([])
     setIsModalVisible(true)
   }
@@ -93,15 +107,22 @@ const AdminProduct: React.FC = () => {
     setIsModalVisible(true)
   }
 
-  const handleDelete = async (id: string) => {
-    dispatch(loadingActions.setLoading(true))
-    try {
-      await deleteProduct(Number(id)).unwrap()
-      message.success('Product deleted successfully')
-    } catch (err) {
-      message.error('Failed to delete product')
-    }
-    dispatch(loadingActions.setLoading(false))
+  const handleDelete = (id: string) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this product?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          await deleteProduct(Number(id)).unwrap()
+          message.success('Product deleted successfully')
+        } catch (err) {
+          message.error('Failed to delete product')
+        }
+      },
+    })
   }
 
   const handleImageDelete = (file: UploadFile) => {
@@ -251,6 +272,7 @@ const AdminProduct: React.FC = () => {
       render: (url: string) => (
         <img src={url} alt='product' className='w-16 h-16 object-cover' />
       ),
+      width: 100,
     },
     {
       title: 'Name',
@@ -271,13 +293,7 @@ const AdminProduct: React.FC = () => {
       key: 'standardPrice',
       sorter: (a, b) => a.standardPrice - b.standardPrice,
       render: (price: number) => formatCurrency(price),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (text: any) =>
-        text === statusProduct.ACTIVE ? 'Active' : 'Inactive',
+      width: 170,
     },
     {
       title: 'Brand',
@@ -311,7 +327,11 @@ const AdminProduct: React.FC = () => {
       dataIndex: 'status',
       key: 'status',
       render: (text: any) =>
-        text === statusProduct.ACTIVE ? 'Active' : 'Inactive',
+        text === statusProduct.ACTIVE ? (
+          <Tag color='green'>Active</Tag>
+        ) : (
+          <Tag color='red'>Inactive</Tag>
+        ),
     },
     {
       title: 'Created At',
@@ -330,6 +350,12 @@ const AdminProduct: React.FC = () => {
       key: 'actions',
       render: (_, record) => (
         <div className='flex items-center gap-2'>
+          <button
+            onClick={() => handleView(record)}
+            className=' btn btn-square btn-sm border border-primary text-primary hover:border hover:border-primary hover:text-primary'
+          >
+            <EyeOutlined className='text-primary' />
+          </button>
           <button
             onClick={() => handleEdit(record)}
             className=' btn btn-square btn-sm border border-primary text-primary hover:border hover:border-primary hover:text-primary'
@@ -373,7 +399,12 @@ const AdminProduct: React.FC = () => {
         columns={columns}
         dataSource={data?.data}
         rowKey={(record) => record.id}
-        loading={isLoadingAllProduct && isLoadingBrand && isLoadingSubCategory}
+        loading={
+          isLoadingAllProduct ||
+          isFetchingAllProduct ||
+          isLoadingSubCategory ||
+          isLoadingBrand
+        }
         className='bg-white shadow-md rounded-lg'
         scroll={{ x: 'max-content', y: 'calc(100vh - 300px)' }}
       />
@@ -571,6 +602,11 @@ const AdminProduct: React.FC = () => {
       >
         <img alt='preview' style={{ width: '100%' }} src={previewImage} />
       </Modal>
+      <ProductViewModal
+        visible={isViewModalVisible}
+        product={viewProduct}
+        onClose={() => setIsViewModalVisible(false)}
+      />
     </div>
   )
 }

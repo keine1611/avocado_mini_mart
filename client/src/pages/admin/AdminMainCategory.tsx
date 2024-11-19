@@ -31,7 +31,12 @@ const AdminMainCategory: React.FC = () => {
   const [searchedColumn, setSearchedColumn] = useState('')
   let searchInput: InputRef | null = null
 
-  const { data, error, isLoading } = useGetAllMainCategoryQuery()
+  const {
+    data,
+    error,
+    isLoading: isLoadingMainCategory,
+    isFetching: isFetchingMainCategory,
+  } = useGetAllMainCategoryQuery()
   const [createMainCategory, { isLoading: isCreating }] =
     useCreateMainCategoryMutation()
   const [updateMainCategory, { isLoading: isUpdating }] =
@@ -51,13 +56,22 @@ const AdminMainCategory: React.FC = () => {
     setIsModalVisible(true)
   }
 
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteMainCategory(id).unwrap()
-      message.success('Main Category deleted successfully')
-    } catch (err) {
-      message.error('Failed to delete Main Category')
-    }
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this main category?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          await deleteMainCategory(id).unwrap()
+          message.success('Main Category deleted successfully')
+        } catch (err) {
+          message.error('Failed to delete Main Category')
+        }
+      },
+    })
   }
 
   const handleModalOk = () => {
@@ -198,7 +212,7 @@ const AdminMainCategory: React.FC = () => {
         columns={columns}
         dataSource={data?.data}
         rowKey={(record) => record.id}
-        loading={isLoading}
+        loading={isLoadingMainCategory || isFetchingMainCategory}
         className='bg-white shadow-md rounded-lg'
         scroll={{ x: 'max-content' }}
       />

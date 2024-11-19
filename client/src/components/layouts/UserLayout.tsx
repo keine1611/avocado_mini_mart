@@ -7,7 +7,7 @@ export const UserLayout: React.FC = () => {
   const autoSyncCart = useAutoSyncCart()
   const autoSyncFavorites = useAutoSyncFavorites()
   return (
-    <div className='flex flex-col w-full relative'>
+    <div className='flex flex-col h-screen w-full relative'>
       <HeaderNavBar />
       <main className='flex-grow'>
         <Outlet />

@@ -1,9 +1,8 @@
 export const ORDER_STATUS = {
   PENDING: 'pending',
-  PROCESSING: 'processing',
-  SHIPPED: 'shipped',
+  REJECTED: 'rejected',
+  SHIPPING: 'shipping',
   DELIVERED: 'delivered',
   CANCELLED: 'cancelled',
   CONFIRMED: 'confirmed',
-  RETURNED: 'returned',
 }

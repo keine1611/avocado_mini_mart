@@ -68,14 +68,10 @@ const HeaderNavBar: React.FC = () => {
   const profileMenu: MenuProps['items'] = [
     {
       key: '1',
-      label: <Link to='/profile'>Profile</Link>,
+      label: <Link to='/account/profile'>Account</Link>,
     },
     {
       key: '2',
-      label: <Link to='/profile/settings'>Settings</Link>,
-    },
-    {
-      key: '3',
       label: <div onClick={auth().logout}>Logout</div>,
     },
   ]

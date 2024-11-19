@@ -13,6 +13,15 @@ export class OrderItem extends Model {
           type: DataTypes.FLOAT(10, 2),
           allowNull: false,
         },
+        discount: {
+          type: DataTypes.DECIMAL(5, 2),
+          allowNull: false,
+        },
+        isReviewed: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
       },
       {
         sequelize,

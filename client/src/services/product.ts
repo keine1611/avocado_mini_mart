@@ -1,4 +1,4 @@
-import { Product } from '@/types'
+import { BatchProduct, Product } from '@/types'
 import { ApiResponse } from '@/types/ApiResponse'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { encodeBase64 } from '@/utils'
@@ -100,6 +100,71 @@ export const productApi = createApi({
         providesTags: [{ type: 'productApi', id: 'LIST' }],
       }
     ),
+    getBatchProduct: builder.query<
+      ApiResponse<{
+        product: Product & { stock: number }
+        batchProduct: BatchProduct[]
+      }>,
+      number
+    >({
+      query: (id: number) => ({
+        url: `/${id}/batch-product`,
+        method: 'GET',
+      }),
+    }),
+    getLowStockProduct: builder.query<ApiResponse<Product[]>, void>({
+      query: () => ({
+        url: '/low-stock',
+        method: 'GET',
+      }),
+    }),
+    getProductLowStock: builder.query<
+      ApiResponse<Product & { stock: number }[]>,
+      void
+    >({
+      query: () => ({
+        url: '/low-stock',
+        method: 'GET',
+      }),
+    }),
+    getNearlyExpiredProduct: builder.query<
+      ApiResponse<Product & { batchProduct: BatchProduct[] }[]>,
+      { days: number }
+    >({
+      query: ({ days }) => {
+        if (days) {
+          const param = encodeBase64(JSON.stringify({ days }))
+          return {
+            url: '/nearly-expired',
+            method: 'GET',
+            params: { param },
+          }
+        }
+        return {
+          url: '/nearly-expired',
+          method: 'GET',
+        }
+      },
+    }),
+    getExpiredProduct: builder.query<
+      ApiResponse<Product & { batchProduct: BatchProduct[] }[]>,
+      { days: number }
+    >({
+      query: ({ days }) => {
+        if (days) {
+          const param = encodeBase64(JSON.stringify({ days }))
+          return {
+            url: '/expired',
+            method: 'GET',
+            params: { param },
+          }
+        }
+        return {
+          url: '/expired',
+          method: 'GET',
+        }
+      },
+    }),
   }),
 })
 
@@ -110,4 +175,8 @@ export const {
   useDeleteProductMutation,
   useGetProductDetailQuery,
   useGetAllProductWithoutPaginationQuery,
+  useLazyGetBatchProductQuery,
+  useLazyGetProductLowStockQuery,
+  useLazyGetNearlyExpiredProductQuery,
+  useLazyGetExpiredProductQuery,
 } = productApi

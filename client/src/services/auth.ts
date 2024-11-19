@@ -1,4 +1,12 @@
-import { Account, Cart, Favorite, LoginResponse, Order, Product } from '@/types'
+import {
+  Account,
+  Cart,
+  Favorite,
+  LoginResponse,
+  Order,
+  OrderInfo,
+  Product,
+} from '@/types'
 import { ApiResponse } from '@/types/ApiResponse'
 import { decodeBase64, encodeBase64 } from '@/utils'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
@@ -99,6 +107,59 @@ export const authApi = createApi({
         method: 'GET',
       }),
     }),
+    addOrderInfo: builder.mutation<ApiResponse<OrderInfo>, OrderInfo>({
+      query: (body) => ({
+        url: '/add-order-info',
+        method: 'POST',
+        body,
+      }),
+    }),
+    updateOrderInfo: builder.mutation<ApiResponse<OrderInfo>, OrderInfo>({
+      query: (body) => ({
+        url: `/update-order-info/${body.id}`,
+        method: 'PUT',
+        body,
+      }),
+    }),
+    deleteOrderInfo: builder.mutation<ApiResponse<void>, number>({
+      query: (id) => ({
+        url: `/delete-order-info/${id}`,
+        method: 'DELETE',
+      }),
+    }),
+    updateProfile: builder.mutation<ApiResponse<Account>, FormData>({
+      query: (body) => ({
+        url: '/update-profile',
+        method: 'PUT',
+        body,
+      }),
+    }),
+    changePassword: builder.mutation<
+      ApiResponse<void>,
+      { verificationCode: string }
+    >({
+      query: (body) => ({
+        url: '/change-password',
+        method: 'POST',
+        body,
+      }),
+    }),
+    changePasswordRequest: builder.mutation<
+      ApiResponse<void>,
+      { oldPassword: string; newPassword: string }
+    >({
+      query: (body) => ({
+        url: '/change-password-request',
+        method: 'POST',
+        body,
+      }),
+    }),
+    resendChangePasswordCode: builder.mutation<ApiResponse<void>, void>({
+      query: () => ({
+        url: '/resend-change-password-code',
+        method: 'POST',
+      }),
+    }),
   }),
 })
 
@@ -113,4 +174,11 @@ export const {
   useGetUserCartProductsQuery,
   useGetListCartProductsByIdsQuery,
   useGetUserOrdersQuery,
+  useAddOrderInfoMutation,
+  useUpdateOrderInfoMutation,
+  useDeleteOrderInfoMutation,
+  useUpdateProfileMutation,
+  useChangePasswordMutation,
+  useChangePasswordRequestMutation,
+  useResendChangePasswordCodeMutation,
 } = authApi

@@ -130,6 +130,10 @@ export class Account extends Model {
       foreignKey: 'accountId',
       as: 'favorites',
     })
+    Account.hasMany(models.OrderInfo, {
+      foreignKey: 'accountId',
+      as: 'orderInfos',
+    })
   }
 }
 

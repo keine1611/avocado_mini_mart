@@ -7,6 +7,9 @@ const upload = multer({ storage: multer.memoryStorage() })
 
 productRouter.get('/', productController.getAll)
 productRouter.get('/all', productController.getAllProductWithoutPagination)
+productRouter.get('/nearly-expired', productController.getNearlyExpiredProduct)
+productRouter.get('/low-stock', productController.getLowStockProduct)
+productRouter.get('/expired', productController.getExpiredProduct)
 productRouter.post(
   '/',
   upload.fields([
@@ -26,5 +29,6 @@ productRouter.put(
 productRouter.delete('/:id', productController.delete)
 productRouter.get('/:slug', productController.getDetail)
 productRouter.get('/ids', productController.getListProductByIds)
+productRouter.get('/:id/batch-product', productController.getBatchProduct)
 
 export { productRouter }

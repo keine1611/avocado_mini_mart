@@ -15,6 +15,12 @@ export class ProductDiscount extends Model {
           allowNull: false,
           primaryKey: true,
         },
+        discountPercentage: {
+          type: DataTypes.INTEGER,
+          min: 0,
+          max: 100,
+          allowNull: false,
+        },
       },
       {
         sequelize,
@@ -23,13 +29,15 @@ export class ProductDiscount extends Model {
     )
   }
   static associate(models) {
-    ProductDiscount.belongsTo(models.Product, {
+    this.belongsTo(models.Product, {
       foreignKey: 'productId',
       as: 'product',
+      onDelete: 'CASCADE',
     })
-    ProductDiscount.belongsTo(models.Discount, {
+    this.belongsTo(models.Discount, {
       foreignKey: 'discountId',
       as: 'discount',
+      onDelete: 'CASCADE',
     })
   }
 }

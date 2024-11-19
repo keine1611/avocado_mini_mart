@@ -1,3 +1,4 @@
+import { Order } from './Order'
 import { Product } from './Product'
 
 export interface OrderItem {
@@ -6,5 +7,8 @@ export interface OrderItem {
   price: number
   productId: string
   orderId: string
+  order: Order
   product: Product
+  discount: number
+  isReviewed: boolean
 }

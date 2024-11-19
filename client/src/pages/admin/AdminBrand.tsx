@@ -39,7 +39,12 @@ const AdminBrand: React.FC = () => {
   let searchInput: InputRef | null = null
   const [previewVisible, setPreviewVisible] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
-  const { data, error, isLoading } = useGetAllBrandQuery()
+  const {
+    data,
+    error,
+    isLoading: isLoadingBrand,
+    isFetching: isFetchingBrand,
+  } = useGetAllBrandQuery()
   const [createBrand, { isLoading: isCreating }] = useCreateBrandMutation()
   const [updateBrand, { isLoading: isUpdating }] = useUpdateBrandMutation()
   const [deleteBrand, { isLoading: isDeleting }] = useDeleteBrandMutation()
@@ -62,23 +67,21 @@ const AdminBrand: React.FC = () => {
     setIsModalVisible(true)
   }
 
-  const handleDelete = async (id: number) => {
-    try {
-      const response = await deleteBrand(id).unwrap()
-      message.success(response.message)
-    } catch (err: any) {
-      message.error(err.data?.message || 'Failed to delete brand')
-    }
-  }
-
-  const confirmDelete = (id: number) => {
+  const handleDelete = (id: number) => {
     Modal.confirm({
       title: 'Are you sure you want to delete this brand?',
       content: 'This action cannot be undone.',
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
-      onOk: () => handleDelete(id),
+      onOk: async () => {
+        try {
+          const response = await deleteBrand(id).unwrap()
+          message.success(response.message)
+        } catch (err: any) {
+          message.error(err.data?.message || 'Failed to delete brand')
+        }
+      },
     })
   }
 
@@ -273,7 +276,7 @@ const AdminBrand: React.FC = () => {
             <EditOutlined className='text-primary' />
           </button>
           <button
-            onClick={() => confirmDelete(record.id)}
+            onClick={() => handleDelete(record.id)}
             className=' btn btn-square btn-sm border border-red-500 text-red-500 hover:border hover:border-red-500 hover:text-red-500'
           >
             <DeleteOutlined className='text-red-500' />
@@ -296,7 +299,7 @@ const AdminBrand: React.FC = () => {
         columns={columns}
         dataSource={data?.data}
         rowKey={(record) => record.id}
-        loading={isLoading}
+        loading={isLoadingBrand || isFetchingBrand}
         className='bg-white shadow-md rounded-lg'
         scroll={{ x: 'max-content' }}
       />

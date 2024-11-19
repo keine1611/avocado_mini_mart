@@ -19,6 +19,10 @@ import { Discount } from './discount'
 import { Favorite } from './favorite'
 import { DiscountCode } from './discountCode'
 import { BatchProduct } from './batchProduct'
+import { Review } from './review'
+import { ReviewMedia } from './reviewMedia'
+import { OrderInfo } from './orderInfo'
+import { OrderStatus } from './orderStatus'
 
 export const models = {
   Account,
@@ -41,6 +45,10 @@ export const models = {
   Favorite,
   DiscountCode,
   BatchProduct,
+  Review,
+  ReviewMedia,
+  OrderInfo,
+  OrderStatus,
 }
 
 Object.values(models).forEach((model) => {
@@ -67,3 +75,7 @@ export * from './discount'
 export * from './favorite'
 export * from './discountCode'
 export * from './batchProduct'
+export * from './review'
+export * from './reviewMedia'
+export * from './orderInfo'
+export * from './orderStatus'

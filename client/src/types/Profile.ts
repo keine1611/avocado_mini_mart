@@ -7,4 +7,5 @@ export interface Profile {
   address: string | null
   updateAt: string
   accountId: number
+  gender: string | null
 }

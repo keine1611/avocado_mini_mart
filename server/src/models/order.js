@@ -54,7 +54,7 @@ export class Order extends Model {
           allowNull: false,
         },
         totalAmount: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.FLOAT(10, 2),
           allowNull: false,
         },
 
@@ -77,11 +77,11 @@ export class Order extends Model {
           allowNull: false,
         },
         shippingFee: {
-          type: DataTypes.FLOAT,
+          type: DataTypes.FLOAT(10, 2),
           allowNull: false,
         },
         discount: {
-          type: DataTypes.FLOAT,
+          type: DataTypes.FLOAT(10, 2),
           allowNull: false,
         },
         createdAt: {

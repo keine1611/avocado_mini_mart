@@ -27,6 +27,10 @@ export const authenticateToken = () => async (req, res, next) => {
   try {
     const account = await verifyAccessToken({ accessToken })
     if (!account) throw new Error()
+    if (account.role.name === 'ADMIN') {
+      req.account = account
+      return next()
+    }
     const permissions = account.role.rolePermissions.map((p) => p.permission)
     const permission = permissions.find(
       (p) =>

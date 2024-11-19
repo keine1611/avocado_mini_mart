@@ -81,6 +81,12 @@ export const verifyAccessToken = ({ accessToken }) => {
   })
 }
 
+export const deleteRefreshToken = ({ email }) => {
+  const tokens = readRefreshTokens()
+  const newTokens = tokens.filter((token) => token.email !== email)
+  writeRefreshTokens(newTokens)
+}
+
 export const readRefreshTokens = () => {
   if (!fs.existsSync(process.env.REFRESH_TOKENS_FILE)) {
     fs.writeFileSync(process.env.REFRESH_TOKENS_FILE, JSON.stringify([]))

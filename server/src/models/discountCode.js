@@ -32,7 +32,7 @@ export class DiscountCode extends Model {
           allowNull: false,
         },
         discountValue: {
-          type: DataTypes.DECIMAL(10, 2),
+          type: DataTypes.DECIMAL(5, 2),
           allowNull: false,
         },
         expiryDate: {

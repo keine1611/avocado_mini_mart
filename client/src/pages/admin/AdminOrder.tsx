@@ -42,23 +42,21 @@ const AdminOrder: React.FC = () => {
     setIsModalVisible(true)
   }
 
-  const handleDelete = async (id: number) => {
-    try {
-      // // const response = await deleteOrder(id).unwrap()
-      // message.success(response.message)
-    } catch (err: any) {
-      message.error(err.data?.message || 'Failed to delete order')
-    }
-  }
-
-  const confirmDelete = (id: number) => {
+  const handleDelete = (id: number) => {
     Modal.confirm({
       title: 'Are you sure you want to delete this order?',
       content: 'This action cannot be undone.',
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
-      onOk: () => handleDelete(id),
+      onOk: async () => {
+        try {
+          await deleteOrder(id).unwrap()
+          message.success('Order deleted successfully')
+        } catch (err: any) {
+          message.error(err.data?.message || 'Failed to delete order')
+        }
+      },
     })
   }
 

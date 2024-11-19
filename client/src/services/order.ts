@@ -1,3 +1,4 @@
+import { ORDER_STATUS } from '@/enum'
 import { Order, ApiResponse } from '@/types'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { createApi } from '@reduxjs/toolkit/query/react'
@@ -10,12 +11,22 @@ export const orderApi = createApi({
     baseUrl: BASE_URL + '/orders',
     credentials: 'include',
   }),
+  tagTypes: ['orderApi'],
   endpoints: (builder) => ({
     getOrders: builder.query<ApiResponse<Order[]>, void>({
       query: () => '/',
+      providesTags(result) {
+        if (result?.data) {
+          return [
+            ...result.data.map(({ id }) => ({ type: 'orderApi' as const, id })),
+            { type: 'orderApi' as const, id: 'LIST' },
+          ]
+        }
+        return [{ type: 'orderApi' as const, id: 'LIST' }]
+      },
     }),
-    getOrderById: builder.query<ApiResponse<Order>, number>({
-      query: (id) => `/${id}`,
+    getOrderByCode: builder.query<ApiResponse<Order>, string>({
+      query: (orderCode) => `/${orderCode}`,
     }),
     createOrder: builder.mutation<ApiResponse<Order>, Order>({
       query: (order) => ({
@@ -23,6 +34,7 @@ export const orderApi = createApi({
         method: 'POST',
         body: order,
       }),
+      invalidatesTags: [{ type: 'orderApi' as const, id: 'LIST' }],
     }),
     updateOrder: builder.mutation<ApiResponse<Order>, Order>({
       query: (order) => ({
@@ -30,13 +42,26 @@ export const orderApi = createApi({
         method: 'PUT',
         body: order,
       }),
+      invalidatesTags: [{ type: 'orderApi' as const, id: 'LIST' }],
+    }),
+    updateOrderStatus: builder.mutation<
+      ApiResponse<Order>,
+      { orderCode: string; orderStatus: ORDER_STATUS }
+    >({
+      query: ({ orderCode, orderStatus }) => ({
+        url: `/update-status/${orderCode}`,
+        method: 'PUT',
+        body: { orderStatus },
+      }),
+      invalidatesTags: [{ type: 'orderApi' as const, id: 'LIST' }],
     }),
   }),
 })
 
 export const {
   useGetOrdersQuery,
-  useGetOrderByIdQuery,
+  useGetOrderByCodeQuery,
   useCreateOrderMutation,
   useUpdateOrderMutation,
+  useUpdateOrderStatusMutation,
 } = orderApi

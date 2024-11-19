@@ -3,7 +3,9 @@ export const slugToTitle = (slug: string) => {
 }
 
 export const formatPhoneNumber = (phone: string) => {
-  return phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')
+  let normalized = phone.replace(/^(\+84|84)/, '0')
+
+  return normalized.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3')
 }
 
 export const getValueByPath = (obj: any, path: string) => {
@@ -26,4 +28,11 @@ export const enumToArray = <T extends object>(
       label: formatEnumValue(key),
       value: enumObj[key as keyof T] as string,
     }))
+}
+
+export const formatQuantity = (quantity: number) => {
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(quantity)
 }

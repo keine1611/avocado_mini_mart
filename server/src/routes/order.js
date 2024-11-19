@@ -3,10 +3,10 @@ import { orderController } from '@/controllers'
 
 export const orderRouter = express.Router()
 
+orderRouter.get('/:orderCode', orderController.getOrderById)
 orderRouter.get('/', orderController.getOrders)
 // orderRouter.post('/', orderController.createOrder)
-// orderRouter.get('/:id', orderController.getOrderById)
 // orderRouter.put('/:id', orderController.updateOrder)
 // orderRouter.delete('/:id', orderController.deleteOrder)
-
+orderRouter.put('/update-status/:orderCode', orderController.updateOrderStatus)
 export default orderRouter

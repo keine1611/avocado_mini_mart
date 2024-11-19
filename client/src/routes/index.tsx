@@ -20,10 +20,16 @@ import {
   UserFavorite,
   AdminDiscountCode,
   AdminBatch,
+  AdminBatchProduct,
+  AdminDiscount,
   UserMyOrder,
+  UserProfile,
+  UserOrderDetail,
+  AdminCheckOrder,
 } from '@/pages'
-import { AdminLayout, UserLayout } from '@/components'
+import { AdminLayout, UserLayout, MyAccount } from '@/components'
 import { useAppSelector } from '@/store'
+
 interface PrivateRouteProps {
   roles?: string[]
   children: React.ReactNode
@@ -85,8 +91,22 @@ const router = createBrowserRouter([
         element: <UserFavorite />,
       },
       {
-        path: 'my-orders',
-        element: <UserMyOrder />,
+        path: 'account',
+        element: <MyAccount />,
+        children: [
+          {
+            path: 'orders',
+            element: <UserMyOrder />,
+          },
+          {
+            path: 'orders/:orderCode',
+            element: <UserOrderDetail />,
+          },
+          {
+            path: 'profile',
+            element: <UserProfile />,
+          },
+        ],
       },
     ],
   },
@@ -152,6 +172,23 @@ const router = createBrowserRouter([
           {
             path: 'batches',
             element: <AdminBatch />,
+          },
+          {
+            path: 'batch-product',
+            element: <AdminBatchProduct />,
+          },
+          {
+            path: 'discounts',
+            element: <AdminDiscount />,
+          },
+        ],
+      },
+      {
+        path: 'tasks',
+        children: [
+          {
+            path: 'check-orders',
+            element: <AdminCheckOrder />,
           },
         ],
       },

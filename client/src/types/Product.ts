@@ -9,6 +9,8 @@ export interface Product {
   standardPrice: number
   mainImage: string
   maxDiscount: number
+  totalQuantity: number
+  status: string
   brandId: number
   subCategoryId: number
   createdAt: string

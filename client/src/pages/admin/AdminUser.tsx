@@ -43,6 +43,7 @@ const AdminUser: React.FC = () => {
   const {
     data: accounts,
     isLoading: isLoadingAccounts,
+    isFetching: isFetchingAccounts,
     error,
   } = useGetAllAccountQuery()
   const {
@@ -133,10 +134,22 @@ const AdminUser: React.FC = () => {
     setIsModalVisible(true)
   }
 
-  const handleDelete = async (id: number) => {
-    dispatch(loadingActions.setLoading(true))
-    await deleteAccount(id).unwrap()
-    dispatch(loadingActions.setLoading(false))
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this user?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          await deleteAccount(id).unwrap()
+          message.success('User deleted successfully')
+        } catch (error) {
+          message.error('Failed to delete user')
+        }
+      },
+    })
   }
 
   const handleCreate = () => {
@@ -338,7 +351,7 @@ const AdminUser: React.FC = () => {
         rowKey='id'
         className='bg-white shadow-md rounded-lg'
         scroll={{ x: 'max-content' }}
-        loading={isLoadingAccounts || isLoadingRoles}
+        loading={isLoadingAccounts || isFetchingAccounts}
       />
       <Modal
         open={isModalVisible}

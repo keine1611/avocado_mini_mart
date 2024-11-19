@@ -1,15 +1,19 @@
-import dayjs from "dayjs"
+import dayjs from 'dayjs'
 
-const dateFormat = 'DDMMYYYYHHmmss'
+const {
+  VITE_DATE_FORMAT_API,
+  VITE_DATE_FORMAT_DISPLAY_TIME,
+  VITE_DATE_FORMAT_DISPLAY,
+} = import.meta.env
 
 export const stringToDate = (date: string) => {
-    if (!date) return 'Invalid date.'
-    const parsedDate = dayjs(date, dateFormat)
-    return parsedDate.format('DD-MM-YYYY')
+  if (!date) return 'Invalid date.'
+  const parsedDate = dayjs(date, VITE_DATE_FORMAT_API)
+  return parsedDate.format(VITE_DATE_FORMAT_DISPLAY)
 }
 
 export const stringToDateTime = (date: string) => {
-    if (!date) return 'Invalid date.'
-    const parsedDate = dayjs(date, dateFormat)
-    return parsedDate.format('HH:mm DD-MM-YYYY ')
+  if (!date) return 'Invalid date.'
+  const parsedDate = dayjs(date, VITE_DATE_FORMAT_API)
+  return parsedDate.format(VITE_DATE_FORMAT_DISPLAY_TIME)
 }

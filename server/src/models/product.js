@@ -1,4 +1,4 @@
-import { DataTypes, Model } from 'sequelize'
+import { DataTypes, Model, Op } from 'sequelize'
 import { getToday, createSlug } from '@/utils'
 import { statusProduct } from '@/enum'
 import { sequelize } from '@/config'
@@ -81,26 +81,13 @@ export class Product extends Model {
         sequelize,
         tableName: 'products',
         hooks: {
-          afterUpdate: async (product, options) => {
-            product.updatedAt = getToday()
-          },
           beforeCreate: async (product, options) => {
             if (!product.slug) {
               product.slug = await createSlug({ name: product.name })
             }
           },
           beforeUpdate: async (product, options) => {
-            const productData = await Product.findOne({
-              where: { id: product.id },
-            })
-            if (product.standardPrice !== productData.standardPrice) {
-              await models.PriceHistory.create({
-                productId: product.id,
-                oldPrice: productData.standardPrice,
-                newPrice: product.standardPrice,
-                changeDate: getToday(),
-              })
-            }
+            product.updatedAt = getToday()
           },
         },
       }
@@ -138,6 +125,10 @@ export class Product extends Model {
     Product.hasMany(models.Favorite, {
       foreignKey: 'productId',
       as: 'favorites',
+    })
+    Product.hasMany(models.BatchProduct, {
+      foreignKey: 'productId',
+      as: 'batchProducts',
     })
   }
 }
