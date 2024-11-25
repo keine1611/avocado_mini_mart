@@ -9,4 +9,5 @@ orderRouter.get('/', orderController.getOrders)
 // orderRouter.put('/:id', orderController.updateOrder)
 // orderRouter.delete('/:id', orderController.deleteOrder)
 orderRouter.put('/update-status/:orderCode', orderController.updateOrderStatus)
+orderRouter.post('/user-create-order', orderController.userCreateOrder)
 export default orderRouter

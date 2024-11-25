@@ -3,6 +3,7 @@ import { Server } from 'socket.io'
 import cookie from 'cookie'
 import { verifyAccessToken } from '@/utils'
 import { cartService } from '@/services/cart'
+
 const setupWebSocket = (server) => {
   const io = new Server(server, {
     cors: {
@@ -45,11 +46,12 @@ const setupWebSocket = (server) => {
     })
 
     socket.on('syncCart', async (cart) => {
-      const cartCreated = await cartService.syncCart({
+      await cartService.syncCart({
         cartItems: cart,
         accountId: account.id,
       })
-      io.to(`user-${account.id}`).emit('cartUpdated', cartCreated)
+      const cartUpdated = await cartService.getCart({ accountId: account.id })
+      io.to(`user-${account.id}`).emit('cartUpdated', cartUpdated)
     })
 
     socket.on('disconnect', () => {

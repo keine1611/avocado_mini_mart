@@ -180,7 +180,7 @@ const orderValidation = {
       }),
     discount: Joi.number()
       .min(0)
-      .required()
+      .optional()
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {

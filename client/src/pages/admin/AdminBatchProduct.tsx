@@ -12,6 +12,8 @@ import { ColumnsType } from 'antd/es/table'
 import { formatCurrency, formatQuantity, stringToDate } from '@/utils'
 import { exportExcel } from '@/utils'
 
+const { VITE_DATE_FORMAT_API } = import.meta.env
+
 const AdminBatchProduct: React.FC = () => {
   const { data: products, isLoading: isProductsLoading } =
     useGetAllProductWithoutPaginationQuery()

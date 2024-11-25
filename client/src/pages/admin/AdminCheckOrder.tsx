@@ -34,7 +34,14 @@ const AdminCheckOrder: React.FC = () => {
   const [modalDescriptionInvisible, setModalDescriptionInvisible] =
     useState(false)
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
-  const { data, error, isLoading } = useGetOrdersQuery()
+  const {
+    data,
+    error,
+    isLoading,
+    isFetching: isFetchingOrders,
+  } = useGetOrdersQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  })
   const [updateOrder, { isLoading: isUpdating }] = useUpdateOrderMutation()
   const [updateOrderStatus, { isLoading: isUpdatingStatus }] =
     useUpdateOrderStatusMutation()
@@ -88,7 +95,7 @@ const AdminCheckOrder: React.FC = () => {
         ) : (
           <Input
             ref={(node) => {
-              searchInput.current = node
+              searchInput.current = node as any
             }}
             placeholder={`Search ${dataIndex}`}
             value={selectedKeys[0]}
@@ -427,7 +434,7 @@ const AdminCheckOrder: React.FC = () => {
         columns={columns}
         dataSource={data?.data}
         rowKey={(record) => record.id}
-        loading={isLoading}
+        loading={isLoading || isFetchingOrders}
         className='bg-white shadow-md rounded-lg'
         scroll={{ x: '', y: 'calc(100vh - 300px)' }}
         onRow={(record) => ({

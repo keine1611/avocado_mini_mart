@@ -22,7 +22,7 @@ import { BatchProduct } from './batchProduct'
 import { Review } from './review'
 import { ReviewMedia } from './reviewMedia'
 import { OrderInfo } from './orderInfo'
-import { OrderStatus } from './orderStatus'
+import { OrderLog } from './orderLog'
 
 export const models = {
   Account,
@@ -48,7 +48,7 @@ export const models = {
   Review,
   ReviewMedia,
   OrderInfo,
-  OrderStatus,
+  OrderLog,
 }
 
 Object.values(models).forEach((model) => {
@@ -78,4 +78,4 @@ export * from './batchProduct'
 export * from './review'
 export * from './reviewMedia'
 export * from './orderInfo'
-export * from './orderStatus'
+export * from './orderLog'

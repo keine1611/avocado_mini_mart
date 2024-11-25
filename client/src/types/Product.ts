@@ -1,4 +1,4 @@
-import { Brand, SubCategory } from '@/types'
+import { Brand, Review, SubCategory } from '@/types'
 
 export interface Product {
   id: number
@@ -13,11 +13,14 @@ export interface Product {
   status: string
   brandId: number
   subCategoryId: number
+  rating: number
   createdAt: string
   updatedAt: string
   productImages?: ProductImage[]
   brand?: Brand
   subCategory?: SubCategory
+  reviews?: Review[]
+  recommendedProducts?: Product[]
 }
 
 export interface ProductImage {

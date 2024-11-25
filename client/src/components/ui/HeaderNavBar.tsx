@@ -13,7 +13,10 @@ import { cartActions } from '@/store'
 import {
   setCheckedCartFromLocalStorage,
   clearCheckedCartFromLocalStorage,
+  getCheckedCartFromLocalStorage,
 } from '@/utils'
+import { showToast } from '@/components'
+import { FaRegTrashAlt } from 'react-icons/fa'
 
 const favoritesMenu: MenuProps['items'] = [
   {
@@ -41,29 +44,32 @@ const HeaderNavBar: React.FC = () => {
     action: 'increase' | 'decrease'
   ) => {
     if (productId) {
+      const cartItem = cart.find((item) => item.productId === productId)
       if (action === 'increase') {
-        const cartItem = cart.find((item) => item.productId === productId)
-        dispatch(cartActions.plusCart({ productId }))
-
-        if (cartItem) {
-          setCheckedCartItems((prev) => [
-            ...prev.filter((item) => item.productId !== productId),
-            { ...cartItem, quantity: cartItem.quantity + 1 },
-          ])
+        if (
+          cartItem &&
+          cartItem.quantity >= (cartItem.product?.totalQuantity || 0)
+        ) {
+          showToast.warning(
+            'Quantity exceeds stock, but you can still decrease or remove.'
+          )
+        } else {
+          dispatch(cartActions.plusCart({ productId }))
         }
       } else if (action === 'decrease') {
         dispatch(cartActions.minusCart({ productId }))
-
-        const cartItem = cart.find((item) => item.productId === productId)
-        if (cartItem) {
-          setCheckedCartItems((prev) => [
-            ...prev.filter((item) => item.productId !== productId),
-            { ...cartItem, quantity: cartItem.quantity - 1 },
-          ])
-        }
       }
     }
   }
+
+  useEffect(() => {
+    const cartChecked = cart.filter((item) =>
+      checkedCartItems.some(
+        (checkedItem) => checkedItem.productId === item.productId
+      )
+    )
+    setCheckedCartItems(cartChecked)
+  }, [cart])
 
   const profileMenu: MenuProps['items'] = [
     {
@@ -104,9 +110,31 @@ const HeaderNavBar: React.FC = () => {
 
   const handleCheckboxChange = (cartItem: Cart, checked: boolean) => {
     if (checked) {
-      setCheckedCartItems((prev) => [...prev, cartItem])
+      const haveCartItem = checkedCartItems.find(
+        (item) => item.productId === cartItem.productId
+      )
+
+      if (!haveCartItem) {
+        if (cartItem.quantity > (cartItem.product?.totalQuantity || 0)) {
+          showToast.warning(
+            'Quantity exceeds stock, but you can still decrease or remove.'
+          )
+          return
+        } else {
+          setCheckedCartItems((prev) => {
+            const newCart = [...prev].filter(
+              (item) => item.productId !== cartItem.productId
+            )
+            return [...newCart, cartItem]
+          })
+        }
+      } else {
+        setCheckedCartItems((prev) => [...prev, cartItem])
+      }
     } else {
-      setCheckedCartItems((prev) => prev.filter((item) => item !== cartItem))
+      setCheckedCartItems((prev) =>
+        prev.filter((item) => item.productId !== cartItem.productId)
+      )
     }
   }
 
@@ -288,8 +316,8 @@ const HeaderNavBar: React.FC = () => {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        className='rounded-lg shadow-lg'
-        width={800}
+        className='rounded-lg'
+        width={1000}
         footer={null}
       >
         <div className='cart-list p-4 bg-white rounded-lg overflow-y-auto'>
@@ -297,32 +325,68 @@ const HeaderNavBar: React.FC = () => {
             <p className='text-center text-gray-500'>Your cart is empty.</p>
           ) : (
             <div className='grid sm:grid-cols-1 md:grid-cols-3 gap-4'>
-              <div className='md:col-span-2 max-h-[300px] overflow-y-auto pr-4'>
+              <div className='md:col-span-2 max-h-[400px] overflow-y-auto pr-4'>
                 <div className='space-y-4'>
                   {cart.map((item: Cart) => (
                     <div
                       key={item.product?.id}
-                      className='flex justify-between items-center p-2 border-b border-gray-200'
+                      className='relative flex justify-between items-center p-4 border-b border-gray-200'
                     >
+                      {item.quantity > (item.product?.totalQuantity || 0) && (
+                        <span className='absolute top-0 right-0 px-2 py-[2px] text-red-500 text-xs'>
+                          Exceeds stock
+                        </span>
+                      )}
                       <div className='flex items-center'>
                         <input
                           type='checkbox'
-                          className='mr-2 hover:cursor-pointer checkbox-primary'
+                          className='mr-4 hover:cursor-pointer checkbox-primary'
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             handleCheckboxChange(item, e.target.checked)
                           }
                         />
-                        <img
-                          src={item.product?.mainImage}
-                          alt={item.product?.name}
-                          className='w-16 h-16 object-contain rounded-md mr-2'
-                        />
+                        <div className='relative'>
+                          <img
+                            src={item.product?.mainImage}
+                            alt={item.product?.name}
+                            className='w-20 h-20 object-contain rounded-md mr-4'
+                          />
+                          {item.product?.maxDiscount != undefined &&
+                            item.product?.maxDiscount > 0 && (
+                              <div className='absolute top-0 left-0 bg-secondary text-white px-[1px] rounded-br-lg'>
+                                <span className='text-xs'>
+                                  -{item.product.maxDiscount}%
+                                </span>
+                              </div>
+                            )}
+                        </div>
                         <div className='flex flex-col gap-2'>
                           <span className='font-medium'>
                             {item.product?.name}
                           </span>
                           <span className='text-gray-500'>
-                            ${item.product?.standardPrice}
+                            {item.product?.maxDiscount &&
+                            item.product?.maxDiscount > 0 ? (
+                              <>
+                                <span className='text-red-500'>
+                                  $
+                                  {(
+                                    item.product?.standardPrice -
+                                    (item.product?.standardPrice *
+                                      item.product?.maxDiscount) /
+                                      100
+                                  ).toFixed(2)}
+                                </span>
+                                <span className='line-through ml-2'>
+                                  ${item.product?.standardPrice}
+                                </span>
+                              </>
+                            ) : (
+                              <span>${item.product?.standardPrice}</span>
+                            )}
+                          </span>
+                          <span className='text-sm text-gray-500'>
+                            {`In Stock: ${item.product?.totalQuantity}`}
                           </span>
                         </div>
                       </div>
@@ -340,11 +404,50 @@ const HeaderNavBar: React.FC = () => {
                           onClick={() =>
                             handleQuantityChange(item.productId, 'increase')
                           }
-                          className='px-2 border border-gray-300 rounded-md hover:bg-gray-100'
+                          className={`px-2 border border-gray-300 rounded-md hover:bg-gray-100 ${
+                            item.quantity >= (item.product?.totalQuantity || 0)
+                              ? 'opacity-50 cursor-not-allowed'
+                              : ''
+                          }`}
+                          disabled={
+                            item.quantity >= (item.product?.totalQuantity || 0)
+                          }
                         >
                           +
                         </button>
+                        <button
+                          onClick={() =>
+                            dispatch(
+                              cartActions.removeCart({
+                                productId: item.productId,
+                              })
+                            )
+                          }
+                          className='ml-2 px-2 py-[4px] border border-red-300 rounded-md hover:bg-red-100 text-red-500'
+                        >
+                          <FaRegTrashAlt />
+                        </button>
                       </div>
+                      {item.product?.totalQuantity !== undefined &&
+                        item.product?.totalQuantity <= 0 && (
+                          <div className='absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-lg shadow-lg'>
+                            <span className='text-white font-bold mb-2'>
+                              Out of Stock
+                            </span>
+                            <button
+                              onClick={() =>
+                                dispatch(
+                                  cartActions.removeCart({
+                                    productId: item.productId,
+                                  })
+                                )
+                              }
+                              className=' btn btn-sm btn-error px-4 py-2 text-white rounded-md hover:bg-red-600 transition-all duration-300 ease-in-out'
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        )}
                     </div>
                   ))}
                 </div>
@@ -357,7 +460,9 @@ const HeaderNavBar: React.FC = () => {
                     .reduce(
                       (total, item) =>
                         total +
-                        (item.product?.standardPrice || 0) * item.quantity,
+                        (item.product?.standardPrice || 0) *
+                          (1 - (item.product?.maxDiscount || 0) / 100) *
+                          item.quantity,
                       0
                     )
                     .toFixed(2)}

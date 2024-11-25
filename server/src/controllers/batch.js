@@ -24,7 +24,6 @@ const batchController = {
     }
   },
   createBatch: async (req, res) => {
-    console.log(req.body)
     try {
       const { error } = batchValidation.createBatch.validate(req.body)
       if (error) {
@@ -56,22 +55,74 @@ const batchController = {
   updateBatch: async (req, res) => {
     let transaction
     try {
+      const { batchProducts, ...batchData } = req.body
       transaction = await sequelize.transaction()
-      const batch = await Batch.update(req.body, {
-        where: { id: req.params.id },
+      const batch = await Batch.findByPk(req.params.id, {
+        transaction,
+        include: {
+          model: BatchProduct,
+          as: 'batchProducts',
+        },
+      })
+
+      if (!batch) {
+        await transaction.rollback()
+        return res.status(404).json({ message: 'Batch not found' })
+      }
+
+      await batch.update(batchData, { transaction })
+
+      const existingBatchProducts = batch.batchProducts.map(
+        (bp) => bp.productId
+      )
+      const updatedBatchProducts = req.body.batchProducts.map(
+        (bp) => bp.productId
+      )
+
+      // Create new BatchProducts
+      const newBatchProducts = req.body.batchProducts.filter((bp) => {
+        const existing = existingBatchProducts.find(
+          (existingProductId) => existingProductId == bp.productId
+        )
+        return !existing
+      })
+      await BatchProduct.bulkCreate(
+        newBatchProducts.map((bp) => ({
+          ...bp,
+          batchId: req.params.id,
+        })),
+        { transaction }
+      )
+
+      // Delete BatchProducts not in the update
+      const batchProductsToDelete = existingBatchProducts.filter(
+        (productId) => {
+          const updated = updatedBatchProducts.find(
+            (updatedProductId) => updatedProductId === productId
+          )
+          return !updated
+        }
+      )
+      await BatchProduct.destroy({
+        where: {
+          batchId: req.params.id,
+          productId: batchProductsToDelete,
+        },
         transaction,
       })
 
-      if (req.body.batchProducts) {
-        await Promise.all(
-          req.body.batchProducts.map(async (product) => {
-            await BatchProduct.update(product, {
-              where: { productId: product.productId, batchId: req.params.id },
+      // Update existing BatchProducts
+      await Promise.all(
+        req.body.batchProducts.map(async (bp) => {
+          if (existingBatchProducts.includes(bp.productId)) {
+            await BatchProduct.update(bp, {
+              where: { productId: bp.productId, batchId: req.params.id },
               transaction,
             })
-          })
-        )
-      }
+          }
+        })
+      )
+
       await transaction.commit()
       res
         .status(200)

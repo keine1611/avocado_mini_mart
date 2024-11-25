@@ -3,10 +3,12 @@ import { reduxReducers } from './reduxReducers'
 import { serviceReducer, serviceMiddleware } from '@/services'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { useDispatch, useSelector, useStore } from 'react-redux'
+import { dashboardApi } from '@/services/dashboard'
 
 const rootReducer = {
   ...serviceReducer,
   ...reduxReducers,
+  [dashboardApi.reducerPath]: dashboardApi.reducer,
 }
 
 export const store = configureStore({

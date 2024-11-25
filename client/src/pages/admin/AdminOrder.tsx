@@ -50,12 +50,12 @@ const AdminOrder: React.FC = () => {
       okType: 'danger',
       cancelText: 'No',
       onOk: async () => {
-        try {
-          await deleteOrder(id).unwrap()
-          message.success('Order deleted successfully')
-        } catch (err: any) {
-          message.error(err.data?.message || 'Failed to delete order')
-        }
+        // try {
+        //   await deleteOrder(id).unwrap()
+        //   message.success('Order deleted successfully')
+        // } catch (err: any) {
+        //   message.error(err.data?.message || 'Failed to delete order')
+        // }
       },
     })
   }
@@ -114,7 +114,7 @@ const AdminOrder: React.FC = () => {
               {record.orderStatus}
             </Tag>
           )
-        } else if (record.orderStatus === ORDER_STATUS.PROCESSING) {
+        } else if (record.orderStatus === ORDER_STATUS.CONFIRMED) {
           return (
             <Tag icon={<MdPendingActions />} color='lime' className='uppercase'>
               {record.orderStatus}

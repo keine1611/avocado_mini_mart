@@ -26,6 +26,7 @@ import {
   UserProfile,
   UserOrderDetail,
   AdminCheckOrder,
+  AdminDashboard,
 } from '@/pages'
 import { AdminLayout, UserLayout, MyAccount } from '@/components'
 import { useAppSelector } from '@/store'
@@ -191,6 +192,10 @@ const router = createBrowserRouter([
             element: <AdminCheckOrder />,
           },
         ],
+      },
+      {
+        path: 'dashboard',
+        element: <AdminDashboard />,
       },
     ],
   },

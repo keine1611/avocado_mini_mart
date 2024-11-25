@@ -130,6 +130,10 @@ export class Product extends Model {
       foreignKey: 'productId',
       as: 'batchProducts',
     })
+    Product.hasMany(models.Review, {
+      foreignKey: 'productId',
+      as: 'reviews',
+    })
   }
 }
 

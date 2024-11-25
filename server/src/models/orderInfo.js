@@ -41,7 +41,7 @@ export class OrderInfo extends Model {
       },
       {
         sequelize,
-        modelName: 'orderInfo',
+        tableName: 'order_infos',
       }
     )
   }

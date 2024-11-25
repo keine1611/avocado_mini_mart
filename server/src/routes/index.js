@@ -11,6 +11,8 @@ import { paymentRouter } from './payment'
 import { discountCodeRouter } from './discountCode'
 import { batchRouter } from './batch'
 import { discountRouter } from './discount'
+import { reviewRouter } from './review'
+import { dashboardRouter } from './dashboard'
 
 export const route = (app) => {
   app.use('/api/brands', brandRouter)
@@ -26,4 +28,6 @@ export const route = (app) => {
   app.use('/api/discount-codes', discountCodeRouter)
   app.use('/api/batches', batchRouter)
   app.use('/api/discounts', discountRouter)
+  app.use('/api/reviews', reviewRouter)
+  app.use('/api/dashboard', dashboardRouter)
 }

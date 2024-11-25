@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Confirmation</title>
+  </head>
+  <body
+    style="
+      background-color: #f9f9f9;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    "
+  >
+    <div
+      style="
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      "
+    >
+      <div style="text-align: center; margin-bottom: 20px">
+        <img
+          src="https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/static%2Flogo.png?alt=media&token=d982bc32-27f9-4a1a-8eec-8ed1b91ab4a5"
+          alt="Company Logo"
+          style="max-width: 100px; margin-bottom: 20px"
+        />
+        <h1 style="color: #333; font-size: 24px; font-weight: bold">
+          Order Confirmation
+        </h1>
+        <p style="color: #555; font-size: 16px">
+          We got your order (thank you!). This is your receipt and confirmation
+          that everything's going according to plan, so print it and file it
+          away somewhere safe. Just kidding.
+        </p>
+        <p style="color: #555; font-size: 14px">
+          Due to longer processing times, it may take more time than usual to
+          fulfill your order. We'll make sure you receive an email as soon as
+          your order ships. Our current estimate is that your order will ship
+          within the next 7-12 business days. We are working to get your order
+          out as quickly as possible. Thank you for your patience!
+        </p>
+      </div>
+      <table
+        style="width: 100%; margin-bottom: 20px; border-collapse: collapse"
+      >
+        <tbody>
+          <% orderDetails.orderItems.forEach(orderItem => { %>
+          <tr>
+            <td style="padding: 10px; width: 100px">
+              <% if (orderItem.discount > 0) { %>
+              <div
+                style="
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  background-color: #ffcc00;
+                  color: #fff;
+                  padding: 2px 5px;
+                  font-size: 12px;
+                  border-radius: 0 0 5px 0;
+                  width: fit-content;
+                "
+              >
+                -<%= orderItem.discount.toFixed(0) %>%
+              </div>
+              <% } %>
+              <img
+                src="<%= orderItem.product.mainImage %>"
+                alt="<%= orderItem.product.name %>"
+                style="
+                  width: 80px;
+                  height: 80px;
+                  object-fit: cover;
+                  border-radius: 5px;
+                  display: block;
+                  position: relative;
+                "
+              />
+            </td>
+            <td
+              style="
+                padding: 10px;
+                color: #333;
+                font-size: 16px;
+                font-weight: bold;
+              "
+            >
+              <p><%= orderItem.product.name %></p>
+              <% if (orderItem.discount > 0) { %>
+              <span style="color: red">
+                $<%= (orderItem.price * (1 - orderItem.discount /
+                100)).toFixed(2) %>
+              </span>
+              <span
+                style="
+                  text-decoration: line-through;
+                  margin-left: 5px;
+                  color: #888;
+                "
+              >
+                $<%= orderItem.price.toFixed(2) %>
+              </span>
+              <% } else { %> $<%= orderItem.price.toFixed(2) %> <% } %>
+            </td>
+
+            <td
+              style="
+                padding: 10px;
+                color: #555;
+                font-size: 14px;
+                width: fit-content;
+              "
+            >
+              x<%= orderItem.quantity %>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <div style="margin-top: 20px">
+        <p style="color: #333; font-size: 16px">
+          Subtotal
+          <span style="float: right">$<%= orderDetails.totalAmount %></span>
+        </p>
+        <p style="color: #333; font-size: 16px">
+          Promotion
+          <span style="float: right">-$<%= orderDetails.discount %></span>
+        </p>
+        <p style="color: #333; font-size: 16px">
+          Shipping
+          <span style="float: right">$<%= orderDetails.shippingFee %></span>
+        </p>
+        <p style="color: #333; font-size: 18px; font-weight: bold">
+          Total
+          <span style="float: right">$<%= total %></span>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

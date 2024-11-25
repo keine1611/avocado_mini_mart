@@ -1,5 +1,6 @@
 import { models, Product, ProductImage, BatchProduct } from '@/models'
 import { sequelize } from '@/config'
+import _, { includes } from 'lodash'
 import {
   getPagination,
   decodeQueryFromBase64,
@@ -13,7 +14,12 @@ import { productValidation } from '@/validation'
 import { v4 as uuidv4 } from 'uuid'
 import { statusProduct } from '@/enum'
 import dayjs from 'dayjs'
-import { updateProductPrice } from '@/services'
+
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+dayjs.extend(customParseFormat)
+
+import { updateProductPrice, getRecommendedProducts } from '@/services'
+import { getProductByIds } from '@/services'
 
 const { DATE_FORMAT } = process.env
 
@@ -31,9 +37,9 @@ export const productController = {
         subcategory,
         maxprice,
         minprice,
-      } = (subcategory = await decodeQueryFromBase64({
+      } = await decodeQueryFromBase64({
         param,
-      }))
+      })
 
       const productWhereCondition = { status: statusProduct.ACTIVE }
       if (minprice !== undefined && minprice !== null) {
@@ -126,7 +132,7 @@ export const productController = {
 
       const productsWithDetails = products.map((product) => {
         const totalQuantity = product.batchProducts.reduce((acc, batch) => {
-          if (dayjs(batch.expiredDate).isAfter(dayjs())) {
+          if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(dayjs())) {
             return acc + batch.quantity
           }
           return acc
@@ -376,18 +382,68 @@ export const productController = {
             include: [{ model: models.MainCategory, as: 'mainCategory' }],
           },
           {
-            model: models.ProductDiscount,
-            as: 'productDiscounts',
-            include: {
-              model: models.Discount,
-              as: 'discount',
-            },
+            model: models.Review,
+            as: 'reviews',
+            attributes: ['rating', 'comment', 'createdAt'],
+            order: [['createdAt', 'DESC']],
+            include: [
+              {
+                model: models.Account,
+                as: 'account',
+                attributes: ['email', 'avatarUrl'],
+              },
+              {
+                model: models.ReviewMedia,
+                as: 'reviewMedia',
+                attributes: ['url', 'mediaType'],
+              },
+            ],
           },
         ],
       })
+
+      const productDiscounts = await models.ProductDiscount.findAll({
+        where: { productId: product.id },
+        include: {
+          model: models.Discount,
+          as: 'discount',
+          where: { isActive: true },
+        },
+        attributes: ['discountPercentage'],
+        order: [['discountPercentage', 'DESC']],
+      })
+
+      const rating =
+        product.reviews.length > 0
+          ? product.reviews.reduce((acc, review) => {
+              return acc + review.rating
+            }, 0) / product.reviews.length
+          : 0
+      const maxDiscount =
+        productDiscounts.length > 0 ? productDiscounts[0].discountPercentage : 0
+
+      const batchProducts = await BatchProduct.findAll({
+        where: { productId: product.id },
+      })
+      const totalQuantity = batchProducts.reduce((acc, batch) => {
+        if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(dayjs())) {
+          return acc + batch.quantity
+        }
+        return acc
+      }, 0)
+
+      const recommendedProducts = await getRecommendedProducts(product.id)
+      const shuffledProducts = _.shuffle(recommendedProducts).slice(0, 10)
+
       res.status(200).json({
         message: 'Product detail retrieved successfully',
-        data: product,
+        data: {
+          ...product.dataValues,
+          maxDiscount,
+          totalQuantity,
+          rating,
+          recommendedProducts: shuffledProducts,
+        },
       })
     } catch (error) {
       res.status(500).json({
@@ -398,10 +454,9 @@ export const productController = {
   },
   getListProductByIds: async (req, res) => {
     try {
-      const { ids } = req.params
-      const products = await Product.findAll({
-        where: { id: { [Op.in]: ids } },
-      })
+      const { ids } = req.query
+      const arrIds = JSON.parse(ids)
+      const products = await getProductByIds(arrIds)
       res.status(200).json({
         message: 'Products retrieved successfully',
         data: products,

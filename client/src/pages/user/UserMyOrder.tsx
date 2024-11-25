@@ -9,7 +9,12 @@ import { EyeOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 
 const UserMyOrder: React.FC = () => {
-  const { data: orders, isLoading: isLoadingOrders } = useGetUserOrdersQuery()
+  const { data: orders, isLoading: isLoadingOrders } = useGetUserOrdersQuery(
+    undefined,
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  )
 
   const [ordersData, setOrdersData] = useState<Order[]>([])
 

@@ -89,7 +89,7 @@ export class Order extends Model {
           allowNull: false,
           defaultValue: () => getToday(),
         },
-        updateAt: {
+        updatedAt: {
           type: DataTypes.STRING,
           allowNull: false,
           defaultValue: () => getToday(),
@@ -114,6 +114,10 @@ export class Order extends Model {
     Order.belongsTo(models.Account, {
       foreignKey: 'accountId',
       as: 'account',
+    })
+    Order.hasMany(models.OrderLog, {
+      foreignKey: 'orderId',
+      as: 'orderLogs',
     })
   }
 }

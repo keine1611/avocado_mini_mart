@@ -23,11 +23,6 @@ export class ReviewMedia extends Model {
           type: DataTypes.STRING(255),
           allowNull: false,
         },
-        createdAt: {
-          type: DataTypes.STRING(14),
-          allowNull: true,
-          defaultValue: getToday(),
-        },
       },
       {
         sequelize,

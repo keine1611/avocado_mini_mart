@@ -27,6 +27,9 @@ export const orderApi = createApi({
     }),
     getOrderByCode: builder.query<ApiResponse<Order>, string>({
       query: (orderCode) => `/${orderCode}`,
+      providesTags(result, error, orderCode) {
+        return [{ type: 'orderApi', id: 'ORDERDETAIL' }]
+      },
     }),
     createOrder: builder.mutation<ApiResponse<Order>, Order>({
       query: (order) => ({
@@ -55,6 +58,13 @@ export const orderApi = createApi({
       }),
       invalidatesTags: [{ type: 'orderApi' as const, id: 'LIST' }],
     }),
+    userCreateOrder: builder.mutation<ApiResponse<any>, any>({
+      query: (order) => ({
+        url: '/user-create-order',
+        method: 'POST',
+        body: order,
+      }),
+    }),
   }),
 })
 
@@ -64,4 +74,5 @@ export const {
   useCreateOrderMutation,
   useUpdateOrderMutation,
   useUpdateOrderStatusMutation,
+  useUserCreateOrderMutation,
 } = orderApi

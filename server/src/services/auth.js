@@ -7,6 +7,7 @@ import {
   writeRefreshTokens,
 } from '@/utils'
 import bcrypt from 'bcrypt'
+import { cartService } from './cart'
 
 export const register = async ({ email, password }) => {
   const account = await Account.create({
@@ -30,12 +31,6 @@ export const login = async ({ email, password }) => {
         model: models.Role,
         as: 'role',
         attributes: ['id', 'name'],
-      },
-      {
-        model: models.Cart,
-        as: 'carts',
-        attributes: ['productId', 'quantity'],
-        include: [{ model: models.Product, as: 'product' }],
       },
       {
         model: models.Favorite,
@@ -67,13 +62,14 @@ export const login = async ({ email, password }) => {
   refreshTokens.push({ email, id: account.id, refreshToken })
   writeRefreshTokens(refreshTokens)
 
+  const carts = await cartService.getCart({ accountId: account.id })
   const accountWithoutPassword = {
     id: account.id,
     email: account.email,
     avatarUrl: account.avatarUrl,
     profile: account.profile,
     role: account.role,
-    carts: account.carts,
+    carts,
     favorites: account.favorites,
     orderInfos: account.orderInfos,
   }

@@ -10,7 +10,7 @@ import { paymentService } from './payment'
 import { discountCodeApi } from './discountCode'
 import { batchApi } from './batch'
 import { discountApi } from './discount'
-
+import { dashboardApi } from './dashboard'
 export const serviceReducer = {
   [brandApi.reducerPath]: brandApi.reducer,
   [authApi.reducerPath]: authApi.reducer,
@@ -24,6 +24,7 @@ export const serviceReducer = {
   [discountCodeApi.reducerPath]: discountCodeApi.reducer,
   [batchApi.reducerPath]: batchApi.reducer,
   [discountApi.reducerPath]: discountApi.reducer,
+  [dashboardApi.reducerPath]: dashboardApi.reducer,
 }
 
 export const serviceMiddleware = [
@@ -39,4 +40,5 @@ export const serviceMiddleware = [
   discountCodeApi.middleware,
   batchApi.middleware,
   discountApi.middleware,
+  dashboardApi.middleware,
 ]

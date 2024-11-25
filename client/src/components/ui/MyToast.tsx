@@ -40,6 +40,9 @@ export const showToast = {
       toastOption
     )
   },
+  warning: (message: string) => {
+    toast.warning(message + ' 🤔', toastOption)
+  },
 }
 
 const toastOption: ToastOptions = {

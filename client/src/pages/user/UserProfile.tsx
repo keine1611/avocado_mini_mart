@@ -236,7 +236,7 @@ const UserProfile: React.FC = () => {
   )
 }
 
-const ModalAddAddress: React.FC<{
+export const ModalAddAddress: React.FC<{
   open: boolean
   setOpen: (open: boolean) => void
   editOrderInfo: OrderInfo | null

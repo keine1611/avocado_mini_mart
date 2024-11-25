@@ -18,6 +18,7 @@ productRouter.post(
   ]),
   productController.create
 )
+productRouter.get('/ids', productController.getListProductByIds)
 productRouter.put(
   '/:id',
   upload.fields([
@@ -28,7 +29,6 @@ productRouter.put(
 )
 productRouter.delete('/:id', productController.delete)
 productRouter.get('/:slug', productController.getDetail)
-productRouter.get('/ids', productController.getListProductByIds)
 productRouter.get('/:id/batch-product', productController.getBatchProduct)
 
 export { productRouter }

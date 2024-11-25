@@ -1,5 +1,6 @@
 import { Account } from './Account'
 import { OrderItem } from './OrderItem'
+import { OrderLog } from './OrderLog'
 
 interface Order {
   id: number
@@ -21,6 +22,7 @@ interface Order {
   discount: number
   createdAt: string
   updatedAt: string
+  orderLogs: OrderLog[]
   orderItems: OrderItem[]
   account: Account
 }

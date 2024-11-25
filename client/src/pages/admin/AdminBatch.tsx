@@ -69,12 +69,23 @@ const AdminBatch: React.FC = () => {
     const newBatch: Batch = {
       code: values.code,
       arrivalDate: dayjs(values.arrivalDate).format(VITE_DATE_FORMAT_API),
-      batchProducts: batchProducts.map((item) => ({
-        productId: item.productId,
-        initialQuantity: item.initialQuantity,
-        expiredDate: item.expiredDate,
-        price: item.price,
-      })),
+      batchProducts: batchProducts.map((item) => {
+        if (editBatch) {
+          return {
+            productId: item.productId,
+            quantity: item.quantity,
+            initialQuantity: item.initialQuantity,
+            expiredDate: item.expiredDate,
+            price: item.price,
+          }
+        }
+        return {
+          productId: item.productId,
+          initialQuantity: item.initialQuantity,
+          expiredDate: item.expiredDate,
+          price: item.price,
+        }
+      }),
     } as Batch
 
     try {
@@ -109,6 +120,7 @@ const AdminBatch: React.FC = () => {
         `initialQuantity_${item.productId}`,
         item.initialQuantity
       )
+      form.setFieldValue(`quantity_${item.productId}`, item.quantity)
       form.setFieldValue(`price_${item.productId}`, item.price)
       form.setFieldValue(
         `expiredDate_${item.productId}`,
@@ -260,16 +272,70 @@ const AdminBatch: React.FC = () => {
       title: 'Product',
       dataIndex: 'product',
       render: (text: Product) => text.name,
+      width: 200,
     },
     {
       title: 'Barcode',
       dataIndex: 'product.barcode',
       render: (text: string, record: BatchProduct) => record.product?.barcode,
+      width: 150,
     },
+    ...(editBatch
+      ? [
+          {
+            title: 'Quantity',
+            dataIndex: 'quantity',
+            render: (text: number, record: BatchProduct) => (
+              <Form.Item
+                name={`quantity_${record.productId}`}
+                rules={[
+                  { required: true, message: 'Quantity is required' },
+                  {
+                    validator: (_, value) => {
+                      if (value < 0) {
+                        return Promise.reject('Quantity cannot be negative')
+                      }
+                      if (editBatch) {
+                        const findProduct = batchProducts.find(
+                          (item) => item.productId === record.productId
+                        )
+                        if (
+                          findProduct &&
+                          findProduct.initialQuantity < value
+                        ) {
+                          return Promise.reject(
+                            'Quantity cannot be greater than Initial Quantity'
+                          )
+                        }
+                      }
+                      return Promise.resolve()
+                    },
+                  },
+                ]}
+                className='my-auto'
+              >
+                <Input
+                  type='number'
+                  step='1'
+                  value={text}
+                  onChange={(e) =>
+                    handleEditBatchProduct(
+                      record.productId,
+                      'quantity',
+                      Number(e.target.value)
+                    )
+                  }
+                  className='w-full'
+                />
+              </Form.Item>
+            ),
+          },
+        ]
+      : []),
     {
       title: 'Initial Quantity',
       dataIndex: 'initialQuantity',
-      render: (text: number, record: BatchProduct, index: number) => (
+      render: (text: number, record: BatchProduct) => (
         <Form.Item
           name={`initialQuantity_${record.productId}`}
           rules={[
@@ -279,11 +345,12 @@ const AdminBatch: React.FC = () => {
                 if (value < 1) {
                   return Promise.reject('Must be greater than 0')
                 }
+
                 return Promise.resolve()
               },
             },
           ]}
-          className=' my-auto'
+          className='my-auto'
         >
           <Input
             type='number'
@@ -304,7 +371,7 @@ const AdminBatch: React.FC = () => {
     {
       title: 'Price',
       dataIndex: 'price',
-      render: (text: number, record: BatchProduct, index: number) => (
+      render: (text: number, record: BatchProduct) => (
         <Form.Item
           name={`price_${record.productId}`}
           rules={[
@@ -318,7 +385,7 @@ const AdminBatch: React.FC = () => {
               },
             },
           ]}
-          className=' my-auto'
+          className='my-auto'
         >
           <Input
             type='number'
@@ -339,11 +406,11 @@ const AdminBatch: React.FC = () => {
     {
       title: 'Expired Date',
       dataIndex: 'expiredDate',
-      render: (text: string, record: BatchProduct, index: number) => (
+      render: (text: string, record: BatchProduct) => (
         <Form.Item
           name={`expiredDate_${record.productId}`}
           rules={[{ required: true, message: 'Expired Date is required' }]}
-          className=' my-auto'
+          className='my-auto'
         >
           <DatePicker
             format={'DD-MM-YYYY'}
@@ -358,6 +425,7 @@ const AdminBatch: React.FC = () => {
           />
         </Form.Item>
       ),
+      width: 160,
     },
     {
       title: 'Action',
@@ -432,7 +500,7 @@ const AdminBatch: React.FC = () => {
       <Modal
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        width={1000}
+        width={1200}
         footer={null}
         centered
       >

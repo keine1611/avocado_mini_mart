@@ -7,4 +7,5 @@ export type OrderInfo = {
   provinceCode: string
   districtCode: string
   wardCode: string
+  accountId: number
 }

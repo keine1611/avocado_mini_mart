@@ -87,7 +87,7 @@ export const productApi = createApi({
         query: (ids) => ({
           url: `/ids`,
           method: 'GET',
-          params: { ids },
+          params: { ids: JSON.stringify(ids) },
         }),
       }
     ),
@@ -179,4 +179,5 @@ export const {
   useLazyGetProductLowStockQuery,
   useLazyGetNearlyExpiredProductQuery,
   useLazyGetExpiredProductQuery,
+  useGetListProductByIdsQuery,
 } = productApi

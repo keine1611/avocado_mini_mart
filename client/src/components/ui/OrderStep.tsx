@@ -45,7 +45,7 @@ export const OrderStep: React.FC<{ status: ORDER_STATUS }> = ({ status }) => {
   return (
     <ConfigProvider theme={{ token: { colorPrimary: VITE_COLOR_PRIMARY } }}>
       <Steps current={currentStepIndex} className='w-full px-2 my-4'>
-        {steps.map((step) => (
+        {steps.map((step, index) => (
           <Step
             key={step.status}
             icon={
@@ -53,6 +53,14 @@ export const OrderStep: React.FC<{ status: ORDER_STATUS }> = ({ status }) => {
                 {step.icon}
                 <div className=''>{step.label}</div>
               </div>
+            }
+            status={
+              index <= currentStepIndex
+                ? step.status === ORDER_STATUS.CANCELLED ||
+                  step.status === ORDER_STATUS.REJECTED
+                  ? 'error'
+                  : 'finish'
+                : 'wait'
             }
           />
         ))}

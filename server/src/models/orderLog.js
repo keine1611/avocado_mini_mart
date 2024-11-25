@@ -3,7 +3,7 @@ import { sequelize } from '@/config'
 import { ORDER_STATUS } from '@/enum'
 import { getToday } from '@/utils'
 
-export class OrderStatus extends Model {
+export class OrderLog extends Model {
   static init(sequelize) {
     super.init(
       {
@@ -27,9 +27,9 @@ export class OrderStatus extends Model {
       },
       {
         sequelize,
-        tableName: 'order_status',
+        tableName: 'order_logs',
         hooks: {
-          beforeCreate: (orderStatus) => (orderStatus.updatedAt = getToday()),
+          beforeCreate: (orderLog) => (orderLog.updatedAt = getToday()),
         },
       }
     )
@@ -39,4 +39,4 @@ export class OrderStatus extends Model {
   }
 }
 
-OrderStatus.init(sequelize)
+OrderLog.init(sequelize)

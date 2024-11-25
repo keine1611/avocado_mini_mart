@@ -1,5 +1,6 @@
 import { Cart, Product } from '../models'
 import { sequelize } from '@/config'
+import { getProductById } from './product'
 
 const cartService = {
   syncCart: async ({ cartItems, accountId }) => {
@@ -29,6 +30,24 @@ const cartService = {
         include: [{ model: Product, as: 'product' }],
       })
     }
+  },
+  getCart: async ({ accountId }) => {
+    const cart = await Cart.findAll({
+      where: { accountId },
+      include: [{ model: Product, as: 'product' }],
+    })
+
+    const cartWithTotalQuantity = await Promise.all(
+      cart.map(async (item) => {
+        const product = await getProductById(item.productId)
+        return {
+          ...item.toJSON(),
+          product: product,
+        }
+      })
+    )
+
+    return cartWithTotalQuantity
   },
 }
 

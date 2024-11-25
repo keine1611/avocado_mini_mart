@@ -1,5 +1,6 @@
 import { Model, DataTypes } from 'sequelize'
 import { sequelize } from '@/config'
+import { getToday } from '@/utils'
 
 export class Review extends Model {
   static init(sequelize) {
@@ -18,22 +19,29 @@ export class Review extends Model {
           type: DataTypes.TEXT,
           allowNull: false,
         },
-        accountId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-        },
-        productId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
+        createdAt: {
+          type: DataTypes.STRING(14),
+          allowNull: true,
         },
       },
-      { sequelize, tableName: 'reviews' }
+      {
+        sequelize,
+        tableName: 'reviews',
+        hooks: {
+          beforeCreate: async (review, options) => {
+            review.createdAt = getToday()
+          },
+        },
+      }
     )
   }
   static associate(models) {
-    this.belongsTo(models.Account, { foreignKey: 'accountId' })
-    this.belongsTo(models.Product, { foreignKey: 'productId' })
-    this.hasMany(models.ReviewMedia, { foreignKey: 'reviewId' })
+    this.belongsTo(models.Account, { foreignKey: 'accountId', as: 'account' })
+    this.belongsTo(models.Product, { foreignKey: 'productId', as: 'product' })
+    this.hasMany(models.ReviewMedia, {
+      foreignKey: 'reviewId',
+      as: 'reviewMedia',
+    })
   }
 }
 

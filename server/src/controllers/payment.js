@@ -1,6 +1,6 @@
 import { client } from '@/config'
 import paypal from '@paypal/checkout-server-sdk'
-import { Product, Order, OrderItem, Discount } from '@/models'
+import { Product, Order, OrderItem, Discount, OrderLog } from '@/models'
 import { Op } from 'sequelize'
 import { orderValidation } from '@/validation'
 import { PAYMENT_METHOD, PAYMENT_STATUS, ORDER_STATUS } from '@/enum'
@@ -13,6 +13,7 @@ const paymentController = {
     try {
       const { items, discountCode, ...data } = req.body
       const account = req.account
+
       const itemsData = JSON.parse(items)
       if (!itemsData || !Array.isArray(itemsData)) {
         return res.status(400).json({
@@ -20,6 +21,7 @@ const paymentController = {
           data: null,
         })
       }
+      console.log(itemsData)
       if (itemsData.length === 0) {
         return res.status(400).json({
           message: 'Product order is empty',
@@ -80,9 +82,19 @@ const paymentController = {
         const discountData = await Discount.findOne({
           where: { code: discountCode },
         })
-        if (discountData) {
-          discount = discountData.value
+        if (!discountData) {
+          return res.status(400).json({
+            message: 'Discount code is not found',
+            data: null,
+          })
         }
+        if (!discountData.isActive) {
+          return res.status(400).json({
+            message: 'Discount code is not active',
+            data: null,
+          })
+        }
+        discount = discountData.value
       }
       let transaction
       try {
@@ -98,10 +110,19 @@ const paymentController = {
             orderStatus: ORDER_STATUS.PENDING,
             shippingFee: data.shippingMethod === 'standard' ? 5 : 10,
             accountId: account.id,
+            discount,
           },
           { transaction }
         )
         await createOrderItems(itemsData, transaction, order.id)
+        await OrderLog.create(
+          {
+            orderId: order.id,
+            status: ORDER_STATUS.PENDING,
+            updatedBy: account.email,
+          },
+          { transaction }
+        )
         await transaction.commit()
         res.status(200).json({
           paymentOrderID: response.result.id,

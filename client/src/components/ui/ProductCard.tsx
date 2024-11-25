@@ -40,12 +40,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <div
-      className=' relative max-w-xs w-full mx-auto block bg-white shadow-md rounded-xl'
+      key={product.id}
+      className='relative max-w-xs w-full mx-auto block bg-white shadow-md rounded-xl'
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Link
         to={`/products/${product.subCategory?.mainCategory?.slug}/${product.subCategory?.slug}/${product.slug}`}
+        replace
+        onClick={() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }}
       >
         <div className='relative'>
           <img
@@ -55,8 +60,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               isHovered ? ' scale-110' : ''
             } transition-all duration-700 `}
           />
+          {product.totalQuantity === 0 && (
+            <div className='absolute inset-0 bg-gray-500 bg-opacity-75 flex items-start justify-center rounded-lg border-none'>
+              <img
+                src='/images/sold-out.png'
+                alt='Sold Out'
+                className={`w-32 h-32 ${
+                  isHovered ? 'scale-110' : 'scale-100'
+                } transition-all duration-700`}
+              />
+            </div>
+          )}
           <div
-            className={` flex items-center justify-center gap-2 absolute right-1/2 translate-x-1/2 translate-y-1/2 transition-all duration-700 ${
+            className={`flex items-center justify-center gap-2 absolute right-1/2 translate-x-1/2 translate-y-1/2 transition-all duration-700 ${
               isHovered ? 'opacity-100 bottom-2' : 'opacity-0  -bottom-10'
             }`}
           >
@@ -66,25 +82,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   e.preventDefault()
                   handleAddFavorite(product.id)
                 }}
-                className=' text-2xl text-white hover:text-secondary p-2 rounded-full bg-red-500 transition-all duration-500'
+                className='text-2xl text-white hover:text-secondary p-2 rounded-full bg-red-500 transition-all duration-500'
               />
             ) : (
-              <div className=' p-2 rounded-full bg-white shadow-md'>
+              <div className=' p-[6px] rounded-full bg-white shadow-md'>
                 <FaHeartCircleCheck
                   onClick={(e) => {
                     e.preventDefault()
                     handleRemoveFavorite(product.id)
                   }}
-                  className=' text-2xl text-red-500 bg-white hover:text-secondary border-1 border-red-500 rounded-full transition-all duration-500'
+                  className='text-xl text-red-500 bg-white hover:text-secondary border-1 border-red-500 rounded-full transition-all duration-500'
                 />
               </div>
             )}
-            <div className=' p-2 rounded-full bg-white shadow-md'>
+            <div className='px-2 py-1 rounded-full bg-white shadow-md'>
               <EyeOutlined
                 onClick={(e) => {
                   e.preventDefault()
                 }}
-                className=' text-2xl hover:text-secondary text-primary transition-all duration-500'
+                className='text-2xl text-primary bg-white hover:text-secondary border-1 border-primary rounded-full transition-all duration-500'
               />
             </div>
           </div>
@@ -118,7 +134,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
       </Link>
       {product.maxDiscount > 0 && (
-        <div className='absolute top-0 left-0 bg-secondary/80 text-white px-2 rounded-br-lg rounded-tl-lg'>
+        <div className='absolute top-0 left-0 bg-secondary text-white px-2 rounded-br-lg rounded-tl-lg'>
           <span className='text-sm'>-{product.maxDiscount}%</span>
         </div>
       )}

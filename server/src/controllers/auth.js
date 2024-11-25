@@ -26,6 +26,7 @@ import { deleteRefreshToken } from '@/utils'
 import jwt from 'jsonwebtoken'
 import { FIREBASE_PATH_AVATAR } from '@/config'
 import bcrypt from 'bcrypt'
+import { cartService } from '@/services/cart'
 
 export const authController = {
   login: async (req, res, next) => {
@@ -114,16 +115,13 @@ export const authController = {
                 as: 'favorites',
               },
               {
-                model: models.Cart,
-                as: 'carts',
-                include: [{ model: Product, as: 'product' }],
-              },
-              {
                 model: models.OrderInfo,
                 as: 'orderInfos',
               },
             ],
           })
+          if (!account)
+            return res.status(403).json({ message: 'Forbidden', data: {} })
           if (rememberMe) {
             setTokenCookie({
               res,
@@ -139,9 +137,13 @@ export const authController = {
               isSession: true,
             })
           }
+          const carts = await cartService.getCart({ accountId: account.id })
           res.status(200).json({
             message: 'success',
-            data: account,
+            data: {
+              ...account.toJSON(),
+              carts,
+            },
           })
         }
       )
@@ -220,7 +222,7 @@ export const authController = {
       global.pendingRegistrations.set(email, { password, verificationCode })
 
       // Send verification email
-      await sendVerificationEmail(email, verificationCode)
+      await sendVerificationEmail(email, verificationCode, 'registration')
 
       res
         .status(200)
@@ -546,7 +548,11 @@ export const authController = {
       })
 
       try {
-        await sendVerificationEmail(account.email, verificationCode)
+        await sendVerificationEmail(
+          account.email,
+          verificationCode,
+          'change password'
+        )
         res.status(200).json({
           message: req.query.resend
             ? 'New verification code sent to your email.'
@@ -606,7 +612,11 @@ export const authController = {
     })
 
     try {
-      await sendVerificationEmail(account.email, verificationCode)
+      await sendVerificationEmail(
+        account.email,
+        verificationCode,
+        'change password'
+      )
       res
         .status(200)
         .json({ message: 'New verification code sent to your email.' })

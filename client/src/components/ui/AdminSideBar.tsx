@@ -47,27 +47,27 @@ export const AdminSideBar: React.FC = () => {
                 icon={<DashboardIcon className='h-6 w-6' />}
                 title='Dashboard'
                 isOpen={isOpen}
-                isActive={isActiveLink('/dashboard')}
+                isActive={isActiveLink('/admin/dashboard')}
               >
                 <SidebarSubItem
-                  to='/dashboard/analytics'
+                  to='/admin/dashboard'
                   title='Analytics'
-                  isActive={isActiveLink('/dashboard/analytics')}
+                  isActive={isActiveLink('/admin/dashboard')}
                 />
                 <SidebarSubItem
-                  to='/dashboard/ecommerce'
+                  to='/admin/dashboard'
                   title='Ecommerce'
-                  isActive={isActiveLink('/dashboard/ecommerce')}
+                  isActive={isActiveLink('/admin/dashboard')}
                 />
                 <SidebarSubItem
-                  to='/dashboard/project'
+                  to='/admin/dashboard'
                   title='Project'
-                  isActive={isActiveLink('/dashboard/project')}
+                  isActive={isActiveLink('/admin/dashboard')}
                 />
                 <SidebarSubItem
-                  to='/dashboard/report'
+                  to='/admin/dashboard'
                   title='Report'
-                  isActive={isActiveLink('/dashboard/report')}
+                  isActive={isActiveLink('/admin/dashboard')}
                 />
               </SidebarItem>
               <SidebarItem
