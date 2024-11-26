@@ -175,10 +175,6 @@ const router = createBrowserRouter([
             element: <AdminBatch />,
           },
           {
-            path: 'batch-product',
-            element: <AdminBatchProduct />,
-          },
-          {
             path: 'discounts',
             element: <AdminDiscount />,
           },
@@ -196,6 +192,10 @@ const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <AdminDashboard />,
+      },
+      {
+        path: 'products-analytics',
+        element: <AdminBatchProduct />,
       },
     ],
   },

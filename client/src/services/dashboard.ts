@@ -13,7 +13,24 @@ export const dashboardApi = createApi({
     getDashboardData: builder.query<any, void>({
       query: () => '/',
     }),
+    getEarningsComparisonByPeriod: builder.query<any, { period: string }>({
+      query: ({ period }) => `/earnings-comparison-by-period?period=${period}`,
+    }),
+    getTopProductSoldComparisonByPeriod: builder.query<any, { period: string }>(
+      {
+        query: ({ period }) =>
+          `/top-product-sold-comparison-by-period?period=${period}`,
+      }
+    ),
+    getProfitComparisonByPeriod: builder.query<any, { period: string }>({
+      query: ({ period }) => `/profit-comparison-by-period?period=${period}`,
+    }),
   }),
 })
 
-export const { useGetDashboardDataQuery } = dashboardApi
+export const {
+  useGetDashboardDataQuery,
+  useGetEarningsComparisonByPeriodQuery,
+  useGetTopProductSoldComparisonByPeriodQuery,
+  useGetProfitComparisonByPeriodQuery,
+} = dashboardApi

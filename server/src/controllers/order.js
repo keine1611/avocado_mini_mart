@@ -1,4 +1,11 @@
-import { models, Order, OrderLog, Product, Discount } from '@/models'
+import {
+  models,
+  Order,
+  OrderLog,
+  Product,
+  Discount,
+  DiscountCode,
+} from '@/models'
 import { formatError } from '@/utils'
 import { sequelize } from '@/config'
 import {
@@ -6,12 +13,18 @@ import {
   ORDER_STATUS,
   PAYMENT_STATUS,
   SHIPPING_METHOD,
+  DISCOUNT_TYPE,
 } from '@/enum'
 import { orderValidation } from '@/validation'
 import { generateOrderCode, sendOrderConfirmationEmail } from '@/utils'
 import { Op } from 'sequelize'
 import { getProductWithMaxDiscount } from '@/services'
 import { createOrderItems } from '@/services'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+dayjs.extend(customParseFormat)
+
+const DATE_FORMAT = process.env.DATE_FORMAT
 
 const orderController = {
   getOrders: async (req, res) => {
@@ -92,7 +105,7 @@ const orderController = {
     try {
       const { items, discountCode, ...data } = req.body
       const account = req.account
-
+      let transaction
       const itemsData = JSON.parse(items)
       if (!itemsData || !Array.isArray(itemsData)) {
         return res.status(400).json({
@@ -141,8 +154,13 @@ const orderController = {
 
       let discount = 0
       if (discountCode && discountCode !== '') {
-        const discountData = await Discount.findOne({
-          where: { code: discountCode },
+        const discountData = await DiscountCode.findOne({
+          where: {
+            code: discountCode,
+            isActive: true,
+            expiryDate: { [Op.gte]: dayjs().format(DATE_FORMAT) },
+            timesUsed: { [Op.lt]: sequelize.col('usageLimit') },
+          },
         })
         if (!discountData) {
           return res.status(400).json({
@@ -150,16 +168,19 @@ const orderController = {
             data: null,
           })
         }
-        if (!discountData.isActive) {
-          return res.status(400).json({
-            message: 'Discount code is not active',
-            data: null,
-          })
+        if (discountData.discountType == DISCOUNT_TYPE.PERCENTAGE) {
+          discount = (totalAmount * discountData.discountValue) / 100
+        } else {
+          if (discountData.discountValue > totalAmount) {
+            discount = totalAmount
+          } else {
+            discount = discountData.discountValue
+          }
         }
-        discount = discountData.value
+        discountData.timesUsed += 1
+        await discountData.save({ transaction })
       }
 
-      let transaction
       try {
         transaction = await sequelize.transaction()
         const order = await Order.create(
@@ -193,10 +214,12 @@ const orderController = {
             { model: models.OrderItem, as: 'orderItems', include: ['product'] },
           ],
         })
-        await sendOrderConfirmationEmail(
-          orderDetails.email || account.email,
-          orderDetails.toJSON()
-        )
+        try {
+          await sendOrderConfirmationEmail(
+            orderDetails.email || account.email,
+            orderDetails.toJSON()
+          )
+        } catch (error) {}
 
         res.status(200).json({
           message: 'Order created successfully',

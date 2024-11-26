@@ -7,6 +7,7 @@ import { FaTasks } from 'react-icons/fa'
 export const AdminSideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
+  const [expandedItem, setExpandedItem] = useState<string | null>(null)
 
   const isActiveLink = (path: string) => location.pathname.startsWith(path)
 
@@ -48,26 +49,19 @@ export const AdminSideBar: React.FC = () => {
                 title='Dashboard'
                 isOpen={isOpen}
                 isActive={isActiveLink('/admin/dashboard')}
+                expandedItem={expandedItem}
+                setExpandedItem={setExpandedItem}
+                itemKey='dashboard'
               >
                 <SidebarSubItem
                   to='/admin/dashboard'
-                  title='Analytics'
+                  title='Dashboard'
                   isActive={isActiveLink('/admin/dashboard')}
                 />
                 <SidebarSubItem
-                  to='/admin/dashboard'
-                  title='Ecommerce'
-                  isActive={isActiveLink('/admin/dashboard')}
-                />
-                <SidebarSubItem
-                  to='/admin/dashboard'
-                  title='Project'
-                  isActive={isActiveLink('/admin/dashboard')}
-                />
-                <SidebarSubItem
-                  to='/admin/dashboard'
-                  title='Report'
-                  isActive={isActiveLink('/admin/dashboard')}
+                  to='/admin/products-analytics'
+                  title='Products Analytics'
+                  isActive={isActiveLink('/admin/products-analytics')}
                 />
               </SidebarItem>
               <SidebarItem
@@ -75,6 +69,9 @@ export const AdminSideBar: React.FC = () => {
                 title='Database'
                 isOpen={isOpen}
                 isActive={isActiveLink('/database')}
+                expandedItem={expandedItem}
+                setExpandedItem={setExpandedItem}
+                itemKey='database'
               >
                 <SidebarSubItem
                   to='/admin/databases/brands'
@@ -112,11 +109,6 @@ export const AdminSideBar: React.FC = () => {
                   isActive={isActiveLink('/admin/databases/batches')}
                 />
                 <SidebarSubItem
-                  to='/admin/databases/batch-product'
-                  title='Batch Product'
-                  isActive={isActiveLink('/admin/databases/batch-product')}
-                />
-                <SidebarSubItem
                   to='/admin/databases/discounts'
                   title='Discounts Event'
                   isActive={isActiveLink('/admin/databases/discounts')}
@@ -137,6 +129,9 @@ export const AdminSideBar: React.FC = () => {
                 title='Tasks'
                 isOpen={isOpen}
                 isActive={isActiveLink('/tasks')}
+                expandedItem={expandedItem}
+                setExpandedItem={setExpandedItem}
+                itemKey='tasks'
               >
                 <SidebarSubItem
                   to='/admin/tasks/check-orders'
@@ -168,6 +163,9 @@ interface SidebarItemProps {
   isOpen: boolean
   isActive: boolean
   children: React.ReactNode
+  expandedItem: string | null
+  setExpandedItem: (itemKey: string | null) => void
+  itemKey: string
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = ({
@@ -176,19 +174,22 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   isOpen,
   isActive,
   children,
+  expandedItem,
+  setExpandedItem,
+  itemKey,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+  const isExpanded = expandedItem === itemKey
 
   return (
     <div
       className={`collapse collapse-arrow border-base-300 bg-base-200 rounded-md ${
-        isActive ? 'border-l-4 border-primary' : ''
+        isActive ? '' : ''
       }`}
     >
       <input
         type='checkbox'
         checked={isExpanded}
-        onChange={() => setIsExpanded(!isExpanded)}
+        onChange={() => setExpandedItem(isExpanded ? null : itemKey)}
         className='peer'
       />
       <div

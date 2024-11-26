@@ -1,19 +1,28 @@
 import { client } from '@/config'
 import paypal from '@paypal/checkout-server-sdk'
-import { Product, Order, OrderItem, Discount, OrderLog } from '@/models'
+import { Product, Order, OrderItem, DiscountCode, OrderLog } from '@/models'
 import { Op } from 'sequelize'
 import { orderValidation } from '@/validation'
-import { PAYMENT_METHOD, PAYMENT_STATUS, ORDER_STATUS } from '@/enum'
+import {
+  PAYMENT_METHOD,
+  PAYMENT_STATUS,
+  ORDER_STATUS,
+  DISCOUNT_TYPE,
+} from '@/enum'
 import { sequelize } from '@/config'
 import { generateOrderCode } from '@/utils'
 import { createOrderItems, getProductWithMaxDiscount } from '@/services'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+dayjs.extend(customParseFormat)
+const DATE_FORMAT = process.env.DATE_FORMAT
 
 const paymentController = {
   paypalCreateOrder: async (req, res) => {
     try {
       const { items, discountCode, ...data } = req.body
       const account = req.account
-
+      let transaction
       const itemsData = JSON.parse(items)
       if (!itemsData || !Array.isArray(itemsData)) {
         return res.status(400).json({
@@ -62,7 +71,7 @@ const paymentController = {
       }, Promise.resolve(0))
 
       const paymentAmount =
-        totalAmount + (data.shippingMethod === 'standard' ? 5 : 10)
+        totalAmount + (data.shippingMethod === 'standard' ? 5 : 10) - discount
 
       const request = new paypal.orders.OrdersCreateRequest()
       request.prefer('return=representation')
@@ -78,9 +87,14 @@ const paymentController = {
         ],
       })
       let discount = 0
-      if (discountCode) {
-        const discountData = await Discount.findOne({
-          where: { code: discountCode },
+      if (discountCode && discountCode !== '') {
+        const discountData = await DiscountCode.findOne({
+          where: {
+            code: discountCode,
+            isActive: true,
+            expiryDate: { [Op.gte]: dayjs().format(DATE_FORMAT) },
+            timesUsed: { [Op.lt]: sequelize.col('usageLimit') },
+          },
         })
         if (!discountData) {
           return res.status(400).json({
@@ -88,15 +102,19 @@ const paymentController = {
             data: null,
           })
         }
-        if (!discountData.isActive) {
-          return res.status(400).json({
-            message: 'Discount code is not active',
-            data: null,
-          })
+        if (discountData.discountType == DISCOUNT_TYPE.PERCENTAGE) {
+          discount = (totalAmount * discountData.discountValue) / 100
+        } else {
+          if (discountData.discountValue > totalAmount) {
+            discount = totalAmount
+          } else {
+            discount = discountData.discountValue
+          }
         }
-        discount = discountData.value
+        discountData.timesUsed += 1
+        await discountData.save({ transaction })
       }
-      let transaction
+
       try {
         transaction = await sequelize.transaction()
         const response = await client.execute(request)
@@ -146,12 +164,21 @@ const paymentController = {
       const response = await client.execute(
         new paypal.orders.OrdersGetRequest(paypalOrderID)
       )
-      const order = await Order.findOne({ where: { code: orderCode } })
+      const order = await Order.findOne({
+        where: { code: orderCode },
+        include: [{ model: OrderItem, as: 'orderItems', include: ['product'] }],
+      })
       if (response.result.status === 'COMPLETED') {
         if (order.paymentStatus === PAYMENT_STATUS.PENDING) {
           await order.update({ paymentStatus: PAYMENT_STATUS.PAID })
           await order.save()
         }
+        try {
+          await sendOrderConfirmationEmail(
+            order.email || order.account.email,
+            order.toJSON()
+          )
+        } catch (error) {}
         res.status(200).json({ message: 'Order completed' })
       } else {
         res.status(400).json({ message: 'Order not completed' })

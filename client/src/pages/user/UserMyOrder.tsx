@@ -144,7 +144,9 @@ const OrderCard: React.FC<{ order: Order }> = ({ order }) => {
               </p>
               <p className='text-gray-600'>
                 <span className='font-semibold text-primary'>
-                  {formatCurrency(order.totalAmount)}
+                  {formatCurrency(
+                    order.totalAmount + order.shippingFee - order.discount
+                  )}
                 </span>
               </p>
             </div>

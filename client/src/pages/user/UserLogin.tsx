@@ -42,7 +42,7 @@ export const UserLogin = () => {
         navigate(from, { replace: true })
       } else {
         if (user.role.name.toLowerCase() === 'admin') {
-          navigate('/admin')
+          navigate('/admin/dashboard')
         } else {
           navigate('/')
         }

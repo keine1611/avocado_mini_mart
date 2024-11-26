@@ -162,7 +162,11 @@ const UserOrderDetail: React.FC = () => {
                 </div>
                 <div className='flex items-center justify-between gap-2'>
                   <span className='font-bold'>Total Amount:</span>{' '}
-                  {formatCurrency(order.data.totalAmount)}
+                  {formatCurrency(
+                    order.data.totalAmount +
+                      order.data.shippingFee -
+                      order.data.discount
+                  )}
                 </div>
                 <div className='flex items-center justify-between gap-2'>
                   <span className='font-bold'>Payment Method:</span>{' '}
@@ -196,9 +200,7 @@ const UserOrderDetail: React.FC = () => {
             <div className='flex flex-col items-end gap-2'>
               <div className='flex justify-between gap-4'>
                 <div>Subtotal:</div>
-                <div>
-                  {formatCurrency(order.data.totalAmount + order.data.discount)}
-                </div>
+                <div>{formatCurrency(order.data.totalAmount)}</div>
               </div>
               <div className='flex justify-between gap-4'>
                 <div>Shipping fee:</div>
