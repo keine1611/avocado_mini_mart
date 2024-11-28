@@ -217,8 +217,8 @@ const UserProductDetail: React.FC = () => {
                   </span>
                 </div>
               </div>
-              <div className='flex flex-row mt-4 truncate line-clamp-3'>
-                <p className='text-gray-500 text-md'>
+              <div className='flex flex-row mt-4'>
+                <p className='text-gray-500 text-md line-clamp-6'>
                   {product?.data.description}
                 </p>
               </div>
@@ -322,7 +322,7 @@ const UserProductDetail: React.FC = () => {
         </div>
       ) : (
         <div className='flex justify-center items-center h-screen'>
-          <Loading size='large' color='text-white' />
+          <Loading />
         </div>
       )}
     </div>

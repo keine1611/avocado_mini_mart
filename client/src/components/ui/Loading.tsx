@@ -1,25 +1,27 @@
 import React from 'react'
 
 interface LoadingProps {
-  size?: 'small' | 'medium' | 'large'
+  size?: 'loading-sm' | 'loading-md' | 'loading-lg' | 'loading-xl'
   color?: string
 }
 
 export const Loading: React.FC<LoadingProps> = ({
-  size = 'medium',
+  size = 'loading-lg',
   color = 'text-primary',
 }) => {
-  const sizeClasses = {
-    small: 'w-6 h-6',
-    medium: 'w-12 h-12',
-    large: 'w-16 h-16',
-  }
-
   return (
     <div className='flex justify-center items-center'>
-      <div
-        className={`animate-spin rounded-full border-t-2 border-b-2 ${color} ${sizeClasses[size]}`}
-      ></div>
+      <span
+        className={`loading loading-ring ${
+          size === 'loading-xl'
+            ? 'w-24 h-24'
+            : size === 'loading-lg'
+            ? 'w-16 h-16'
+            : size === 'loading-md'
+            ? 'w-8 h-8'
+            : 'w-6 h-6'
+        } ${color}`}
+      ></span>
     </div>
   )
 }

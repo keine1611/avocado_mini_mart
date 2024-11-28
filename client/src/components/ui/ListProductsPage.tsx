@@ -7,7 +7,7 @@ const ListProductsPage: React.FC = () => {
   const { slugmaincategory, slugsubcategory } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const currentPage = parseInt(searchParams.get('page') || '1')
-  const pageSize = parseInt(searchParams.get('limit') || '12')
+  const pageSize = parseInt(searchParams.get('size') || '12')
 
   const {
     data: productData,
@@ -18,7 +18,7 @@ const ListProductsPage: React.FC = () => {
     ...(slugmaincategory && { maincategory: slugmaincategory }),
     ...(slugsubcategory && { subcategory: slugsubcategory }),
     page: currentPage,
-    limit: pageSize,
+    size: pageSize,
     search: searchParams.get('search') || undefined,
     maxprice: searchParams.get('maxprice')
       ? parseInt(searchParams.get('maxprice')!)
@@ -36,7 +36,7 @@ const ListProductsPage: React.FC = () => {
     <div className='lg:col-span-9 col-span-12'>
       {getAllProductLoading || isFetchingProduct ? (
         <div className='flex justify-center items-center h-96 w-full'>
-          <Loading size='small' />
+          <Loading size='loading-md' />
         </div>
       ) : (
         <ListProduct

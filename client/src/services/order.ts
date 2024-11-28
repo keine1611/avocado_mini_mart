@@ -65,6 +65,18 @@ export const orderApi = createApi({
         body: order,
       }),
     }),
+    cancelOrder: builder.mutation<ApiResponse<any>, string>({
+      query: (orderCode) => ({
+        url: `/${orderCode}/cancel`,
+        method: 'POST',
+      }),
+    }),
+    userCancelOrder: builder.mutation<ApiResponse<any>, string>({
+      query: (orderCode) => ({
+        url: `/${orderCode}/cancel`,
+        method: 'POST',
+      }),
+    }),
   }),
 })
 
@@ -75,4 +87,5 @@ export const {
   useUpdateOrderMutation,
   useUpdateOrderStatusMutation,
   useUserCreateOrderMutation,
+  useUserCancelOrderMutation,
 } = orderApi

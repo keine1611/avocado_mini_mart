@@ -32,7 +32,7 @@ connectToDB()
 const io = setupWebSocket(server)
 
 app.use(logRequest)
-app.use(delayResponse(1500))
+app.use(delayResponse(1000))
 app.use(authenticateToken())
 
 route(app)

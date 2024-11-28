@@ -5,12 +5,15 @@ import {
   PriceHistory,
   ProductDiscount,
   Discount,
+  OrderItemBatch,
+  Batch,
 } from '@/models'
 import { Op } from 'sequelize'
 import { getToday } from '@/utils'
 import { models } from '@/models'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { sequelize } from '@/config'
 dayjs.extend(customParseFormat)
 
 const DATE_FORMAT = process.env.DATE_FORMAT
@@ -27,9 +30,19 @@ export const createOrderItems = async (orderItems, transaction, orderId) => {
           quantity: { [Op.gt]: 0 },
           expiredDate: { [Op.gt]: getToday() },
         },
+        include: {
+          model: models.Batch,
+          as: 'batch',
+        },
         order: [['expiredDate', 'ASC']],
       })
+      const product = await Product.findByPk(productId)
 
+      const discount = await getProductWithMaxDiscount(productId)
+      const orderItem = await OrderItem.create(
+        { ...item, price: product.standardPrice, discount, orderId },
+        { transaction }
+      )
       for (const batchProduct of batchProducts) {
         if (remainingQuantity <= 0) return
 
@@ -38,22 +51,32 @@ export const createOrderItems = async (orderItems, transaction, orderId) => {
             { quantity: batchProduct.quantity - remainingQuantity },
             { transaction }
           )
+
+          await OrderItemBatch.create(
+            {
+              orderItemId: orderItem.id,
+              batchId: batchProduct.batch.id,
+              quantity: remainingQuantity,
+            },
+            { transaction }
+          )
           remainingQuantity = 0
         } else {
           remainingQuantity -= batchProduct.quantity
+          await OrderItemBatch.create(
+            {
+              orderItemId: orderItem.id,
+              batchId: batchProduct.batch.id,
+              quantity: batchProduct.quantity,
+            },
+            { transaction }
+          )
           await batchProduct.update({ quantity: 0 }, { transaction })
         }
       }
-
-      const product = await Product.findByPk(productId)
       if (remainingQuantity > 0) {
         throw new Error(product.name + ' quantity is not enough')
       }
-      const discount = await getProductWithMaxDiscount(productId)
-      await OrderItem.create(
-        { ...item, price: product.standardPrice, discount, orderId },
-        { transaction }
-      )
     }
   } catch (error) {
     throw new Error(error.message || 'Failed to create order items')
@@ -303,4 +326,85 @@ export const getRecommendedProducts = async (productId) => {
   })
   const activeProducts = products.filter((product) => product.totalQuantity > 0)
   return activeProducts
+}
+
+export const getFeaturedProducts = async () => {
+  try {
+    const topSellingProducts = await OrderItem.findAll({
+      attributes: [
+        'productId',
+        [sequelize.fn('SUM', sequelize.col('quantity')), 'totalSold'],
+      ],
+      group: ['productId'],
+      order: [[sequelize.literal('totalSold'), 'DESC']],
+      limit: 10,
+    })
+
+    const productIds = topSellingProducts.map((item) => item.productId)
+
+    const featuredProducts = await Product.findAll({
+      where: {
+        id: productIds,
+      },
+      include: [
+        {
+          model: models.Review,
+          as: 'reviews',
+          attributes: ['rating', 'comment'],
+          include: [
+            {
+              model: models.Account,
+              as: 'account',
+              attributes: ['email', 'avatarUrl'],
+            },
+            {
+              model: models.ReviewMedia,
+              as: 'reviewMedia',
+              attributes: ['url', 'mediaType'],
+            },
+          ],
+        },
+        {
+          model: models.SubCategory,
+          as: 'subCategory',
+          include: [
+            {
+              model: models.MainCategory,
+              as: 'mainCategory',
+            },
+          ],
+        },
+        {
+          model: BatchProduct,
+          as: 'batchProducts',
+          attributes: ['quantity'],
+        },
+        {
+          model: ProductDiscount,
+          as: 'productDiscounts',
+          separate: true,
+          include: [
+            {
+              model: Discount,
+              as: 'discount',
+              where: { isActive: true },
+            },
+          ],
+          required: false,
+          attributes: ['discountPercentage'],
+          order: [['discountPercentage', 'DESC']],
+        },
+      ],
+    })
+
+    return featuredProducts.filter((product) => {
+      const totalQuantity = product.batchProducts.reduce(
+        (acc, batch) => acc + batch.quantity,
+        0
+      )
+      return totalQuantity > 0
+    })
+  } catch (error) {
+    throw new Error(error.message || 'Failed to fetch featured products')
+  }
 }

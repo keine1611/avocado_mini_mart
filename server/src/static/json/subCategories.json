@@ -1,0 +1,80 @@
+[
+  {
+    "id": "1",
+    "name": "Instant Noodles",
+    "slug": "instant-noodles",
+    "mainCategoryId": "1"
+  },
+  {
+    "id": "2",
+    "name": "Snack",
+    "slug": "snack",
+    "mainCategoryId": "1"
+  },
+  {
+    "id": "3",
+    "name": "Sweet and Candy",
+    "slug": "sweet-and-candy",
+    "mainCategoryId": "1"
+  },
+  {
+    "id": "4",
+    "name": "Vegetable",
+    "slug": "vegetable",
+    "mainCategoryId": "2"
+  },
+  {
+    "id": "5",
+    "name": "Fruit",
+    "slug": "fruit",
+    "mainCategoryId": "2"
+  },
+  {
+    "id": "6",
+    "name": "Soft Drink",
+    "slug": "soft-drink",
+    "mainCategoryId": "3"
+  },
+  {
+    "id": "7",
+    "name": "Milk and Dairy",
+    "slug": "milk-and-dairy",
+    "mainCategoryId": "3"
+  },
+  {
+    "id": "8",
+    "name": "Coffee and Tea",
+    "slug": "coffee-and-tea",
+    "mainCategoryId": "3"
+  },
+  {
+    "id": "9",
+    "name": "Seafood",
+    "slug": "seafood",
+    "mainCategoryId": "4"
+  },
+  {
+    "id": "10",
+    "name": "Meat",
+    "slug": "meat",
+    "mainCategoryId": "4"
+  },
+  {
+    "id": "11",
+    "name": "Egg",
+    "slug": "egg",
+    "mainCategoryId": "4"
+  },
+  {
+    "id": "12",
+    "name": "Sauce",
+    "slug": "sauce",
+    "mainCategoryId": "5"
+  },
+  {
+    "id": "13",
+    "name": "Salt, sugar, spice",
+    "slug": "salt-sugar-spice",
+    "mainCategoryId": "5"
+  }
+]

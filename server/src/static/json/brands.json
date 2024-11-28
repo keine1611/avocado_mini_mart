@@ -1,0 +1,138 @@
+[
+  {
+    "id": "1",
+    "name": "Coca-Cola",
+    "code": "cocacola",
+    "slug": "coca-cola",
+    "description ": "Coca-Cola is a carbonated soft drink manufactured by The Coca-Cola Company.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fcoca-cola.png?alt=media&token=1490e80d-458a-4bde-9c0d-d334096845bf"
+  },
+  {
+    "id": "2",
+    "name": "Vinamilk",
+    "code": "vinamilk",
+    "slug": "vinamilk",
+    "description ": "Vinamilk is a dairy product manufacturer in Vietnam.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fvinamilk.png?alt=media&token=1490e80d-458a-4bde-9c0d-d334096845bf"
+  },
+  {
+    "id": "3",
+    "name": "Acecook",
+    "code": "acecook",
+    "slug": "acecook",
+    "description ": "Acecook is a leading food company specializing in instant noodles and packaged foods. Founded in Japan, it has expanded globally, offering high-quality, flavorful products that combine convenience with authentic taste.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Facecook.png?alt=media&token=edb9f154-8c23-4493-be9f-796e4853e873"
+  },
+  {
+    "id": "4",
+    "name": "Samyang",
+    "code": "samyang",
+    "slug": "samyang",
+    "description ": "Samyang is a popular South Korean brand known for its instant noodles, especially the spicy Buldak Bokkeummyeon. Founded in 1961, Samyang has become one of the leading instant noodle manufacturers globally.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fsamyang.png?alt=media&token=c490bb1e-825f-424f-b005-9de52954206a"
+  },
+  {
+    "id": "5",
+    "name": "Omachi",
+    "code": "omachi",
+    "slug": "omachi",
+    "description ": "Omachi is a popular instant noodle brand from Japan, known for its delicious and savory flavors. Launched in 1969 by the company Nissin Foods, Omachi has become a beloved brand among noodle enthusiasts both in Japan and internationally.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fomachi.png?alt=media&token=9c5c1937-c92a-47a3-a127-e5923f4ca3e6"
+  },
+  {
+    "id": "6",
+    "name": "Oshi",
+    "code": "oshi",
+    "slug": "oshi",
+    "description ": "Oshi (おし) is a term commonly used in Japanese culture, with different meanings depending on the context. If you are referring to Oshi in the context of food, it could be related to \"\"Oshi-zushi\"\" (押し寿司), a type of pressed sushi. However, Oshi can also be used to refer to various concepts in other areas like entertainment and social settings.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Foshi.jpg?alt=media&token=5966bd86-17b3-4b37-9c64-24fe3574c9c3"
+  },
+  {
+    "id": "7",
+    "name": "Orion",
+    "code": "orion",
+    "slug": "orion",
+    "description ": "Orion is a well-known South Korean confectionery brand, recognized for its wide range of delicious snacks, biscuits, cakes, and chocolates. Founded in 1956, Orion has become one of the largest and most trusted snack manufacturers in South Korea and has expanded its presence globally.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Forion.png?alt=media&token=821ae363-9739-4cac-85d9-3b9199ee0f9a"
+  },
+  {
+    "id": "8",
+    "name": "Oreo",
+    "code": "oreo",
+    "slug": "oreo",
+    "description ": "Oreo is one of the world’s most iconic cookie brands, loved for its signature combination of chocolate cookies with a creamy filling. First introduced in 1912 by the National Biscuit Company (Nabisco) in the United States, Oreo has grown to become a global favorite, recognized in over 100 countries.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Foreo.jpg?alt=media&token=f46db32c-4a34-4133-9563-b7d4459280a4"
+  },
+  {
+    "id": "9",
+    "name": "Haribo",
+    "code": "haribo",
+    "slug": "haribo",
+    "description ": "Haribo is a world-renowned German confectionery company, famous for its gummy candies, especially the iconic Goldbears. Founded in 1920 by Hans Riegel in Bonn, Germany, Haribo's name is an acronym derived from Hans, Riegel, and Bonn. Over the years, it has become one of the leading gummy candy brands globally, loved for its playful shapes and vibrant flavors.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fharibo.jpg?alt=media&token=20d1b651-46c2-4ee9-8ccc-571fd979e365"
+  },
+  {
+    "id": "10",
+    "name": "DaLat Farmer",
+    "code": "dalatfarmer",
+    "slug": "dalat-farmer",
+    "description ": "Dalat Farmer is a brand specializing in high-quality agricultural products from Da Lat, Vietnam. Known for its lush highlands and favorable climate, Da Lat is renowned for producing fresh and flavorful fruits, vegetables, and processed food products. Dalat Farmer embodies the region's dedication to quality and sustainability, offering consumers natural, premium, and health-conscious products.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fdalat-farmer.png?alt=media&token=58b9b7fa-fc59-4f5d-ac95-f9e4451aafac"
+  },
+  {
+    "id": "11",
+    "name": "Mogu Mogu",
+    "code": "mogumogu",
+    "slug": "mogu-mogu",
+    "description ": "Mogu Mogu is a popular drink brand known for its refreshing fruit drinks with chewy nata de coco (coconut jelly) pieces. It is available in a variety of flavors, including mango, lychee, strawberry, and coconut. Mogu Mogu drinks are loved for their sweet and fruity taste, combined with the unique texture of the nata de coco pieces, making it a fun and satisfying drink to enjoy. It's a popular choice for those looking for a flavorful, slightly chewy beverage, offering both hydration and a light snack experience.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fmogumogu.png?alt=media&token=00c6480b-e77a-47bc-be46-8a356aeb1a0a"
+  },
+  {
+    "id": "12",
+    "name": "Nescafe",
+    "code": "nescafe",
+    "slug": "nescafe",
+    "description ": "Nescafé is one of the most well-known and widely consumed coffee brands in the world, owned by Nestlé. First introduced in 1938, Nescafé has become a global leader in instant coffee, offering a range of products that cater to different tastes and preferences. The brand is recognized for its rich, smooth taste and convenience, with various formats like instant coffee, coffee blends, and ready-to-drink beverages.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fnescafe.jpg?alt=media&token=b058d77b-dd6c-4c70-82a8-0203ae939fd3"
+  },
+  {
+    "id": "13",
+    "name": "Lipton",
+    "code": "lipton",
+    "slug": "lipton",
+    "description ": "Lipton is a globally recognized tea brand, known for its high-quality, refreshing tea products. Established in 1890 by Sir Thomas Lipton, it has become one of the world's leading tea brands, offering a wide range of tea blends such as black tea, green tea, herbal teas, and iced teas. Lipton is celebrated for its commitment to sustainable sourcing, working closely with tea farmers to ensure quality and environmentally-friendly practices. The brand is known for producing delicious, easy-to-brew tea that offers a natural, soothing taste, perfect for any time of the day.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Flipton.png?alt=media&token=d59d04cc-8a48-4511-af7d-9b3148ef3203"
+  },
+  {
+    "id": "14",
+    "name": "VN Seafood",
+    "code": "vnseafood",
+    "slug": "vn-seafood",
+    "description ": "VNSeafood is a Vietnamese company specializing in the production and export of high-quality seafood products. They offer a variety of fresh, frozen, and processed seafood items such as fish, shrimp, squid, and mollusks, catering to both domestic and international markets. The company is known for its commitment to quality, safety, and sustainability, ensuring that their seafood products meet international food safety standards. VNSeafood is recognized for its expertise in seafood processing, packaging, and distribution, delivering products that are rich in nutrition and flavor.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fvnseafood.png?alt=media&token=d28064ab-661f-44ea-9d52-31c0a97ae6cf"
+  },
+  {
+    "id": "15",
+    "name": "FOHLA",
+    "code": "fohla",
+    "slug": "fohla",
+    "description ": "FOHLA is a well-established supplier of imported frozen food products, serving industries such as restaurants, hotels, eateries, and industrial kitchens. With over 10 years of experience in the market, FOHLA partners with major domestic and international food brands. Their team is composed of young, professionally trained individuals dedicated to delivering the highest quality, cleanest frozen food directly to consumers. The company continues to grow by providing top-notch imported frozen food that meets strict quality standards, ensuring the best products are available for its customers.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Ffohla.jpg?alt=media&token=36ad757c-0fac-467d-9c4c-c94141eef873"
+  },
+  {
+    "id": "16",
+    "name": "Cholimex",
+    "code": "cholimex",
+    "slug": "cholimex",
+    "description ": "Cholimexfood strives to become a leading food manufacturer, processor and distributor with a diversity and abundant product chain that fully meets National and International food safety and hygiene standards to suit the growing consumer tastes of the domestic and export market.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fcholimex.jpg?alt=media&token=6c84a902-b4ca-485f-a9e3-349318b2e779"
+  },
+  {
+    "id": "17",
+    "name": "BienHoa",
+    "code": "bienhoa",
+    "slug": "bienhoa",
+    "description ": "**Bien Hoa Consumer Products (BHC)** is a Vietnamese company committed to delivering high-quality consumer goods, primarily in the food and beverage sector. With a focus on innovation, safety, and consumer satisfaction, BHC offers a diverse range of products, including sugar, sauces, and other food items. These products meet national and international standards, catering to the needs of both local and export markets.",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fbienhoa.jpg?alt=media&token=c5620730-4bcf-4f7e-823c-ee275c7380e9"
+  }
+]

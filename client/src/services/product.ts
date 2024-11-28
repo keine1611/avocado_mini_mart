@@ -25,7 +25,7 @@ export const productApi = createApi({
       },
       {
         page?: number
-        limit?: number
+        size?: number
         search?: string
         maxprice?: number
         minprice?: number
@@ -165,6 +165,12 @@ export const productApi = createApi({
         }
       },
     }),
+    getHomeData: builder.query<any, void>({
+      query: () => ({
+        url: '/home-data',
+        method: 'GET',
+      }),
+    }),
   }),
 })
 
@@ -180,4 +186,5 @@ export const {
   useLazyGetNearlyExpiredProductQuery,
   useLazyGetExpiredProductQuery,
   useGetListProductByIdsQuery,
+  useGetHomeDataQuery,
 } = productApi

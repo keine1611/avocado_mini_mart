@@ -23,8 +23,17 @@ export const paymentService = createApi({
         body: data,
       }),
     }),
+    retryPayment: builder.mutation<any, string>({
+      query: (orderCode) => ({
+        url: `/paypal/retry-order/${orderCode}`,
+        method: 'POST',
+      }),
+    }),
   }),
 })
 
-export const { usePaypalCreateOrderMutation, usePaypalVerifyOrderMutation } =
-  paymentService
+export const {
+  usePaypalCreateOrderMutation,
+  usePaypalVerifyOrderMutation,
+  useRetryPaymentMutation,
+} = paymentService

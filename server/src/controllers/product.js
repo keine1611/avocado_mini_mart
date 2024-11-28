@@ -18,8 +18,12 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 dayjs.extend(customParseFormat)
 
-import { updateProductPrice, getRecommendedProducts } from '@/services'
-import { getProductByIds } from '@/services'
+import {
+  updateProductPrice,
+  getRecommendedProducts,
+  getProductsWithDetails,
+} from '@/services'
+import { getProductByIds, getFeaturedProducts } from '@/services'
 
 const { DATE_FORMAT } = process.env
 
@@ -99,6 +103,7 @@ export const productController = {
         order: order && sort ? [[sort, order]] : [['createdAt', 'DESC']],
         limit,
         offset,
+        distinct: true,
         required: false,
         include: [
           { model: models.Brand, as: 'brand' },
@@ -645,6 +650,38 @@ export const productController = {
       res.status(200).json({
         message: 'Expired product retrieved successfully',
         data: expiredProducts.filter((product) => product !== null),
+      })
+    } catch (error) {
+      res.status(500).json({
+        message: formatError(error.message),
+        data: null,
+      })
+    }
+  },
+
+  getHomeData: async (req, res) => {
+    try {
+      const featuredProducts = await getFeaturedProducts()
+      const freshProduceProducts = await getProductsWithDetails({
+        subCategoryId: { [Op.in]: [4, 5] },
+        status: statusProduct.ACTIVE,
+      })
+      const fastFoodProducts = await getProductsWithDetails({
+        subCategoryId: { [Op.in]: [1, 2, 3] },
+        status: statusProduct.ACTIVE,
+      })
+      const beverageProducts = await getProductsWithDetails({
+        subCategoryId: { [Op.in]: [6, 7, 8] },
+        status: statusProduct.ACTIVE,
+      })
+      res.status(200).json({
+        message: 'Home data retrieved successfully',
+        data: {
+          featuredProducts,
+          freshProduceProducts,
+          fastFoodProducts,
+          beverageProducts,
+        },
       })
     } catch (error) {
       res.status(500).json({

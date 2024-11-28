@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useRegisterMutation, useVerifyAndCreateAccountMutation } from '@/services/auth'
+import {
+  useRegisterMutation,
+  useVerifyAndCreateAccountMutation,
+} from '@/services/auth'
 import { EyeIcon, EyeSlashIcon } from '@/resources'
 import { logo } from '@/constant'
 import { FiMail, FiLock, FiUserPlus } from 'react-icons/fi'
-import { showToast } from '@/components'
+import { Loading, showToast } from '@/components'
 
 export const UserRegister = () => {
   const [email, setEmail] = useState('')
@@ -14,10 +17,15 @@ export const UserRegister = () => {
   const [showVerificationForm, setShowVerificationForm] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showRetypePassword, setShowRetypePassword] = useState(false)
-  const [errors, setErrors] = useState({ email: '', password: '', retypePassword: '' })
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+    retypePassword: '',
+  })
 
-  const [register] = useRegisterMutation()
-  const [verifyAndCreateAccount] = useVerifyAndCreateAccountMutation()
+  const [register, { isLoading: isRegisterLoading }] = useRegisterMutation()
+  const [verifyAndCreateAccount, { isLoading: isVerifyLoading }] =
+    useVerifyAndCreateAccountMutation()
   const navigate = useNavigate()
 
   const validateForm = () => {
@@ -98,35 +106,62 @@ export const UserRegister = () => {
         <div className='bg-base-100 rounded-3xl shadow-2xl md:w-96 w-full p-8 space-y-6 backdrop-blur-sm bg-opacity-80'>
           <div className='text-center'>
             <img src={logo} alt='logo' className='mx-auto h-24 w-auto' />
-            <h2 className='mt-6 text-3xl font-bold text-primary'>Verify Your Account</h2>
-            <p className='mt-2 text-base text-base-content'>Enter the verification code sent to your email</p>
+            <h2 className='mt-6 text-3xl font-bold text-primary'>
+              Verify Your Account
+            </h2>
+            <p className='mt-2 text-base text-base-content'>
+              Enter the verification code sent to your email
+            </p>
           </div>
           <form onSubmit={handleVerify} noValidate className='mt-8 space-y-6'>
             <div className='flex justify-between mb-4'>
               {[0, 1, 2, 3, 4, 5].map((index) => (
                 <input
                   key={index}
-                  type="text"
+                  type='text'
                   maxLength={1}
                   value={verificationCode[index] || ''}
                   onChange={(e) => {
-                    const newCode = verificationCode.split('');
-                    newCode[index] = e.target.value;
-                    setVerificationCode(newCode.join(''));
+                    const newCode = verificationCode.split('')
+                    newCode[index] = e.target.value
+                    setVerificationCode(newCode.join(''))
                     if (e.target.value && e.target.nextSibling) {
-                      (e.target.nextSibling as HTMLInputElement).focus();
+                      ;(e.target.nextSibling as HTMLInputElement).focus()
                     }
+                  }}
+                  onKeyDown={(e) => {
+                    if (
+                      e.key === 'Backspace' &&
+                      !verificationCode[index] &&
+                      index > 0
+                    ) {
+                      const prevInput = (e.target as HTMLInputElement)
+                        .previousElementSibling as HTMLInputElement
+                      if (prevInput) prevInput.focus()
+                    }
+                  }}
+                  onPaste={(e) => {
+                    e.preventDefault()
+                    const pasteData = e.clipboardData
+                      .getData('text')
+                      .slice(0, 6)
+                    setVerificationCode(pasteData)
                   }}
                   className='w-12 h-12 text-center border border-base-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
                   required
                 />
               ))}
             </div>
-            <button 
-              type="submit"
+            <button
+              type='submit'
               className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
+              disabled={isVerifyLoading}
             >
-              Verify
+              {isVerifyLoading ? (
+                <Loading size='loading-sm' color='text-white' />
+              ) : (
+                'Verify'
+              )}
             </button>
           </form>
         </div>
@@ -139,86 +174,117 @@ export const UserRegister = () => {
       <div className='bg-base-100 rounded-3xl shadow-2xl md:w-96 w-full p-8 space-y-6 backdrop-blur-sm bg-opacity-80'>
         <div className='text-center'>
           <img src={logo} alt='logo' className='mx-auto h-24 w-auto' />
-          <h2 className='mt-6 text-3xl font-bold text-primary'>Create Account</h2>
-          <p className='mt-2 text-base text-base-content'>Sign up for a new account</p>
+          <h2 className='mt-6 text-3xl font-bold text-primary'>
+            Create Account
+          </h2>
+          <p className='mt-2 text-base text-base-content'>
+            Sign up for a new account
+          </p>
         </div>
         <form onSubmit={handleRegister} noValidate className='mt-8 space-y-6'>
           <div className='space-y-4'>
             <div className='relative'>
-              <FiMail className='absolute top-3 left-3 text-gray-400 z-20' size={20} />
+              <FiMail
+                className='absolute top-3 left-3 text-gray-400 z-20'
+                size={20}
+              />
               <input
-                type="email"
+                type='email'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
+                placeholder='Email'
                 className='pl-10 appearance-none rounded-md relative block w-full px-3 py-2 border border-base-300 placeholder-base-400 text-base-content focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm'
                 required
               />
-              {errors.email && <p className='mt-2 text-sm text-error'>{errors.email}</p>}
+              {errors.email && (
+                <p className='mt-2 text-sm text-error'>{errors.email}</p>
+              )}
             </div>
             <div className='relative'>
-              <FiLock className='absolute top-3 left-3 text-gray-400 z-20' size={20} />
+              <FiLock
+                className='absolute top-3 left-3 text-gray-400 z-20'
+                size={20}
+              />
               <input
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
+                placeholder='Password'
                 className='pl-10 pr-10 appearance-none rounded-md relative block w-full px-3 py-2 border border-base-300 placeholder-base-400 text-base-content focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm'
                 required
               />
               <button
-                type="button"
+                type='button'
                 onClick={togglePasswordVisibility}
-                className="absolute top-3 right-0 pr-3 flex items-center"
+                className='absolute top-3 right-0 pr-3 flex items-center'
               >
                 {showPassword ? (
-                  <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                  <EyeSlashIcon className='h-5 w-5 text-gray-400' />
                 ) : (
-                  <EyeIcon className="h-5 w-5 text-gray-400" />
+                  <EyeIcon className='h-5 w-5 text-gray-400' />
                 )}
               </button>
-              {errors.password && <p className='mt-2 text-sm text-error'>{errors.password}</p>}
+              {errors.password && (
+                <p className='mt-2 text-sm text-error'>{errors.password}</p>
+              )}
             </div>
             <div className='relative'>
-              <FiLock className='absolute top-3 left-3 text-gray-400 z-20' size={20} />
+              <FiLock
+                className='absolute top-3 left-3 text-gray-400 z-20'
+                size={20}
+              />
               <input
-                type={showRetypePassword ? "text" : "password"}
+                type={showRetypePassword ? 'text' : 'password'}
                 value={retypePassword}
                 onChange={(e) => setRetypePassword(e.target.value)}
-                placeholder="Retype Password"
+                placeholder='Retype Password'
                 className='pl-10 pr-10 appearance-none rounded-md relative block w-full px-3 py-2 border border-base-300 placeholder-base-400 text-base-content focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm'
                 required
               />
               <button
-                type="button"
+                type='button'
                 onClick={toggleRetypePasswordVisibility}
-                className="absolute top-3 right-0 pr-3 flex items-center"
+                className='absolute top-3 right-0 pr-3 flex items-center'
               >
                 {showRetypePassword ? (
-                  <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                  <EyeSlashIcon className='h-5 w-5 text-gray-400' />
                 ) : (
-                  <EyeIcon className="h-5 w-5 text-gray-400" />
+                  <EyeIcon className='h-5 w-5 text-gray-400' />
                 )}
               </button>
-              {errors.retypePassword && <p className='mt-2 text-sm text-error'>{errors.retypePassword}</p>}
+              {errors.retypePassword && (
+                <p className='mt-2 text-sm text-error'>
+                  {errors.retypePassword}
+                </p>
+              )}
             </div>
           </div>
           <div>
-            <button 
-              type="submit"
-              className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
+            <button
+              type='submit'
+              className={`group relative w-full flex ${
+                isRegisterLoading ? 'opacity-50 cursor-not-allowed' : ''
+              } justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
+              disabled={isRegisterLoading}
             >
               <span className='absolute left-0 inset-y-0 flex items-center pl-3'>
                 <FiUserPlus className='h-5 w-5 text-primary-content group-hover:text-white' />
               </span>
-              Register
+              {isRegisterLoading ? (
+                <Loading size='loading-sm' color='text-white' />
+              ) : (
+                'Register'
+              )}
             </button>
           </div>
         </form>
         <div className='text-center'>
           <p className='text-sm text-base-content'>
             Already have an account?{' '}
-            <a href='/login' className='font-medium text-primary hover:text-primary-focus'>
+            <a
+              href='/login'
+              className='font-medium text-primary hover:text-primary-focus'
+            >
               Sign in here
             </a>
           </p>

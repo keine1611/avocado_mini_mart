@@ -1,10 +1,11 @@
 import express from 'express'
-import { orderController } from '@/controllers'
+import { orderController, paymentController } from '@/controllers'
 
 export const orderRouter = express.Router()
 
 orderRouter.get('/:orderCode', orderController.getOrderById)
 orderRouter.get('/', orderController.getOrders)
+orderRouter.post('/:orderCode/cancel', paymentController.cancelOrder)
 // orderRouter.post('/', orderController.createOrder)
 // orderRouter.put('/:id', orderController.updateOrder)
 // orderRouter.delete('/:id', orderController.deleteOrder)

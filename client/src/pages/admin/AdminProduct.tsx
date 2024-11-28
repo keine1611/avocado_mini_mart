@@ -280,6 +280,9 @@ const AdminProduct: React.FC = () => {
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
       ...getColumnSearchProps('Name', 'name'),
+      render: (text: string) =>
+        text.length > 30 ? `${text.slice(0, 30)}...` : text,
+      width: 290,
     },
     {
       title: 'Barcode',

@@ -524,7 +524,7 @@ const AdminCheckOrder: React.FC = () => {
                 )
               }
             >
-              {isUpdatingStatus ? <Loading size='small' /> : 'Update'}
+              {isUpdatingStatus ? <Loading /> : 'Update'}
             </button>
           </div>
         </div>

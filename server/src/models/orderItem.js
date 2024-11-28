@@ -38,6 +38,10 @@ export class OrderItem extends Model {
       foreignKey: 'orderId',
       as: 'order',
     })
+    OrderItem.hasMany(models.OrderItemBatch, {
+      foreignKey: 'orderItemId',
+      as: 'orderItemBatches',
+    })
   }
 }
 

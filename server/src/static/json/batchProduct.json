@@ -1,0 +1,442 @@
+[
+  {
+    "batchId": "1",
+    "productId": "1",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "3.25",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "2",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "3",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "45",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "4",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "42.5",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "5",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.6",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "6",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "7.2",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "7",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.12",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "8",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.22",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "9",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.14",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "10",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "16",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "11",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1.2",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "12",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.34",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "13",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.96",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "14",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.15",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "15",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.45",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "16",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.99",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "17",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.23",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "18",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.3",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "19",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.2",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "20",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.25",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "21",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.5",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "22",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.96",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "23",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "2",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "24",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1.55",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "25",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1.55",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "26",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1.64",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "27",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "7.56",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "28",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "5.21",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "29",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.32",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "30",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1.54",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "31",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.46",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "32",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.43",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "33",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.54",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "34",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "8.2",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "35",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.17",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "36",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "8.5",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "37",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1.6",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "38",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1.22",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "39",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1.5",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "40",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.7",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "41",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.73",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "42",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1.76",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "43",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "3",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "44",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "3.56",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "45",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "6.4",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "46",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "6.4",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "47",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "12.5",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "48",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "2.5",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "49",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "6.2",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "50",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "3.56",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "51",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.65",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "52",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.2",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "53",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.34",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "54",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "0.24",
+    "expiredDate": "20251116000000"
+  },
+  {
+    "batchId": "1",
+    "productId": "55",
+    "initialQuantity": "100",
+    "quantity": "100",
+    "price": "1",
+    "expiredDate": "20251116000000"
+  }
+]

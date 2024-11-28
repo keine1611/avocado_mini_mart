@@ -7,11 +7,19 @@ import {
 import React from 'react'
 import { Carousel } from 'antd'
 import { FireOutlined, ArrowRightOutlined } from '@ant-design/icons'
-import { CategoryCard, ProductCard } from '@/components/ui'
-import { Link } from 'react-router-dom'
-import { useGetAllProductQuery } from '@/services'
+import { CategoryCard, Loading, ProductCard } from '@/components/ui'
+import { Link, useNavigate } from 'react-router-dom'
+import { useGetAllProductQuery, useGetHomeDataQuery } from '@/services'
+import { Product } from '@/types'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation, Autoplay, Scrollbar } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/scrollbar'
 
 const bgTitleLink1 = '/src/assets/images/home/bg-title-link-1.jpg'
+const bgTitleLink2 = '/src/assets/images/home/bg-title-link-2.jpg'
+const bgTitleLink3 = '/src/assets/images/home/bg-title-link-3.jpg'
 
 const mainCategories = [
   {
@@ -46,9 +54,13 @@ const mainCategories = [
 ]
 
 export const UserHome: React.FC = () => {
-  const { data: products, isLoading } = useGetAllProductQuery()
-
-  return (
+  const { data: homeData, isLoading: isLoadingHomeData } = useGetHomeDataQuery()
+  const navigate = useNavigate()
+  return isLoadingHomeData ? (
+    <div className='w-full h-screen flex justify-center items-center'>
+      <Loading size='loading-xl' />
+    </div>
+  ) : (
     <div className='w-full flex flex-col '>
       <section className=''>
         <Carousel
@@ -103,7 +115,7 @@ export const UserHome: React.FC = () => {
             <FireOutlined className='text-secondary font-extrabold text-2xl' />
           </Link>
           <div className=' grid gap-4 lg:grid-cols-5 md:grid-cols-3 grid-cols-2 justify-center items-center mt-10 px-4'>
-            {products?.data.data.map((product) => (
+            {homeData?.data.featuredProducts.map((product: Product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -112,46 +124,193 @@ export const UserHome: React.FC = () => {
           </button>
         </div>
       </section>
-      <section className='w-full px-4 md:px-32 mt-10'>
+      <section className='w-full px-4 md:px-32 mt-16'>
         <div className='grid grid-cols-12 gap-4'>
           <div
-            className={`lg:col-span-3 md:col-span-4 col-span-12 bg-cover bg-center rounded-lg`}
+            className={`lg:col-span-3 md:col-span-4 col-span-12 bg-cover bg-center rounded-lg flex flex-col justify-between`}
             style={{ backgroundImage: `url(${bgTitleLink1})` }}
           >
             <ul className='menu rounded-box'>
               <li>
-                <h2 className='menu-title text-black'>Fast Food</h2>
-                <ul>
-                  <li>
-                    <a>Instant Noodles</a>
-                  </li>
-                  <li>
-                    <a>Snack</a>
-                  </li>
-                  <li>
-                    <a>Sweet and Candy</a>
-                  </li>
+                <h2 className='menu-title text-black text-lg'>Fresh Produce</h2>
+                <ul className='mt-2'>
+                  <Link
+                    to='/products/fresh-produce/vegetable'
+                    className='hover:text-secondary'
+                  >
+                    Vegetable
+                  </Link>
+                </ul>
+                <ul className='mt-2'>
+                  <Link
+                    to='/products/fresh-produce/fruit'
+                    className='hover:text-secondary'
+                  >
+                    Fruit
+                  </Link>
                 </ul>
               </li>
             </ul>
-            <button className=' mx-auto btn btn-xs btn-accent hover:bg-secondary border-none shadow-sm mb-4 block text-neutral mt-4'>
+            <button
+              onClick={() => navigate('/products/fresh-produce')}
+              className=' mx-auto btn btn-xs btn-accent hover:bg-secondary border-none shadow-sm mb-4 block text-neutral'
+            >
               Buy now <ArrowRightOutlined />
             </button>
           </div>
           <div className='col-span-12 md:col-span-8 lg:col-span-9'>
-            <div className='carousel rounded-box gap-4 px-2 w-full'>
-              {products?.data.data.map((product) => (
-                <div className='carousel-item' key={product.id}>
+            <Swiper
+              spaceBetween={16}
+              slidesPerView={1}
+              breakpoints={{
+                640: { slidesPerView: 2 },
+                768: { slidesPerView: 3 },
+                1024: { slidesPerView: 4 },
+              }}
+              navigation
+              modules={[Navigation, Autoplay, Scrollbar]}
+              className='rounded-box gap-4 p-2 w-full'
+            >
+              {homeData?.data.freshProduceProducts.map((product: Product) => (
+                <SwiperSlide key={product.id}>
                   <ProductCard product={product} />
-                </div>
+                </SwiperSlide>
               ))}
-            </div>
+            </Swiper>
           </div>
         </div>
       </section>
-      <section className='w-full px-4 md:px-32 mt-10'>
-        <div>
-          <h1 className='text-2xl font-bold text-center'>New News</h1>
+      <section className='w-full px-4 md:px-32 mt-16'>
+        <div className='grid grid-cols-12 gap-4'>
+          <div className='col-span-12 md:col-span-8 lg:col-span-9'>
+            <Swiper
+              spaceBetween={16}
+              slidesPerView={1}
+              breakpoints={{
+                640: { slidesPerView: 2 },
+                768: { slidesPerView: 3 },
+                1024: { slidesPerView: 4 },
+              }}
+              navigation
+              modules={[Navigation, Autoplay, Scrollbar]}
+              autoplay={{ delay: 1000 }}
+              className='rounded-box gap-4 py-2 w-full'
+            >
+              {homeData?.data.fastFoodProducts.map((product: Product) => (
+                <SwiperSlide key={product.id}>
+                  <ProductCard product={product} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+          <div
+            className={`lg:col-span-3 md:col-span-4 col-span-12 bg-cover bg-center rounded-lg flex flex-col justify-between`}
+            style={{ backgroundImage: `url(${bgTitleLink2})` }}
+          >
+            <ul className='menu rounded-box'>
+              <li>
+                <h2 className='menu-title text-black text-lg'>Fast Food</h2>
+                <ul className='mt-2'>
+                  <Link
+                    to='/products?subcategory=instant-noodles'
+                    className='hover:text-secondary'
+                  >
+                    Instant Noodles
+                  </Link>
+                </ul>
+                <ul className='mt-2'>
+                  <Link
+                    to='/products?subcategory=snack'
+                    className='hover:text-secondary'
+                  >
+                    Snack
+                  </Link>
+                </ul>
+                <ul className='mt-2'>
+                  <Link
+                    to='/products?subcategory=sweet-and-candy'
+                    className='hover:text-secondary'
+                  >
+                    Sweet and Candy
+                  </Link>
+                </ul>
+              </li>
+            </ul>
+            <button
+              onClick={() => navigate('/products/fast-food')}
+              className=' mx-auto btn btn-xs btn-accent hover:bg-secondary border-none shadow-sm mb-4 block text-neutral'
+            >
+              Buy now <ArrowRightOutlined />
+            </button>
+          </div>
+        </div>
+      </section>
+      <section className='w-full px-4 md:px-32 mt-16'>
+        <div className='grid grid-cols-12 gap-4'>
+          <div
+            className={`lg:col-span-3 md:col-span-4 col-span-12 bg-cover bg-center rounded-lg flex flex-col justify-between`}
+            style={{ backgroundImage: `url(${bgTitleLink3})` }}
+          >
+            <ul className='menu rounded-box'>
+              <li>
+                <h2 className='menu-title text-black text-lg'>Beverages</h2>
+                <ul className='mt-2'>
+                  <Link
+                    to='/products/beverages/soft-drinks'
+                    className='hover:text-secondary'
+                  >
+                    Soft Drinks
+                  </Link>
+                </ul>
+                <ul className='mt-2'>
+                  <Link
+                    to='/products/beverages/milk-and-dairy'
+                    className='hover:text-secondary'
+                  >
+                    Milk and Dairy
+                  </Link>
+                </ul>
+                <ul className='mt-2'>
+                  <Link
+                    to='/products/beverages/coffee-and-tea'
+                    className='hover:text-secondary'
+                  >
+                    Coffee and Tea
+                  </Link>
+                </ul>
+              </li>
+            </ul>
+            <button
+              onClick={() => navigate('/products/beverages')}
+              className=' mx-auto btn btn-xs btn-accent hover:bg-secondary border-none shadow-sm mb-4 block text-neutral'
+            >
+              Buy now <ArrowRightOutlined />
+            </button>
+          </div>
+          <div className='col-span-12 md:col-span-8 lg:col-span-9'>
+            <Swiper
+              spaceBetween={16}
+              slidesPerView={1}
+              breakpoints={{
+                640: { slidesPerView: 2 },
+                768: { slidesPerView: 3 },
+                1024: { slidesPerView: 4 },
+              }}
+              navigation
+              modules={[Navigation, Autoplay, Scrollbar]}
+              className='rounded-box gap-4 p-2 w-full'
+            >
+              {homeData?.data.beverageProducts.map((product: Product) =>
+                product.totalQuantity > 0 ? (
+                  <SwiperSlide key={product.id}>
+                    <ProductCard product={product} />
+                  </SwiperSlide>
+                ) : (
+                  <></>
+                )
+              )}
+            </Swiper>
+          </div>
         </div>
       </section>
     </div>

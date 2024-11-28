@@ -18,6 +18,7 @@ productRouter.post(
   ]),
   productController.create
 )
+productRouter.get('/home-data', productController.getHomeData)
 productRouter.get('/ids', productController.getListProductByIds)
 productRouter.put(
   '/:id',

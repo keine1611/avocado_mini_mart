@@ -14,7 +14,7 @@ export class Product extends Model {
           primaryKey: true,
         },
         name: {
-          type: DataTypes.STRING(50),
+          type: DataTypes.STRING(100),
           allowNull: false,
         },
         barcode: {
@@ -33,7 +33,7 @@ export class Product extends Model {
           },
         },
         slug: {
-          type: DataTypes.STRING(50),
+          type: DataTypes.STRING(200),
           allowNull: false,
           unique: true,
           defaultValue: '',
@@ -59,7 +59,7 @@ export class Product extends Model {
           defaultValue: statusProduct.INACTIVE,
         },
         description: {
-          type: DataTypes.STRING(500),
+          type: DataTypes.STRING(1000),
           allowNull: true,
         },
         mainImage: {

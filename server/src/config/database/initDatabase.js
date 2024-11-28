@@ -1,6 +1,8 @@
 import { models } from '@/models'
 import { sequelize } from '@/config'
 import { statusProduct } from '@/enum'
+import fs from 'fs/promises'
+import path from 'path'
 
 const brandPath = [
   {
@@ -441,222 +443,13 @@ export const syncDatabase = async () => {
     console.log('All models were synchronized successfully.')
 
     // Create initial data
-
-    const mainCategory = await models.MainCategory.bulkCreate(
-      [
-        {
-          name: 'Fast Food',
-          slug: 'fast-food',
-          subCategories: [
-            {
-              name: 'Instant Noodles',
-              slug: 'instant-noodles',
-            },
-            {
-              name: 'Snack',
-              slug: 'snack',
-            },
-            {
-              name: 'Sweet and Candy',
-              slug: 'sweet-and-candy',
-            },
-          ],
-        },
-        {
-          name: 'Fresh Produce',
-          slug: 'fresh-produce',
-          subCategories: [
-            {
-              name: 'Vegetable',
-              slug: 'vegetable',
-            },
-            {
-              name: 'Fruit',
-              slug: 'fruit',
-            },
-          ],
-        },
-        {
-          name: 'Beverages',
-          slug: 'beverages',
-          subCategories: [
-            {
-              name: 'Soft Drink',
-              slug: 'soft-drink',
-            },
-            {
-              name: 'Milk and Dairy',
-              slug: 'milk-and-dairy',
-            },
-            {
-              name: 'Coffee and Tea',
-              slug: 'coffee-and-tea',
-            },
-          ],
-        },
-        {
-          name: 'Fresh Food',
-          slug: 'fresh-food',
-          subCategories: [
-            {
-              name: 'Seafood',
-              slug: 'seafood',
-            },
-            {
-              name: 'Meat',
-              slug: 'meat',
-            },
-            {
-              name: 'Egg',
-              slug: 'egg',
-            },
-          ],
-        },
-        {
-          name: 'Condiments',
-          slug: 'condiments',
-          subCategories: [
-            {
-              name: 'Sauce',
-              slug: 'sauce',
-            },
-            {
-              name: 'Salt, sugar, spice',
-              slug: 'salt-sugar-spice',
-            },
-          ],
-        },
-      ],
-      { include: ['subCategories'] }
-    )
-    const brand = await models.Brand.bulkCreate(
-      [
-        {
-          name: 'Coca-Cola',
-          code: 'cocacola',
-          slug: 'coca-cola',
-          description:
-            'Coca-Cola is a carbonated soft drink manufactured by The Coca-Cola Company.',
-          logo: 'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fcoca-cola.png?alt=media&token=1490e80d-458a-4bde-9c0d-d334096845bf',
-          products: [
-            {
-              name: 'Coca-Cola 330ml',
-              barcode: '5449000000996',
-              slug: 'coca-cola-330ml',
-              description:
-                'Coca-Cola is a carbonated soft drink manufactured by The Coca-Cola Company.',
-              standardPrice: 1.5,
-              stock: 100,
-              status: statusProduct.ACTIVE,
-              mainImage:
-                'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/products%2Fcoca330ml.png?alt=media&token=89462a0e-a140-4dd1-892d-762fb9bd708a',
-              subCategoryId: 1,
-            },
-          ],
-        },
-        {
-          name: 'Vinamilk',
-          code: 'vinamilk',
-          slug: 'vinamilk',
-          description: 'Vinamilk is a dairy product manufacturer in Vietnam.',
-          logo: 'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/brands%2Fvinamilk.png?alt=media&token=1490e80d-458a-4bde-9c0d-d334096845bf',
-          products: [
-            {
-              name: 'Vinamilk 1L',
-              barcode: '5449000002996',
-              slug: 'vinamilk-1l',
-              description:
-                'Vinamilk is a dairy product manufacturer in Vietnam.',
-              standardPrice: 1.5,
-              stock: 100,
-              status: statusProduct.ACTIVE,
-              mainImage:
-                'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/products%2Fcoca330ml.png?alt=media&token=89462a0e-a140-4dd1-892d-762fb9bd708a',
-              subCategoryId: 1,
-            },
-            {
-              name: 'Vinamilk 2L',
-              barcode: '5449000003996',
-              slug: 'vinamilk-2l',
-              description:
-                'Vinamilk is a dairy product manufacturer in Vietnam.',
-              standardPrice: 1.5,
-              stock: 100,
-              status: statusProduct.ACTIVE,
-              mainImage:
-                'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/products%2Fcoca330ml.png?alt=media&token=89462a0e-a140-4dd1-892d-762fb9bd708a',
-              subCategoryId: 1,
-            },
-            {
-              name: 'Vinamilk 3L',
-              barcode: '5449000004996',
-              slug: 'vinamilk-3l',
-              description:
-                'Vinamilk is a dairy product manufacturer in Vietnam.',
-              standardPrice: 1.5,
-              stock: 100,
-              status: statusProduct.ACTIVE,
-              mainImage:
-                'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/products%2Fcoca330ml.png?alt=media&token=89462a0e-a140-4dd1-892d-762fb9bd708a',
-              subCategoryId: 1,
-            },
-            {
-              name: 'Vinamilk 1000ml',
-              barcode: '5449000005996',
-              slug: 'vinamilk-1000ml',
-              description:
-                'Vinamilk is a dairy product manufacturer in Vietnam.',
-              standardPrice: 1.5,
-              stock: 100,
-              status: statusProduct.ACTIVE,
-              mainImage:
-                'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/products%2Fcoca330ml.png?alt=media&token=89462a0e-a140-4dd1-892d-762fb9bd708a',
-              subCategoryId: 1,
-            },
-            {
-              name: 'Vinamilk 2000ml',
-              barcode: '5449000006996',
-              slug: 'vinamilk-2000ml',
-              description:
-                'Vinamilk is a dairy product manufacturer in Vietnam.',
-              standardPrice: 1.5,
-              stock: 100,
-              status: statusProduct.ACTIVE,
-              mainImage:
-                'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/products%2Fcoca330ml.png?alt=media&token=89462a0e-a140-4dd1-892d-762fb9bd708a',
-              subCategoryId: 1,
-            },
-            {
-              name: 'Vinamilk 3000ml',
-              barcode: '5449000007996',
-              slug: 'vinamilk-3000ml',
-              description:
-                'Vinamilk is a dairy product manufacturer in Vietnam.',
-              standardPrice: 1.5,
-              stock: 100,
-              status: statusProduct.ACTIVE,
-              mainImage:
-                'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/products%2Fcoca330ml.png?alt=media&token=89462a0e-a140-4dd1-892d-762fb9bd708a',
-              subCategoryId: 1,
-            },
-            {
-              name: 'Vinamilk 5000ml',
-              barcode: '5449000008996',
-              slug: 'vinamilk-5000ml',
-              description:
-                'Vinamilk is a dairy product manufacturer in Vietnam.',
-              standardPrice: 1.5,
-              stock: 100,
-              status: statusProduct.ACTIVE,
-              mainImage:
-                'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/products%2Fcoca330ml.png?alt=media&token=89462a0e-a140-4dd1-892d-762fb9bd708a',
-              subCategoryId: 1,
-            },
-          ],
-        },
-      ],
-      { include: ['products'] }
-    )
+    await importDataFromJson('brands.json', models.Brand)
+    await importDataFromJson('mainCategories.json', models.MainCategory)
+    await importDataFromJson('subCategories.json', models.SubCategory)
+    await importDataFromJson('products.json', models.Product)
+    await importDataFromJson('imagesProduct.json', models.ProductImage)
+    await importDataFromJson('batch.json', models.Batch)
+    await importDataFromJson('batchProduct.json', models.BatchProduct)
 
     await models.Role.bulkCreate([
       { id: 1, name: 'ADMIN' },
@@ -708,5 +501,16 @@ export const syncDatabase = async () => {
     console.log('Initial data created successfully.')
   } catch (error) {
     console.error('Error synchronizing models:', error)
+  }
+}
+
+const importDataFromJson = async (fileName, model) => {
+  try {
+    const dataPath = path.join(__dirname, '../../static/json', fileName)
+    const data = await fs.readFile(dataPath, 'utf8')
+    const jsonData = JSON.parse(data)
+    await model.bulkCreate(jsonData)
+  } catch (error) {
+    console.error('Error importing data from JSON:', error)
   }
 }

@@ -1,6 +1,14 @@
 import { client } from '@/config'
 import paypal from '@paypal/checkout-server-sdk'
-import { Product, Order, OrderItem, DiscountCode, OrderLog } from '@/models'
+import {
+  Product,
+  Order,
+  OrderItem,
+  DiscountCode,
+  OrderLog,
+  OrderItemBatch,
+  BatchProduct,
+} from '@/models'
 import { Op } from 'sequelize'
 import { orderValidation } from '@/validation'
 import {
@@ -30,7 +38,6 @@ const paymentController = {
           data: null,
         })
       }
-      console.log(itemsData)
       if (itemsData.length === 0) {
         return res.status(400).json({
           message: 'Product order is empty',
@@ -69,23 +76,6 @@ const paymentController = {
         }
         return acc
       }, Promise.resolve(0))
-
-      const paymentAmount =
-        totalAmount + (data.shippingMethod === 'standard' ? 5 : 10) - discount
-
-      const request = new paypal.orders.OrdersCreateRequest()
-      request.prefer('return=representation')
-      request.requestBody({
-        intent: 'CAPTURE',
-        purchase_units: [
-          {
-            amount: { value: paymentAmount.toString(), currency_code: 'USD' },
-            address: {
-              country_code: 'VN',
-            },
-          },
-        ],
-      })
       let discount = 0
       if (discountCode && discountCode !== '') {
         const discountData = await DiscountCode.findOne({
@@ -114,6 +104,22 @@ const paymentController = {
         discountData.timesUsed += 1
         await discountData.save({ transaction })
       }
+      const paymentAmount =
+        totalAmount + (data.shippingMethod === 'standard' ? 5 : 10) - discount
+
+      const request = new paypal.orders.OrdersCreateRequest()
+      request.prefer('return=representation')
+      request.requestBody({
+        intent: 'CAPTURE',
+        purchase_units: [
+          {
+            amount: { value: paymentAmount.toString(), currency_code: 'USD' },
+            address: {
+              country_code: 'VN',
+            },
+          },
+        ],
+      })
 
       try {
         transaction = await sequelize.transaction()
@@ -171,6 +177,10 @@ const paymentController = {
       if (response.result.status === 'COMPLETED') {
         if (order.paymentStatus === PAYMENT_STATUS.PENDING) {
           await order.update({ paymentStatus: PAYMENT_STATUS.PAID })
+          await order.update({
+            paymentId:
+              response.result.purchase_units[0].payments.captures[0].id,
+          })
           await order.save()
         }
         try {
@@ -190,13 +200,124 @@ const paymentController = {
     }
   },
   cancelOrder: async (req, res) => {
-    const { orderCode } = req.body
-    await Order.update(
-      { orderStatus: ORDER_STATUS.CANCELLED },
-      { where: { code: orderCode } }
-    )
-    res.status(200).json({ message: 'Order cancelled' })
+    let transaction
+    try {
+      transaction = await sequelize.transaction()
+      const account = req.account
+      const { orderCode } = req.params
+      const order = await Order.findOne({
+        where: { code: orderCode },
+        include: [
+          {
+            model: OrderItem,
+            as: 'orderItems',
+            include: [{ model: OrderItemBatch, as: 'orderItemBatches' }],
+          },
+        ],
+      })
+      if (!order) {
+        return res.status(400).json({ message: 'Order not found' })
+      }
+      if (order.orderStatus !== ORDER_STATUS.PENDING) {
+        return res.status(400).json({ message: 'Order is not pending' })
+      }
+      if (order.paymentStatus === PAYMENT_STATUS.PAID) {
+        await refundOrder({
+          captureId: order.paymentId,
+          amount: order.totalAmount + order.shippingFee - order.discount || 0,
+        })
+      }
+      await order.update(
+        {
+          orderStatus: ORDER_STATUS.CANCELLED,
+          updatedBy: account.email,
+        },
+        { transaction }
+      )
+      for (const orderItem of order.orderItems) {
+        for (const orderItemBatch of orderItem.orderItemBatches) {
+          const batchProduct = await BatchProduct.findOne({
+            where: {
+              batchId: orderItemBatch.batchId,
+              productId: orderItem.productId,
+            },
+          })
+          if (batchProduct) {
+            await batchProduct.update(
+              { quantity: batchProduct.quantity + orderItemBatch.quantity },
+              { transaction }
+            )
+          }
+        }
+      }
+      await OrderLog.create(
+        {
+          orderId: order.id,
+          status: ORDER_STATUS.CANCELLED,
+          updatedBy: account.email,
+        },
+        { transaction }
+      )
+      await order.save({ transaction })
+      await transaction.commit()
+      res.status(200).json({ message: 'Order cancelled' })
+    } catch (error) {
+      if (transaction) {
+        await transaction.rollback()
+      }
+      res
+        .status(500)
+        .json({ message: error.message || 'Failed to cancel order' })
+    }
+  },
+  retryPaypalOrder: async (req, res) => {
+    try {
+      const { orderCode } = req.params
+      const order = await Order.findOne({ where: { code: orderCode } })
+      if (!order) {
+        return res.status(400).json({ message: 'Order not found' })
+      }
+      if (order.paymentMethod !== PAYMENT_METHOD.PAYPAL) {
+        return res.status(400).json({ message: 'Order is not paid by paypal' })
+      }
+      if (order.paymentStatus === PAYMENT_STATUS.PAID) {
+        return res.status(400).json({ message: 'Order is already paid' })
+      }
+      const request = new paypal.orders.OrdersCreateRequest()
+      request.requestBody({
+        intent: 'CAPTURE',
+        purchase_units: [
+          {
+            amount: {
+              value: (
+                order.totalAmount +
+                order.shippingFee -
+                order.discount
+              ).toString(),
+              currency_code: 'USD',
+            },
+          },
+        ],
+      })
+      const response = await client.execute(request)
+      res.status(200).json({ paymentOrderID: response.result.id })
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: error.message || 'Failed to retry paypal order' })
+    }
   },
 }
 
 export { paymentController }
+
+const refundOrder = async ({ captureId, amount }) => {
+  try {
+    const request = new paypal.payments.CapturesRefundRequest(captureId)
+    request.requestBody({ amount: { value: amount, currency_code: 'USD' } })
+    const response = await client.execute(request)
+    return response
+  } catch (error) {
+    throw error
+  }
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "1",
+    "name": "Fast Food",
+    "slug": "fast-food"
+  },
+  {
+    "id": "2",
+    "name": "Fresh Produce",
+    "slug": "fresh-produce"
+  },
+  {
+    "id": "3",
+    "name": "Beverages",
+    "slug": "beverages"
+  },
+  {
+    "id": "4",
+    "name": "Fresh Food",
+    "slug": "fresh-food"
+  },
+  {
+    "id": "5",
+    "name": "Condiments",
+    "slug": "condiments"
+  }
+]

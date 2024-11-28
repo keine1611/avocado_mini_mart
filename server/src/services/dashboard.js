@@ -5,13 +5,16 @@ import {
   BatchProduct,
   Product,
   Account,
+  OrderItemBatch,
 } from '@/models'
+import { models } from '@/models'
 import { Op } from 'sequelize'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { Sequelize } from 'sequelize'
 import { ORDER_STATUS } from '@/enum'
 import { gte } from 'lodash'
+import { mode } from 'crypto-js'
 dayjs.extend(customParseFormat)
 
 const { DATE_FORMAT } = process.env
@@ -87,53 +90,37 @@ export const calculateTotalEarnings = async ({
 }
 
 export const calculateCogs = async ({ startDateString, endDateString }) => {
-  const soldProducts = await OrderItem.findAll({
+  const orderItemBatches = await OrderItemBatch.findAll({
     include: [
       {
-        model: Order,
-        as: 'order',
-        where: {
-          createdAt: {
-            [Op.between]: [startDateString, endDateString],
+        model: models.OrderItem,
+        as: 'orderItem',
+        required: true,
+        include: [
+          {
+            model: models.Order,
+            as: 'order',
+            where: {
+              createdAt: { [Op.between]: [startDateString, endDateString] },
+              orderStatus: { [Op.ne]: ORDER_STATUS.CANCELLED },
+            },
           },
-          orderStatus: {
-            [Op.ne]: ORDER_STATUS.CANCELLED,
-          },
-        },
-        attributes: [],
+        ],
       },
-    ],
-    group: ['productId'],
-    attributes: [
-      'productId',
-      [Sequelize.fn('SUM', Sequelize.col('quantity')), 'totalSold'],
     ],
   })
 
   let totalCogs = 0
 
-  for (const product of soldProducts) {
-    const lots = await BatchProduct.findAll({
-      attributes: [[Sequelize.fn('AVG', Sequelize.col('price')), 'avgPrice']],
+  for (const orderItemBatch of orderItemBatches) {
+    const batchProduct = await models.BatchProduct.findOne({
       where: {
-        productId: product.dataValues.productId,
+        batchId: orderItemBatch.batchId,
+        productId: orderItemBatch.orderItem.productId,
       },
-      include: [
-        {
-          model: Batch,
-          as: 'batch',
-          attributes: [],
-          where: {
-            arrivalDate: {
-              [Op.lte]: endDateString,
-            },
-          },
-        },
-      ],
-      group: ['productId'],
     })
-    if (lots.length > 0) {
-      totalCogs += product.dataValues.totalSold * lots[0].dataValues.avgPrice
+    if (batchProduct) {
+      totalCogs += orderItemBatch.quantity * batchProduct.price
     }
   }
 
