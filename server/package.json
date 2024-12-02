@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "start-server": "nodemon --watch src --exec babel-node src/index.js",
-    "start1": "node src/index.js",
+    "build-server": "babel src -d dist",
+    "start-server-build": "node dist/index.js",
     "start-client": "cd ../client && yarn dev",
     "dev": "concurrently  --kill-others \"yarn start-server\" \"yarn start-client\""
   },
