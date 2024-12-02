@@ -37,7 +37,12 @@ const AdminDashboard: React.FC = () => {
     refetchOnMountOrArgChange: true,
   })
 
-  if (isLoading) return <div className='text-center'>Loading...</div>
+  if (isLoading)
+    return (
+      <div className='text-center flex items-center justify-center h-full min-h-80vh'>
+        <Loading size='loading-lg' />
+      </div>
+    )
   if (error)
     return (
       <div className='text-center text-red-500'>
@@ -46,10 +51,10 @@ const AdminDashboard: React.FC = () => {
     )
 
   return (
-    <div className='p-6 bg-gray-100 h-full flex flex-col gap-6 px-24 overflow-y-auto'>
+    <div className='py-6 bg-gray-100 h-full flex flex-col gap-6 md:px-24 px-4 overflow-y-auto'>
       <div className=''>
         <h1 className='text-2xl font-medium mb-6 text-gray-800'>Overview</h1>
-        <div className='flex gap-4 w-full justify-between'>
+        <div className='grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 w-full justify-between'>
           <div className='bg-white p-6 rounded-2xl shadow-lg transition-transform transform hover:scale-105 w-full'>
             <div className='flex items-center mb-4 gap-2 border-b pb-2'>
               <div className='flex items-center p-3 border border-gray-100 rounded-full bg-yellow-50'>
@@ -240,44 +245,52 @@ const AdminDashboard: React.FC = () => {
               {dashboardData.totalNewCustomersData.thisMonth}
             </p>
             <div className='flex items-center gap-2 mt-2'>
-              {dashboardData.totalNewCustomersData.lastMonth <= 0 &&
-              dashboardData.totalNewCustomersData.thisMonth > 0 ? (
+              {dashboardData.totalNewCustomersData.lastMonth <= 0 ? (
+                dashboardData.totalNewCustomersData.thisMonth > 0 ? (
+                  <>
+                    <FaArrowTrendUp className='text-green-500' />
+                    <p className='text-green-500'>
+                      {100}% <span className='text-gray-500'>last month</span>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    {dashboardData.totalNewCustomersData.thisMonth >
+                    dashboardData.totalNewCustomersData.lastMonth ? (
+                      <>
+                        <FaArrowTrendUp className='text-green-500' />
+                        <p className='text-green-500'>
+                          {(
+                            ((dashboardData.totalNewCustomersData.thisMonth -
+                              dashboardData.totalNewCustomersData.lastMonth) /
+                              dashboardData.totalNewCustomersData.lastMonth) *
+                            100
+                          ).toFixed(2)}
+                          % <span className='text-gray-500'>last month</span>
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <FaArrowTrendDown className='text-red-500' />
+                        <p className='text-red-500'>
+                          {(
+                            ((dashboardData.totalProfitData.lastMonth -
+                              dashboardData.totalNewCustomersData.thisMonth) /
+                              dashboardData.totalNewCustomersData.thisMonth) *
+                            100
+                          ).toFixed(2)}
+                          % <span className='text-gray-500'>last month</span>
+                        </p>
+                      </>
+                    )}
+                  </>
+                )
+              ) : (
                 <>
                   <FaArrowTrendUp className='text-green-500' />
                   <p className='text-green-500'>
                     {100}% <span className='text-gray-500'>last month</span>
                   </p>
-                </>
-              ) : (
-                <>
-                  {dashboardData.totalNewCustomersData.thisMonth >
-                  dashboardData.totalNewCustomersData.lastMonth ? (
-                    <>
-                      <FaArrowTrendUp className='text-green-500' />
-                      <p className='text-green-500'>
-                        {(
-                          ((dashboardData.totalNewCustomersData.thisMonth -
-                            dashboardData.totalNewCustomersData.lastMonth) /
-                            dashboardData.totalNewCustomersData.lastMonth) *
-                          100
-                        ).toFixed(2)}
-                        % <span className='text-gray-500'>last month</span>
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <FaArrowTrendDown className='text-red-500' />
-                      <p className='text-red-500'>
-                        {(
-                          ((dashboardData.totalProfitData.lastMonth -
-                            dashboardData.totalNewCustomersData.thisMonth) /
-                            dashboardData.totalNewCustomersData.thisMonth) *
-                          100
-                        ).toFixed(2)}
-                        % <span className='text-gray-500'>last month</span>
-                      </p>
-                    </>
-                  )}
                 </>
               )}
             </div>
@@ -307,23 +320,6 @@ const ChartRevenue: React.FC = () => {
     refetch().finally(() => setIsLoading(false))
   }, [selectedPeriod])
 
-  const getDataKey = () => {
-    switch (selectedPeriod) {
-      case 'day':
-        return { current: 'today', previous: 'yesterday' }
-      case 'week':
-        return { current: 'thisWeek', previous: 'lastWeek' }
-      case 'month':
-        return { current: 'thisMonth', previous: 'lastMonth' }
-      case 'year':
-        return { current: 'thisYear', previous: 'lastYear' }
-      default:
-        return { current: 'thisYear', previous: 'lastYear' }
-    }
-  }
-
-  const { current, previous } = getDataKey()
-
   return (
     <div className='bg-white p-6 rounded-2xl shadow-lg h-[300px]'>
       <div className='flex items-center justify-between'>
@@ -334,21 +330,21 @@ const ChartRevenue: React.FC = () => {
           className='flex items-center gap-2 select select-sm'
         >
           <option className='text-gray-500' value='day'>
-            Day
+            The past 24 hours
           </option>
           <option className='text-gray-500' value='week'>
-            Week
+            The past 7 days
           </option>
           <option className='text-gray-500' value='month'>
-            Month
+            The past 30 days
           </option>
           <option className='text-gray-500' value='year'>
-            Yearly
+            The past year
           </option>
         </select>
       </div>
       {isLoading || isFetching ? (
-        <div className='text-center flex items-center justify-center h-full'>
+        <div className='text-center flex items-center justify-center h-full min-80vh'>
           <Loading />
         </div>
       ) : (
@@ -357,85 +353,59 @@ const ChartRevenue: React.FC = () => {
             data={earningsComparisonByPeriodData}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='name' />
-            <YAxis />
+            <CartesianGrid
+              strokeDasharray='3 3'
+              stroke='#f0f0f0'
+              vertical={false}
+            />
+            <XAxis
+              dataKey='name'
+              axisLine={false}
+              tickLine={false}
+              tick={false}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#666', fontSize: 12 }}
+              tickFormatter={(value) => formatCurrency(value)}
+            />
             <Tooltip
               formatter={(value: number) => formatCurrency(value)}
+              contentStyle={{
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                border: 'none',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                padding: '12px',
+              }}
               content={({ payload }) => {
                 if (payload && payload.length) {
-                  const previousValue = payload[0].payload[previous]
-                  const currentValue = payload[1].payload[current]
-
-                  const percentageChange =
-                    ((currentValue - previousValue) / previousValue) * 100
                   return (
-                    <div className='custom-tooltip p-2 bg-white shadow-md rounded text-sm'>
-                      <p className='text-sm text-gray-700'>
-                        <span className='capitalize text-[#3e8ab3]'>
-                          {previous} :{' '}
-                        </span>
-                        {formatCurrency(previousValue)}
+                    <div className='custom-tooltip bg-white shadow-lg rounded-lg p-3 text-sm'>
+                      <p className='text-sm font-medium mb-2 text-gray-600'>
+                        {payload[0].payload.name}
                       </p>
-                      <p className='text-sm text-gray-700 mt-2'>
-                        <span className='capitalize text-[#3027db]'>
-                          {current} :{' '}
-                        </span>
-                        {formatCurrency(currentValue)}{' '}
-                        {previousValue <= 0 ? (
-                          currentValue > 0 ? (
-                            <>
-                              <span className='text-green-500 text-xs'>
-                                <FaArrowTrendUp /> {100}%
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span className='text-red-500 text-xs'>
-                                <FaArrowTrendDown /> {0}%
-                              </span>
-                            </>
-                          )
-                        ) : (
-                          <span
-                            className={`${
-                              percentageChange >= 0
-                                ? 'text-green-500'
-                                : 'text-red-500'
-                            }`}
-                          >
-                            <span className='text-xs'>
-                              {percentageChange >= 0 ? (
-                                <FaArrowTrendUp />
-                              ) : (
-                                <FaArrowTrendDown />
-                              )}{' '}
-                              {percentageChange.toFixed(2)}%
-                            </span>
-                          </span>
-                        )}
-                      </p>
+                      <div className='space-y-2'>
+                        <p className='text-sm text-green-500'>
+                          {formatCurrency(payload[0].value ?? 0)}
+                        </p>
+                      </div>
                     </div>
                   )
                 }
                 return null
               }}
             />
-            <Legend />
             <Line
               type='monotone'
-              dataKey={current}
-              stroke='#052df5'
+              dataKey='revenue'
+              stroke='#3BA66B'
               strokeWidth={2}
-              dot={{ r: 4 }}
-            />
-            <Line
-              type='monotone'
-              dataKey={previous}
-              stroke='#6e9cb5'
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              strokeDasharray='5 5'
+              dot={false}
+              activeDot={false}
+              animationDuration={1500}
+              animationEasing='ease-in-out'
             />
           </LineChart>
         </ResponsiveContainer>
@@ -458,23 +428,6 @@ const ChartProfit: React.FC = () => {
     refetch().finally(() => setIsLoading(false))
   }, [selectedPeriod])
 
-  const getDataKey = () => {
-    switch (selectedPeriod) {
-      case 'day':
-        return { current: 'today', previous: 'yesterday' }
-      case 'week':
-        return { current: 'thisWeek', previous: 'lastWeek' }
-      case 'month':
-        return { current: 'thisMonth', previous: 'lastMonth' }
-      case 'year':
-        return { current: 'thisYear', previous: 'lastYear' }
-      default:
-        return { current: 'thisYear', previous: 'lastYear' }
-    }
-  }
-
-  const { current, previous } = getDataKey()
-
   return (
     <div className='bg-white p-6 rounded-2xl shadow-lg h-[300px]'>
       <div className='flex items-center justify-between'>
@@ -485,16 +438,16 @@ const ChartProfit: React.FC = () => {
           className='flex items-center gap-2 select select-sm'
         >
           <option className='text-gray-500' value='day'>
-            Day
+            The past 24 hours
           </option>
           <option className='text-gray-500' value='week'>
-            Week
+            The past 7 days
           </option>
           <option className='text-gray-500' value='month'>
-            Month
+            The past 30 days
           </option>
           <option className='text-gray-500' value='year'>
-            Yearly
+            The past year
           </option>
         </select>
       </div>
@@ -508,85 +461,59 @@ const ChartProfit: React.FC = () => {
             data={profitComparisonByPeriodData}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='name' />
-            <YAxis />
+            <CartesianGrid
+              strokeDasharray='3 3'
+              stroke='#f0f0f0'
+              vertical={false}
+            />
+            <XAxis
+              dataKey='name'
+              axisLine={false}
+              tickLine={false}
+              tick={false}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#666', fontSize: 12 }}
+              tickFormatter={(value) => formatCurrency(value)}
+            />
             <Tooltip
               formatter={(value: number) => formatCurrency(value)}
+              contentStyle={{
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                border: 'none',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                padding: '12px',
+              }}
               content={({ payload }) => {
                 if (payload && payload.length) {
-                  const previousValue = payload[0].payload[previous]
-                  const currentValue = payload[1].payload[current]
-
-                  const percentageChange =
-                    ((currentValue - previousValue) / previousValue) * 100
                   return (
-                    <div className='custom-tooltip p-2 bg-white shadow-md rounded text-sm'>
-                      <p className='text-sm text-gray-700'>
-                        <span className='capitalize text-[#3e8ab3]'>
-                          {previous} :{' '}
-                        </span>
-                        {formatCurrency(previousValue)}
+                    <div className='custom-tooltip bg-white shadow-lg rounded-lg p-3 text-sm'>
+                      <p className='text-sm font-medium mb-2 text-gray-600'>
+                        {payload[0].payload.name}
                       </p>
-                      <p className='text-sm text-gray-700 mt-2'>
-                        <span className='capitalize text-[#3027db]'>
-                          {current} :{' '}
-                        </span>
-                        {formatCurrency(currentValue)}{' '}
-                        {previousValue <= 0 ? (
-                          currentValue > 0 ? (
-                            <>
-                              <span className='text-green-500 text-xs'>
-                                <FaArrowTrendUp /> {100}%
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span className='text-red-500 text-xs'>
-                                <FaArrowTrendDown /> {0}%
-                              </span>
-                            </>
-                          )
-                        ) : (
-                          <span
-                            className={`${
-                              percentageChange >= 0
-                                ? 'text-green-500'
-                                : 'text-red-500'
-                            }`}
-                          >
-                            <span className='text-xs'>
-                              {percentageChange >= 0 ? (
-                                <FaArrowTrendUp />
-                              ) : (
-                                <FaArrowTrendDown />
-                              )}{' '}
-                              {percentageChange.toFixed(2)}%
-                            </span>
-                          </span>
-                        )}
-                      </p>
+                      <div className='space-y-2'>
+                        <p className='text-sm text-green-500'>
+                          {formatCurrency(payload[0].value ?? 0)}
+                        </p>
+                      </div>
                     </div>
                   )
                 }
                 return null
               }}
             />
-            <Legend />
             <Line
               type='monotone'
-              dataKey={current}
-              stroke='#052df5'
+              dataKey='profit'
+              stroke='#3BA66B'
               strokeWidth={2}
-              dot={{ r: 4 }}
-            />
-            <Line
-              type='monotone'
-              dataKey={previous}
-              stroke='#6e9cb5'
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              strokeDasharray='5 5'
+              dot={false}
+              activeDot={false}
+              animationDuration={1500}
+              animationEasing='ease-in-out'
             />
           </LineChart>
         </ResponsiveContainer>
@@ -606,10 +533,7 @@ const TableTopProductSold: React.FC = () => {
       <table className='table w-full table-fixed'>
         <thead className=''>
           <tr>
-            <th className='w-36 text-center uppercase text-sm text-gray-600'>
-              Item
-            </th>
-            <th className='uppercase text-sm text-gray-600'>Name</th>
+            <th className='uppercase text-sm text-gray-600'>Product</th>
             <th className='w-32 text-center uppercase text-sm text-gray-600'>
               Price
             </th>
@@ -621,18 +545,19 @@ const TableTopProductSold: React.FC = () => {
             </th>
           </tr>
         </thead>
-        <tbody className='text-sm max-h-[300px] overflow-y-auto'>
+        <tbody className='text-sm  overflow-y-auto'>
           {topProductSoldData?.map((product: any, index: number) => (
             <tr key={index}>
-              <td className='flex items-center justify-center'>
+              <td className='flex items-center justify-start'>
                 <img
                   src={product.product.mainImage}
                   alt={product.name}
                   className='h-20 w-20 rounded-full'
                 />
-                <span>{product.name}</span>
+                <span className='ml-2 truncate line-clamp-2 text-wrap '>
+                  {product.product.name}
+                </span>
               </td>
-              <td>{product.product.name}</td>
               <td className='text-center'>
                 {formatCurrency(product.product.standardPrice)}
               </td>

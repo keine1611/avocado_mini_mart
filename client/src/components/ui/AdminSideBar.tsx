@@ -3,14 +3,15 @@ import { DashboardIcon, DatabaseIcon, SideBarIcon } from '@/resources'
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { FaTasks } from 'react-icons/fa'
+import { useAppSelector } from '@/store'
 
 export const AdminSideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
   const [expandedItem, setExpandedItem] = useState<string | null>(null)
-
+  const { user } = useAppSelector((state) => state.auth)
   const isActiveLink = (path: string) => location.pathname.startsWith(path)
-
+  const isActiveExactLink = (path: string) => location.pathname === path
   return (
     <>
       <div
@@ -44,91 +45,107 @@ export const AdminSideBar: React.FC = () => {
               <img src={logo} className='h-12 object-contain' alt='Logo' />
             </div>
             <div className='flex-1 bg-base-100 flex flex-col gap-2 py-4 px-2 overflow-y-auto'>
-              <SidebarItem
-                icon={<DashboardIcon className='h-6 w-6' />}
-                title='Dashboard'
-                isOpen={isOpen}
-                isActive={isActiveLink('/admin/dashboard')}
-                expandedItem={expandedItem}
-                setExpandedItem={setExpandedItem}
-                itemKey='dashboard'
-              >
-                <SidebarSubItem
-                  to='/admin/dashboard'
-                  title='Dashboard'
-                  isActive={isActiveLink('/admin/dashboard')}
-                />
-                <SidebarSubItem
-                  to='/admin/products-analytics'
-                  title='Products Analytics'
-                  isActive={isActiveLink('/admin/products-analytics')}
-                />
-              </SidebarItem>
-              <SidebarItem
-                icon={<DatabaseIcon className='h-6 w-6' />}
-                title='Database'
-                isOpen={isOpen}
-                isActive={isActiveLink('/database')}
-                expandedItem={expandedItem}
-                setExpandedItem={setExpandedItem}
-                itemKey='database'
-              >
-                <SidebarSubItem
-                  to='/admin/databases/brands'
-                  title='Brands'
-                  isActive={isActiveLink('/admin/databases/brands')}
-                />
-                <SidebarSubItem
-                  to='/admin/databases/products'
-                  title='Products'
-                  isActive={isActiveLink('/admin/databases/products')}
-                />
-                <SidebarSubItem
-                  to='/admin/databases/main-categories'
-                  title='Main Categories'
-                  isActive={isActiveLink('/admin/databases/main-categories')}
-                />
-                <SidebarSubItem
-                  to='/admin/databases/sub-categories'
-                  title='Sub Categories'
-                  isActive={isActiveLink('/admin/databases/sub-categories')}
-                />
-                <SidebarSubItem
-                  to='/admin/databases/users'
-                  title='Users'
-                  isActive={isActiveLink('/admin/databases/users')}
-                />
-                <SidebarSubItem
-                  to='/admin/databases/orders'
-                  title='Orders'
-                  isActive={isActiveLink('/admin/databases/orders')}
-                />
-                <SidebarSubItem
-                  to='/admin/databases/batches'
-                  title='Batches'
-                  isActive={isActiveLink('/admin/databases/batches')}
-                />
-                <SidebarSubItem
-                  to='/admin/databases/discounts'
-                  title='Discounts Event'
-                  isActive={isActiveLink('/admin/databases/discounts')}
-                />
-                <SidebarSubItem
-                  to='/admin/databases/discount-codes'
-                  title='Discount Codes'
-                  isActive={isActiveLink('/admin/databases/discount-codes')}
-                />
-                <SidebarSubItem
-                  to='/admin/databases/shippings'
-                  title='Shippings'
-                  isActive={isActiveLink('/admin/databases/shippings')}
-                />
-              </SidebarItem>
+              {user?.role?.name === 'ADMIN' && (
+                <>
+                  <SidebarItem
+                    icon={<DashboardIcon className='h-6 w-6' />}
+                    title='Dashboard'
+                    isOpen={isOpen}
+                    isActive={isActiveLink('/admin/dashboard')}
+                    expandedItem={expandedItem}
+                    setExpandedItem={setExpandedItem}
+                    itemKey='dashboard'
+                  >
+                    <SidebarSubItem
+                      to='/admin/dashboard'
+                      title='Dashboard'
+                      isActive={isActiveExactLink('/admin/dashboard')}
+                    />
+                    <SidebarSubItem
+                      to='/admin/dashboard/inventory-analytics'
+                      title='Inventory Analytics'
+                      isActive={isActiveExactLink(
+                        '/admin/dashboard/inventory-analytics'
+                      )}
+                    />
+                    <SidebarSubItem
+                      to='/admin/dashboard/sales-analytics'
+                      title='Sales Analytics'
+                      isActive={isActiveExactLink(
+                        '/admin/dashboard/sales-analytics'
+                      )}
+                    />
+                  </SidebarItem>
+                  <SidebarItem
+                    icon={<DatabaseIcon className='h-6 w-6' />}
+                    title='Database'
+                    isOpen={isOpen}
+                    isActive={isActiveLink('/admin/databases')}
+                    expandedItem={expandedItem}
+                    setExpandedItem={setExpandedItem}
+                    itemKey='database'
+                  >
+                    <SidebarSubItem
+                      to='/admin/databases/brands'
+                      title='Brands'
+                      isActive={isActiveLink('/admin/databases/brands')}
+                    />
+                    <SidebarSubItem
+                      to='/admin/databases/products'
+                      title='Products'
+                      isActive={isActiveLink('/admin/databases/products')}
+                    />
+                    <SidebarSubItem
+                      to='/admin/databases/main-categories'
+                      title='Main Categories'
+                      isActive={isActiveLink(
+                        '/admin/databases/main-categories'
+                      )}
+                    />
+                    <SidebarSubItem
+                      to='/admin/databases/sub-categories'
+                      title='Sub Categories'
+                      isActive={isActiveLink('/admin/databases/sub-categories')}
+                    />
+                    <SidebarSubItem
+                      to='/admin/databases/users'
+                      title='Users'
+                      isActive={isActiveLink('/admin/databases/users')}
+                    />
+
+                    <SidebarSubItem
+                      to='/admin/databases/batches'
+                      title='Batches'
+                      isActive={isActiveLink('/admin/databases/batches')}
+                    />
+                    <SidebarSubItem
+                      to='/admin/databases/discounts'
+                      title='Discounts Event'
+                      isActive={isActiveLink('/admin/databases/discounts')}
+                    />
+                    <SidebarSubItem
+                      to='/admin/databases/discount-codes'
+                      title='Discount Codes'
+                      isActive={isActiveLink('/admin/databases/discount-codes')}
+                    />
+                    <SidebarSubItem
+                      to='/admin/databases/shippings'
+                      title='Shippings'
+                      isActive={isActiveLink('/admin/databases/shippings')}
+                    />
+                    <SidebarSubItem
+                      to='/admin/databases/roles'
+                      title='Roles'
+                      isActive={isActiveLink('/admin/databases/roles')}
+                    />
+                  </SidebarItem>
+                </>
+              )}
               <SidebarItem
                 icon={<FaTasks className='h-6 w-6 text-secondary' />}
                 title='Tasks'
                 isOpen={isOpen}
-                isActive={isActiveLink('/tasks')}
+                isActive={isActiveLink('/admin/tasks')}
                 expandedItem={expandedItem}
                 setExpandedItem={setExpandedItem}
                 itemKey='tasks'
@@ -137,16 +154,6 @@ export const AdminSideBar: React.FC = () => {
                   to='/admin/tasks/check-orders'
                   title='Check Order'
                   isActive={isActiveLink('/admin/tasks/check-orders')}
-                />
-                <SidebarSubItem
-                  to='/admin/tasks/check-reviews'
-                  title='Check Review'
-                  isActive={isActiveLink('/admin/tasks/check-reviews')}
-                />
-                <SidebarSubItem
-                  to='/admin/tasks/supports'
-                  title='Support'
-                  isActive={isActiveLink('/admin/tasks/supports')}
                 />
               </SidebarItem>
             </div>

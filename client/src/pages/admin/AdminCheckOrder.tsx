@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 import { Table, Button, Modal, Form, Input, message, Tag, Select } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
-import { Order } from '@/types'
+import { Order, OrderItem } from '@/types'
 import {
   useGetOrdersQuery,
   useUpdateOrderStatusMutation,
@@ -9,8 +9,23 @@ import {
 } from '@/services'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { ColumnsType } from 'antd/es/table'
-import { enumToArray, formatCurrency, formatPhoneNumber } from '@/utils'
-import { FaEye, FaShippingFast } from 'react-icons/fa'
+import {
+  enumToArray,
+  formatCurrency,
+  formatPhoneNumber,
+  getLocation,
+  stringToDate,
+  stringToDateTime,
+} from '@/utils'
+import {
+  FaBan,
+  FaBoxOpen,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaEye,
+  FaHourglassStart,
+  FaShippingFast,
+} from 'react-icons/fa'
 import {
   SHIPPING_METHOD,
   PAYMENT_METHOD,
@@ -24,8 +39,21 @@ import {
   MdCreditCard,
   MdCheckCircle,
 } from 'react-icons/md'
+import {
+  UserOutlined,
+  ShoppingOutlined,
+  HistoryOutlined,
+  DollarOutlined,
+  CreditCardOutlined,
+  ShoppingCartOutlined,
+} from '@ant-design/icons'
 import { IoCashOutline } from 'react-icons/io5'
 import { Loading, showToast } from '@/components'
+import { OrderLog } from '@/types/OrderLog'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+dayjs.extend(customParseFormat)
+const { VITE_DATE_FORMAT_API } = import.meta.env
 
 const AdminCheckOrder: React.FC = () => {
   const [form] = Form.useForm()
@@ -164,6 +192,45 @@ const AdminCheckOrder: React.FC = () => {
     form.setFieldsValue(order)
     setIsModalVisible(true)
   }
+  const renderOrderStatusTag = (status: ORDER_STATUS) => {
+    if (status === ORDER_STATUS.PENDING) {
+      return (
+        <Tag color='yellow' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    } else if (status === ORDER_STATUS.SHIPPING) {
+      return (
+        <Tag color='lime' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    } else if (status === ORDER_STATUS.DELIVERED) {
+      return (
+        <Tag color='green' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    } else if (status === ORDER_STATUS.CANCELLED) {
+      return (
+        <Tag color='red' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    } else if (status === ORDER_STATUS.CONFIRMED) {
+      return (
+        <Tag color='green' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    } else if (status === ORDER_STATUS.REJECTED) {
+      return (
+        <Tag color='orange' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    }
+  }
 
   const handleModalOk = () => {
     form.validateFields().then(async (values) => {
@@ -189,23 +256,24 @@ const AdminCheckOrder: React.FC = () => {
       ...getColumnSearchProps('code'),
     },
     {
-      title: 'Full Name',
-      dataIndex: 'fullName',
-      key: 'fullName',
-      ellipsis: true,
-      ...getColumnSearchProps('fullName'),
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+
+      render: (_, record: Order) => (
+        <span>{stringToDateTime(record.createdAt)}</span>
+      ),
+      sorter: (a, b) => Number(a.createdAt) - Number(b.createdAt),
     },
     {
-      title: 'Phone',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: 'Updated At',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
       render: (_, record: Order) => (
-        <span>{formatPhoneNumber(record.phone)}</span>
+        <span>{stringToDateTime(record.updatedAt)}</span>
       ),
-      ellipsis: true,
-      ...getColumnSearchProps('phone'),
+      sorter: (a, b) => Number(a.updatedAt) - Number(b.updatedAt),
     },
-
     {
       title: 'Status',
       dataIndex: 'orderStatus',
@@ -400,7 +468,14 @@ const AdminCheckOrder: React.FC = () => {
             onClick={() => handleView(record)}
             className=' hover:text-primary '
           />
-          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+          {(record.orderStatus === ORDER_STATUS.PENDING ||
+            record.orderStatus === ORDER_STATUS.CONFIRMED ||
+            record.orderStatus === ORDER_STATUS.SHIPPING) && (
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            />
+          )}
         </div>
       ),
     },
@@ -418,18 +493,98 @@ const AdminCheckOrder: React.FC = () => {
     try {
       if (orderCode && orderStatus) {
         await updateOrderStatus({ orderCode, orderStatus }).unwrap()
-        setIsModalVisible(false)
         showToast.success('Update order status successfully')
-      } else {
-        showToast.error('Order code or order status is required')
+        setIsModalVisible(false)
       }
     } catch (err: any) {
       showToast.error(err.data?.message || 'Failed to update order status')
     }
   }
 
+  const renderPaymentStatusTag = (status: PAYMENT_STATUS) => {
+    if (status === PAYMENT_STATUS.PENDING) {
+      return (
+        <Tag color='red' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    } else if (status === PAYMENT_STATUS.PAID) {
+      return (
+        <Tag color='green' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    } else if (status === PAYMENT_STATUS.REFUNDED) {
+      return (
+        <Tag color='purple' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    } else if (status === PAYMENT_STATUS.FAILED) {
+      return (
+        <Tag color='red' className='uppercase'>
+          {status}
+        </Tag>
+      )
+    }
+  }
+
+  const renderPaymentMethodTag = (method: PAYMENT_METHOD) => {
+    if (method === PAYMENT_METHOD.COD) {
+      return (
+        <Tag color='red' className='uppercase'>
+          {method}
+        </Tag>
+      )
+    }
+    return (
+      <Tag color='green' className='uppercase'>
+        {method}
+      </Tag>
+    )
+  }
+
+  const renderShippingMethodTag = (method: SHIPPING_METHOD) => {
+    if (method === SHIPPING_METHOD.EXPRESS) {
+      return (
+        <Tag color='blue' className='uppercase'>
+          {method}
+        </Tag>
+      )
+    }
+    return (
+      <Tag color='green' className='uppercase'>
+        {method}
+      </Tag>
+    )
+  }
+
+  const getAvailableStatuses = (currentStatus: ORDER_STATUS) => {
+    switch (currentStatus) {
+      case ORDER_STATUS.PENDING:
+        return [ORDER_STATUS.CONFIRMED, ORDER_STATUS.REJECTED]
+      case ORDER_STATUS.CONFIRMED:
+        return [ORDER_STATUS.SHIPPING]
+      case ORDER_STATUS.SHIPPING:
+        return [ORDER_STATUS.DELIVERED]
+      default:
+        return []
+    }
+  }
+  const [
+    modalOrderItemBatchDetailVisible,
+    setModalOrderItemBatchDetailVisible,
+  ] = useState(false)
+  const [viewOrderItem, setViewOrderItem] = useState<OrderItem | null>(null)
+
+  const handleViewOrderItemBatchDetail = (orderItem: OrderItem) => {
+    setModalOrderItemBatchDetailVisible(true)
+    setViewOrderItem(orderItem)
+  }
+
   return (
     <div className='w-full h-full overflow-y-auto p-4'>
+      <OrderStatistics orders={data?.data || []} />
       <Table
         columns={columns}
         dataSource={data?.data}
@@ -443,7 +598,6 @@ const AdminCheckOrder: React.FC = () => {
       />
       <Modal
         open={isModalVisible}
-        onOk={handleModalOk}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
         centered
@@ -453,78 +607,39 @@ const AdminCheckOrder: React.FC = () => {
             <Form.Item
               name='orderStatus'
               label='Order Status'
-              rules={[{ required: true, message: 'Order Status is required' }]}
+              rules={[{ required: true }]}
             >
               <Select>
-                {editingOrder?.orderStatus === ORDER_STATUS.PENDING && (
-                  <>
-                    <Select.Option
-                      className='capitalize'
-                      value={ORDER_STATUS.CONFIRMED}
-                    >
-                      {ORDER_STATUS.CONFIRMED}
-                    </Select.Option>
-                    <Select.Option
-                      className='capitalize'
-                      value={ORDER_STATUS.REJECTED}
-                    >
-                      {ORDER_STATUS.REJECTED}
-                    </Select.Option>
-                    <Select.Option
-                      className='capitalize'
-                      value={ORDER_STATUS.CANCELLED}
-                    >
-                      {ORDER_STATUS.CANCELLED}
-                    </Select.Option>
-                  </>
-                )}
-                {editingOrder?.orderStatus === ORDER_STATUS.CONFIRMED && (
-                  <>
-                    <Select.Option
-                      className='capitalize'
-                      value={ORDER_STATUS.SHIPPING}
-                    >
-                      {ORDER_STATUS.SHIPPING}
-                    </Select.Option>
-                    <Select.Option
-                      className='capitalize'
-                      value={ORDER_STATUS.CANCELLED}
-                    >
-                      {ORDER_STATUS.CANCELLED}
-                    </Select.Option>
-                  </>
-                )}
-                {editingOrder?.orderStatus === ORDER_STATUS.SHIPPING && (
-                  <>
-                    <Select.Option
-                      className='capitalize'
-                      value={ORDER_STATUS.DELIVERED}
-                    >
-                      {ORDER_STATUS.DELIVERED}
-                    </Select.Option>
-                    <Select.Option
-                      className='capitalize'
-                      value={ORDER_STATUS.CANCELLED}
-                    >
-                      {ORDER_STATUS.CANCELLED}
-                    </Select.Option>
-                  </>
-                )}
-                {editingOrder?.orderStatus === ORDER_STATUS.REJECTED && <></>}
+                {getAvailableStatuses(
+                  editingOrder?.orderStatus as ORDER_STATUS
+                ).map((status) => (
+                  <Select.Option
+                    key={status}
+                    value={status}
+                    className='capitalize'
+                  >
+                    {status}
+                  </Select.Option>
+                ))}
               </Select>
             </Form.Item>
           </Form>
+
           <div className='flex justify-end mt-4'>
             <button
               className='btn btn-primary min-w-[100px] btn-sm text-white'
               onClick={() =>
                 handleUpdateOrderStatus(
                   editingOrder?.code || '',
-                  formEdit.getFieldValue('orderStatus') || ORDER_STATUS.PENDING
+                  formEdit.getFieldValue('orderStatus')
                 )
               }
             >
-              {isUpdatingStatus ? <Loading /> : 'Update'}
+              {isUpdatingStatus ? (
+                <Loading size='loading-sm' text-color='text-white' />
+              ) : (
+                'Update Status'
+              )}
             </button>
           </div>
         </div>
@@ -534,100 +649,519 @@ const AdminCheckOrder: React.FC = () => {
         onCancel={() => setModalDescriptionInvisible(false)}
         footer={null}
         centered
-        width={1000}
+        width={1200}
       >
-        <div className='p-8'>
-          <h1 className='text-3xl font-bold mb-6 text-center text-primary'>
-            Order Description
-          </h1>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-            <div className=' bg-base-200 p-6 rounded-lg shadow-md'>
-              <h2 className='text-xl font-semibold mb-4'>Order Details</h2>
-              <div className='space-y-2 pl-4'>
-                <p>
-                  <strong>Order Code:</strong> {viewOrder?.code}
-                </p>
-                <p>
-                  <strong>Customer Name:</strong> {viewOrder?.fullName}
-                </p>
-                <p>
-                  <strong>Email:</strong> {viewOrder?.email}
-                </p>
-                <p>
-                  <strong>Phone:</strong>{' '}
-                  {formatPhoneNumber(viewOrder?.phone || '')}
-                </p>
-                <p>
-                  <strong>Address:</strong> {viewOrder?.address}
-                </p>
-                <p className='capitalize'>
-                  <strong>Order Status:</strong> {viewOrder?.orderStatus}
+        <div className='p-4 mt-6 max-h-[calc(100vh-100px)] overflow-y-auto'>
+          <div className='flex justify-between items-center mb-6'>
+            <h1 className='text-3xl font-bold text-primary'>
+              Order #{viewOrder?.code}
+            </h1>
+            <div className='flex items-center gap-4'>
+              <div className='text-right'>
+                <p className='text-sm text-gray-500'>Order Date</p>
+                <p className='font-semibold'>
+                  {stringToDate(viewOrder?.createdAt || '')}
                 </p>
               </div>
-            </div>
-            <div className=' bg-base-200 p-6 rounded-lg shadow-md'>
-              <h2 className='text-xl font-semibold mb-4'>
-                Payment Information
-              </h2>
-              <div className='space-y-2 pl-4'>
-                <p>
-                  <strong>Payment Method:</strong> {viewOrder?.paymentMethod}
-                </p>
-                <p>
-                  <strong>Payment Status:</strong> {viewOrder?.paymentStatus}
-                </p>
-                <p>
-                  <strong>Shipping Method:</strong> {viewOrder?.shippingMethod}
+              <div className='text-right'>
+                <p className='text-sm text-gray-500'>Last Updated</p>
+                <p className='font-semibold'>
+                  {stringToDateTime(viewOrder?.updatedAt || '')}
                 </p>
               </div>
             </div>
           </div>
-          <h2 className='text-xl font-semibold mt-6'>Order Items</h2>
+
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
+            {/* Customer Information */}
+            <div className='bg-white p-6 rounded-lg shadow-md border border-gray-100'>
+              <div className='flex items-center gap-2 mb-4'>
+                <UserOutlined className='text-xl text-primary' />
+                <h2 className='text-xl font-semibold'>Customer Information</h2>
+              </div>
+              <div className='space-y-3'>
+                <div>
+                  <p className='text-sm text-gray-500'>Full Name</p>
+                  <p className='font-medium'>{viewOrder?.fullName}</p>
+                </div>
+                <div>
+                  <p className='text-sm text-gray-500'>Email</p>
+                  <p className='font-medium'>{viewOrder?.email}</p>
+                </div>
+                <div>
+                  <p className='text-sm text-gray-500'>Phone</p>
+                  <p className='font-medium'>
+                    {formatPhoneNumber(viewOrder?.phone || '')}
+                  </p>
+                </div>
+                <div>
+                  <p className='text-sm text-gray-500'>Address</p>
+                  <p className='font-medium'>
+                    {viewOrder?.address},{' '}
+                    {getLocation(
+                      viewOrder?.provinceCode || '',
+                      viewOrder?.districtCode || '',
+                      viewOrder?.wardCode || ''
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Order Status */}
+            <div className='bg-white p-6 rounded-lg shadow-md border border-gray-100'>
+              <div className='flex items-center gap-2 mb-4'>
+                <ShoppingOutlined className='text-xl text-primary' />
+                <h2 className='text-xl font-semibold'>Order Status</h2>
+              </div>
+              <div className='space-y-3'>
+                <div>
+                  <p className='text-sm text-gray-500'>Order Status</p>
+                  <div className='mt-1'>
+                    {renderOrderStatusTag(
+                      viewOrder?.orderStatus as ORDER_STATUS
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <p className='text-sm text-gray-500'>Payment Status</p>
+                  <div className='mt-1'>
+                    {renderPaymentStatusTag(
+                      viewOrder?.paymentStatus as PAYMENT_STATUS
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <p className='text-sm text-gray-500'>Payment Method</p>
+                  <div className='mt-1'>
+                    {renderPaymentMethodTag(
+                      viewOrder?.paymentMethod as PAYMENT_METHOD
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <p className='text-sm text-gray-500'>Shipping Method</p>
+                  <div className='mt-1'>
+                    {renderShippingMethodTag(
+                      viewOrder?.shippingMethod as SHIPPING_METHOD
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Order Summary */}
+            <div className='bg-white p-6 rounded-lg shadow-md border border-gray-100'>
+              <div className='flex items-center gap-2 mb-4'>
+                <DollarOutlined className='text-xl text-primary' />
+                <h2 className='text-xl font-semibold'>Order Summary</h2>
+              </div>
+              <div className='space-y-3'>
+                <div className='flex justify-between'>
+                  <p className='text-gray-500'>Subtotal</p>
+                  <p className='font-medium'>
+                    {formatCurrency(viewOrder?.totalAmount || 0)}
+                  </p>
+                </div>
+                <div className='flex justify-between'>
+                  <p className='text-gray-500'>Shipping Fee</p>
+                  <p className='font-medium'>
+                    {formatCurrency(viewOrder?.shippingFee || 0)}
+                  </p>
+                </div>
+                <div className='flex justify-between'>
+                  <p className='text-gray-500'>Discount</p>
+                  <p className='font-medium text-red-500'>
+                    -{formatCurrency(viewOrder?.discount || 0)}
+                  </p>
+                </div>
+                <div className='border-t pt-2 mt-2'>
+                  <div className='flex justify-between'>
+                    <p className='font-semibold'>Total</p>
+                    <p className='font-bold text-primary text-xl'>
+                      {formatCurrency(
+                        (viewOrder?.totalAmount || 0) +
+                          (viewOrder?.shippingFee || 0) -
+                          (viewOrder?.discount || 0)
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Order Items */}
+          <div className='bg-white p-6 rounded-lg shadow-md border border-gray-100'>
+            <div className='flex items-center gap-2 mb-4'>
+              <ShoppingCartOutlined className='text-xl text-primary' />
+              <h2 className='text-xl font-semibold'>Order Items</h2>
+            </div>
+            <Table
+              dataSource={viewOrder?.orderItems}
+              rowKey='id'
+              pagination={false}
+              columns={[
+                {
+                  title: 'Product',
+                  key: 'product',
+                  render: (_, record) => (
+                    <div className='flex items-center gap-3'>
+                      <img
+                        src={record.product.mainImage}
+                        alt={record.product.name}
+                        className='w-16 h-16 object-cover rounded-md border border-gray-200'
+                      />
+                      <div>
+                        <p className='font-medium'>{record.product.name}</p>
+                        <p className='text-sm text-gray-500'>
+                          {record.product.barcode}
+                        </p>
+                      </div>
+                    </div>
+                  ),
+                },
+
+                {
+                  title: 'Price',
+                  dataIndex: 'price',
+                  key: 'price',
+                  render: (price, record) => {
+                    if (record.discount > 0) {
+                      return (
+                        <div className='flex items-center gap-2'>
+                          <span className='text-red-500'>
+                            {formatCurrency(
+                              price * (1 - record.discount / 100) || 0
+                            )}
+                          </span>
+                          <span className='line-through'>
+                            {formatCurrency(price || 0)}
+                          </span>
+                        </div>
+                      )
+                    }
+                    return formatCurrency(price || 0)
+                  },
+                  width: 100,
+                },
+                {
+                  title: 'Quantity',
+                  dataIndex: 'quantity',
+                  key: 'quantity',
+                  width: 100,
+                  render: (quantity) => (
+                    <Tag color='blue' className='px-3 py-1'>
+                      x{quantity}
+                    </Tag>
+                  ),
+                },
+                {
+                  title: 'Total',
+                  key: 'total',
+                  render: (_, record) => (
+                    <span className='font-semibold'>
+                      {formatCurrency(
+                        record.price *
+                          record.quantity *
+                          (1 - record.discount / 100) || 0
+                      )}
+                    </span>
+                  ),
+                  width: 100,
+                },
+              ]}
+              className='mt-4'
+              scroll={{ x: '', y: 'calc(100vh - 400px)' }}
+              onRow={(record) => ({
+                onClick: () => handleViewOrderItemBatchDetail(record),
+              })}
+            />
+          </div>
+
+          {/* Order Timeline */}
+          <div className='bg-white p-6 rounded-lg shadow-md border border-gray-100 mt-6'>
+            <div className='flex items-center gap-2 mb-4'>
+              <HistoryOutlined className='text-xl text-primary' />
+              <h2 className='text-xl font-semibold'>Order Timeline</h2>
+            </div>
+            <OrderLogTimeline logs={viewOrder?.orderLogs || []} />
+          </div>
+        </div>
+      </Modal>
+      <OrderItemBatchDetailModal
+        visible={modalOrderItemBatchDetailVisible}
+        orderItem={viewOrderItem}
+        onClose={() => setModalOrderItemBatchDetailVisible(false)}
+      />
+    </div>
+  )
+}
+
+interface OrderItemDetailModalProps {
+  visible: boolean
+  orderItem: OrderItem | null
+  onClose: () => void
+}
+
+const OrderItemBatchDetailModal: React.FC<OrderItemDetailModalProps> = ({
+  visible,
+  orderItem,
+  onClose,
+}) => {
+  return (
+    <Modal
+      open={visible}
+      onCancel={onClose}
+      footer={null}
+      width={800}
+      centered
+      title={
+        <div className='text-xl font-bold text-primary'>Product Details</div>
+      }
+    >
+      <div className='p-6'>
+        <div className='flex gap-6'>
+          <img
+            src={orderItem?.product?.mainImage}
+            alt={orderItem?.product?.name}
+            className='w-36 h-36 object-cover rounded-lg border border-gray-200'
+          />
+          <div className='flex-1'>
+            <h3 className='text-xl font-semibold mb-2'>
+              {orderItem?.product?.name}
+            </h3>
+            <div className='grid grid-cols-2 gap-4'>
+              <div>
+                <p className='text-gray-500'>Barcode</p>
+                <p className='font-medium'>{orderItem?.product.barcode}</p>
+              </div>
+              <div>
+                <p className='text-gray-500'>Price</p>
+                <p className='font-medium'>
+                  {formatCurrency(orderItem?.price || 0)}
+                </p>
+              </div>
+              <div>
+                <p className='text-gray-500'>Quantity</p>
+                <p className='font-medium'>{orderItem?.quantity}</p>
+              </div>
+              <div>
+                <p className='text-gray-500'>Discount</p>
+                <p className='font-medium text-red-500'>
+                  {orderItem?.discount}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className='mt-6'>
+          <h4 className='text-lg font-semibold mb-3'>Batch Information</h4>
           <Table
-            dataSource={viewOrder?.orderItems}
-            rowKey='id'
+            dataSource={orderItem?.orderItemBatches}
             pagination={false}
             columns={[
               {
-                title: 'Product',
-                dataIndex: 'product.mainImage',
-                key: 'image',
-                render: (_, record) => (
-                  <img
-                    src={record.product.mainImage}
-                    alt='Product'
-                    className='w-10 h-10 object-cover'
-                  />
-                ),
-              },
-              {
-                title: 'Product Name',
-                dataIndex: 'product.name',
-                key: 'productName',
-                render: (_, record) => record.product.name,
-              },
-              {
-                title: 'Price',
-                dataIndex: 'price',
-                key: 'price',
-                render: (text) => formatCurrency(text),
+                title: 'Batch Code',
+                dataIndex: ['batch', 'code'],
+                key: 'batchCode',
+                render: (_, record) => record.batch.code,
               },
               {
                 title: 'Quantity',
                 dataIndex: 'quantity',
                 key: 'quantity',
               },
+              {
+                title: 'Expired Date',
+                dataIndex: ['batch', 'expiredDate'],
+                key: 'expiredDate',
+                render: (_, record) =>
+                  stringToDate(record.batch.batchProducts[0].expiredDate),
+              },
             ]}
-            className='mt-4'
-            scroll={{ x: '100%', y: 'calc(100vh - 300px)' }}
           />
-          <div className='flex justify-end mt-4'>
-            <h2 className='text-xl font-semibold'></h2>
-          </div>
         </div>
-      </Modal>
-    </div>
+      </div>
+    </Modal>
   )
 }
 
+interface OrderLogTimelineProps {
+  logs: OrderLog[]
+}
+
+const OrderLogTimeline: React.FC<OrderLogTimelineProps> = ({ logs }) => {
+  const getStatusIcon = (status: ORDER_STATUS) => {
+    switch (status) {
+      case ORDER_STATUS.PENDING:
+        return <FaHourglassStart className='text-primary' />
+      case ORDER_STATUS.CONFIRMED:
+        return <FaCheckCircle className='text-primary' />
+      case ORDER_STATUS.SHIPPING:
+        return <FaShippingFast className='text-primary' />
+      case ORDER_STATUS.DELIVERED:
+        return <FaBoxOpen className='text-primary' />
+      case ORDER_STATUS.CANCELLED:
+        return <FaTimesCircle className='text-red-500' />
+      case ORDER_STATUS.REJECTED:
+        return <FaBan className='text-red-500' />
+      default:
+        return null
+    }
+  }
+
+  const getStatusText = (status: ORDER_STATUS) => {
+    switch (status) {
+      case ORDER_STATUS.PENDING:
+        return 'Order is pending.'
+      case ORDER_STATUS.CONFIRMED:
+        return 'Order has been confirmed.'
+      case ORDER_STATUS.SHIPPING:
+        return 'Order is being shipped.'
+      case ORDER_STATUS.DELIVERED:
+        return 'Order has been delivered.'
+      case ORDER_STATUS.CANCELLED:
+        return 'Order has been cancelled.'
+      case ORDER_STATUS.REJECTED:
+        return 'Order was rejected.'
+      default:
+        return 'Unknown status.'
+    }
+  }
+
+  return (
+    <div className='relative border-l-2 border-gray-200 pl-4'>
+      {[...logs]
+        .sort((a, b) =>
+          dayjs(b.updatedAt, VITE_DATE_FORMAT_API).diff(
+            dayjs(a.updatedAt, VITE_DATE_FORMAT_API)
+          )
+        )
+        .map((log) => (
+          <div key={log.id} className='mb-8 ml-4'>
+            <div
+              className={`absolute w-3 h-3 rounded-full -left-1.5 border border-white ${
+                log.status === ORDER_STATUS.CANCELLED ||
+                log.status === ORDER_STATUS.REJECTED
+                  ? 'bg-red-500'
+                  : 'bg-primary'
+              }`}
+            ></div>
+            <div className='flex items-center justify-between mb-1'>
+              <time className='text-sm font-normal leading-none text-gray-400'>
+                {stringToDateTime(log.updatedAt)}
+              </time>
+              <span className='text-sm text-gray-500'>
+                Updated by: {log.updatedBy}
+              </span>
+            </div>
+            <div className='flex items-center'>
+              {getStatusIcon(log.status as ORDER_STATUS)}
+              <p className='text-md text-gray-900 ml-2'>
+                {getStatusText(log.status as ORDER_STATUS)}
+              </p>
+            </div>
+          </div>
+        ))}
+    </div>
+  )
+}
 export { AdminCheckOrder }
+interface OrderStatisticsProps {
+  orders: Order[]
+}
+
+export const OrderStatistics: React.FC<OrderStatisticsProps> = ({ orders }) => {
+  const statistics = useMemo(() => {
+    if (!orders) {
+      return {
+        totalOrders: 0,
+        orderedItems: 0,
+        returns: 0,
+        fulfilledOrders: 0,
+        deliveredOrders: 0,
+      }
+    }
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    return {
+      // Orders created today
+      totalOrders: orders.filter((order) =>
+        dayjs(order.createdAt, VITE_DATE_FORMAT_API).isSame(today, 'day')
+      ).length,
+
+      // Total items ordered across all orders
+      orderedItems: orders.reduce(
+        (acc, order) =>
+          acc + order.orderItems.reduce((sum, item) => sum + item.quantity, 0),
+        0
+      ),
+
+      // Pending orders
+      pendingOrders: orders.filter(
+        (order) => order.orderStatus === ORDER_STATUS.PENDING
+      ).length,
+
+      fulfilledOrders: orders.filter(
+        (order) =>
+          order.orderStatus === ORDER_STATUS.CONFIRMED ||
+          order.orderStatus === ORDER_STATUS.SHIPPING
+      ).length,
+
+      // Delivered orders
+      deliveredOrders: orders.filter(
+        (order) => order.orderStatus === ORDER_STATUS.DELIVERED
+      ).length,
+    }
+  }, [orders])
+
+  return (
+    <div className='bg-white rounded-xl shadow-sm p-4 mb-2 border border-gray-100'>
+      <div className='grid grid-cols-5 gap-4'>
+        <div className='flex flex-col items-center border-r border-gray-100'>
+          <span className='text-gray-600 text-sm'>Total orders</span>
+          <span className='text-2xl font-bold text-primary'>
+            {statistics.totalOrders}
+          </span>
+          <span className='text-xs text-gray-500'>Today</span>
+        </div>
+
+        <div className='flex flex-col items-center border-r border-gray-100'>
+          <span className='text-gray-600 text-sm'>Ordered items over time</span>
+          <span className='text-2xl font-bold text-primary'>
+            {statistics.orderedItems}
+          </span>
+        </div>
+
+        <div className='flex flex-col items-center border-r border-gray-100'>
+          <span className='text-gray-600 text-sm'>Pending orders</span>
+          <span className='text-2xl font-bold text-yellow-500'>
+            {statistics.pendingOrders}
+          </span>
+        </div>
+
+        <div className='flex flex-col items-center border-r border-gray-100'>
+          <span className='text-gray-600 text-sm'>
+            Fulfilled orders over time
+          </span>
+          <span className='text-2xl font-bold text-green-500'>
+            {statistics.fulfilledOrders}
+          </span>
+        </div>
+
+        <div className='flex flex-col items-center border-r border-gray-100'>
+          <span className='text-gray-600 text-sm'>
+            Delivered orders over time
+          </span>
+          <span className='text-2xl font-bold text-blue-500'>
+            {statistics.deliveredOrders}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}

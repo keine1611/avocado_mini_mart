@@ -31,5 +31,5 @@ productRouter.put(
 productRouter.delete('/:id', productController.delete)
 productRouter.get('/:slug', productController.getDetail)
 productRouter.get('/:id/batch-product', productController.getBatchProduct)
-
+productRouter.put('/:id/price', productController.updateProductPrice)
 export { productRouter }

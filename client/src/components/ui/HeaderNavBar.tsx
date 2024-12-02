@@ -180,9 +180,9 @@ const HeaderNavBar: React.FC = () => {
           Categories
         </Link>
         <Link
-          to='/'
+          to='/about'
           className={`${isActiveLink(
-            '/'
+            '/about'
           )} text-md hover:text-secondary transition duration-200`}
           onClick={() => toggleDrawer(false)}
         >
@@ -204,9 +204,15 @@ const HeaderNavBar: React.FC = () => {
           <input
             type='text'
             className=' input-sm w-full p-4 border shadow rounded-full dark:text-gray-800 dark:border-gray-700 dark:bg-gray-200'
-            placeholder='search'
+            placeholder='Search...'
+            value={searchTerm}
+            onChange={handleSearch}
           />
-          <button type='submit' className='absolute right-0 top-0'>
+          <button
+            onClick={() => navigate(`/products?search=${searchTerm}`)}
+            type='submit'
+            className='absolute right-0 top-0'
+          >
             <SearchOutlined className='text-md bg-secondary text-neutral p-2 h-full rounded-full hover:cursor-pointer hover:bg-secondary/80' />
           </button>
         </div>
@@ -250,7 +256,7 @@ const HeaderNavBar: React.FC = () => {
           <Link
             to='/login'
             state={{ from: location.pathname }}
-            className='text-md hover:text-secondary transition duration-200'
+            className='text-md hover:text-secondary transition duration-200 text-white'
           >
             Login
           </Link>

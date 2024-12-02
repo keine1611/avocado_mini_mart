@@ -16,4 +16,20 @@ dashboardRouter.get(
   '/profit-comparison-by-period',
   dashboardController.getProfitComparisonByPeriod
 )
+dashboardRouter.get(
+  '/product-sales-data-by-period',
+  dashboardController.getProductSalesDataByPeriod
+)
+dashboardRouter.get(
+  '/chart-product-analytics-data-by-period/:productId',
+  dashboardController.getChartProductAnalyticsDataByPeriod
+)
+dashboardRouter.get(
+  '/product-price-history/:productId',
+  dashboardController.getProductPriceHistory
+)
+dashboardRouter.get(
+  '/product-data/:productId',
+  dashboardController.getProductData
+)
 export { dashboardRouter }

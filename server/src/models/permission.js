@@ -8,7 +8,7 @@ export class Permission extends Model {
       {
         name: {
           primaryKey: true,
-          type: DataTypes.STRING(30),
+          type: DataTypes.STRING(100),
           allowNull: false,
           unique: true,
           validate: {

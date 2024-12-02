@@ -1,4 +1,5 @@
 import { Order } from './Order'
+import { OrderItemBatch } from './OrderItemBatch'
 import { Product } from './Product'
 
 export interface OrderItem {
@@ -11,4 +12,5 @@ export interface OrderItem {
   product: Product
   discount: number
   isReviewed: boolean
+  orderItemBatches: OrderItemBatch[]
 }

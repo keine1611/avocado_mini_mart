@@ -6,6 +6,7 @@ import {
   Product,
   Account,
   OrderItemBatch,
+  PriceHistory,
 } from '@/models'
 import { models } from '@/models'
 import { Op } from 'sequelize'
@@ -13,7 +14,7 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { Sequelize } from 'sequelize'
 import { ORDER_STATUS } from '@/enum'
-import { gte } from 'lodash'
+import { groupBy, gte } from 'lodash'
 import { mode } from 'crypto-js'
 dayjs.extend(customParseFormat)
 
@@ -79,14 +80,14 @@ export const calculateTotalEarnings = async ({
         },
         {
           orderStatus: {
-            [Op.ne]: ORDER_STATUS.CANCELLED,
+            [Op.eq]: ORDER_STATUS.DELIVERED,
           },
         },
       ],
     },
   })
 
-  return orders.reduce((acc, curr) => acc + curr.totalAmount, 0)
+  return orders.reduce((acc, curr) => acc + curr.totalAmount - curr.discount, 0)
 }
 
 export const calculateCogs = async ({ startDateString, endDateString }) => {
@@ -102,7 +103,7 @@ export const calculateCogs = async ({ startDateString, endDateString }) => {
             as: 'order',
             where: {
               createdAt: { [Op.between]: [startDateString, endDateString] },
-              orderStatus: { [Op.ne]: ORDER_STATUS.CANCELLED },
+              orderStatus: { [Op.eq]: ORDER_STATUS.DELIVERED },
             },
           },
         ],
@@ -148,35 +149,24 @@ export const getTotalNewCustomers = async ({
 
 // Chart Earnings(Revenue)
 export const calculateEarningsComparisonByHour = async () => {
-  const today = dayjs().startOf('day')
-  const yesterday = dayjs().subtract(1, 'day').startOf('day')
+  const now = dayjs()
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
   const earningsComparison = await Promise.all(
     hours.map(async (hour) => {
-      const startOfTodayHour = today.add(hour, 'hour').format(DATE_FORMAT)
-      const endOfTodayHour = today.add(hour + 1, 'hour').format(DATE_FORMAT)
-      const startOfYesterdayHour = yesterday
-        .add(hour, 'hour')
-        .format(DATE_FORMAT)
-      const endOfYesterdayHour = yesterday
-        .add(hour + 1, 'hour')
-        .format(DATE_FORMAT)
+      const startOfHour = now.subtract(24 - hour, 'hour').format(DATE_FORMAT)
+      const endOfHour = now.subtract(23 - hour, 'hour').format(DATE_FORMAT)
 
-      const todayEarnings = await calculateTotalEarnings({
-        startDateString: startOfTodayHour,
-        endDateString: endOfTodayHour,
-      })
-
-      const yesterdayEarnings = await calculateTotalEarnings({
-        startDateString: startOfYesterdayHour,
-        endDateString: endOfYesterdayHour,
+      const earnings = await calculateTotalEarnings({
+        startDateString: startOfHour,
+        endDateString: endOfHour,
       })
 
       return {
-        name: today.add(hour, 'hour').format('HH:mm'),
-        today: todayEarnings,
-        yesterday: yesterdayEarnings,
+        name: `${now.subtract(23 - hour, 'hour').format('DD/MM')} ${now
+          .subtract(23 - hour, 'hour')
+          .format('HH')}h`,
+        revenue: earnings,
       }
     })
   )
@@ -185,96 +175,82 @@ export const calculateEarningsComparisonByHour = async () => {
 }
 
 export const calculateEarningsComparisonByWeek = async () => {
-  const startOfThisWeek = dayjs().startOf('week')
-  const startOfLastWeek = dayjs().subtract(1, 'week').startOf('week')
+  const now = dayjs()
   const days = Array.from({ length: 7 }, (_, i) => i)
 
-  const earningsComparison = []
-  for (const day of days) {
-    const startOfThisDay = startOfThisWeek.add(day, 'day').format(DATE_FORMAT)
-    const endOfThisDay = startOfThisWeek.add(day + 1, 'day').format(DATE_FORMAT)
-    const startOfLastDay = startOfLastWeek.add(day, 'day').format(DATE_FORMAT)
-    const endOfLastDay = startOfLastWeek.add(day + 1, 'day').format(DATE_FORMAT)
-    const earningsThisWeek = await calculateTotalEarnings({
-      startDateString: startOfThisDay,
-      endDateString: endOfThisDay,
+  const earningsComparison = await Promise.all(
+    days.map(async (day) => {
+      const startOfDay = now
+        .subtract(6 - day, 'day')
+        .startOf('day')
+        .format(DATE_FORMAT)
+      const endOfDay = now
+        .subtract(6 - day, 'day')
+        .endOf('day')
+        .format(DATE_FORMAT)
+
+      const earnings = await calculateTotalEarnings({
+        startDateString: startOfDay,
+        endDateString: endOfDay,
+      })
+
+      return {
+        name: now.subtract(6 - day, 'day').format('DD/MM'),
+        revenue: earnings,
+      }
     })
-    const earningsLastWeek = await calculateTotalEarnings({
-      startDateString: startOfLastDay,
-      endDateString: endOfLastDay,
-    })
-    earningsComparison.push({
-      name: startOfThisWeek.add(day, 'day').format('dddd'),
-      thisWeek: earningsThisWeek,
-      lastWeek: earningsLastWeek,
-    })
-  }
+  )
   return earningsComparison
 }
 
 export const calculateEarningsComparisonByMonth = async () => {
-  const startOfThisMonth = dayjs().startOf('month')
-  const startOfLastMonth = dayjs().subtract(1, 'month').startOf('month')
+  const now = dayjs()
   const days = Array.from({ length: 30 }, (_, i) => i)
 
-  const earningsComparison = []
-  for (const day of days) {
-    const startOfThisDay = startOfThisMonth.add(day, 'day').format(DATE_FORMAT)
-    const endOfThisDay = startOfThisMonth
-      .add(day + 1, 'day')
-      .format(DATE_FORMAT)
-    const startOfLastDay = startOfLastMonth.add(day, 'day').format(DATE_FORMAT)
-    const endOfLastDay = startOfLastMonth
-      .add(day + 1, 'day')
-      .format(DATE_FORMAT)
-    const earningsThisMonth = await calculateTotalEarnings({
-      startDateString: startOfThisDay,
-      endDateString: endOfThisDay,
+  const earningsComparison = await Promise.all(
+    days.map(async (day) => {
+      const startOfDay = now
+        .subtract(29 - day, 'day')
+        .startOf('day')
+        .format(DATE_FORMAT)
+      const endOfDay = now
+        .subtract(29 - day, 'day')
+        .endOf('day')
+        .format(DATE_FORMAT)
+
+      const earnings = await calculateTotalEarnings({
+        startDateString: startOfDay,
+        endDateString: endOfDay,
+      })
+
+      return {
+        name: now.subtract(29 - day, 'day').format('DD/MM'),
+        revenue: earnings,
+      }
     })
-    const earningsLastMonth = await calculateTotalEarnings({
-      startDateString: startOfLastDay,
-      endDateString: endOfLastDay,
-    })
-    earningsComparison.push({
-      name: dayjs(startOfThisDay).format('DD'),
-      thisMonth: earningsThisMonth,
-      lastMonth: earningsLastMonth,
-    })
-  }
+  )
+
   return earningsComparison
 }
 
 export const calculateEarningsComparisonByYear = async () => {
-  const startOfThisYear = dayjs().startOf('year')
-  const startOfLastYear = dayjs().subtract(1, 'year').startOf('year')
-  const months = Array.from({ length: 12 }, (_, i) => i)
+  const startOfYear = dayjs().startOf('year')
+  const currentMonth = dayjs().month()
+  const months = Array.from({ length: currentMonth + 1 }, (_, i) => i)
 
   const earningsComparison = []
   for (const month of months) {
-    const startOfThisMonth = startOfThisYear
-      .add(month, 'month')
-      .format(DATE_FORMAT)
-    const endOfThisMonth = startOfThisYear
-      .add(month + 1, 'month')
-      .format(DATE_FORMAT)
-    const startOfLastMonth = startOfLastYear
-      .add(month, 'month')
-      .format(DATE_FORMAT)
-    const endOfLastMonth = startOfLastYear
-      .add(month + 1, 'month')
-      .format(DATE_FORMAT)
-    const earningsThisMonth = await calculateTotalEarnings({
-      startDateString: startOfThisMonth,
-      endDateString: endOfThisMonth,
+    const startOfMonth = startOfYear.add(month, 'month').format(DATE_FORMAT)
+    const endOfMonth = startOfYear.add(month + 1, 'month').format(DATE_FORMAT)
+
+    const earnings = await calculateTotalEarnings({
+      startDateString: startOfMonth,
+      endDateString: endOfMonth,
     })
-    const earningsLastMonth = await calculateTotalEarnings({
-      startDateString: startOfLastMonth,
-      endDateString: endOfLastMonth,
-    })
+
     earningsComparison.push({
-      name: dayjs(startOfThisMonth).format('MMM'),
-      thisYear: earningsThisMonth,
-      lastYear: earningsLastMonth,
+      name: dayjs(startOfMonth).format('MMM'),
+      revenue: earnings,
     })
   }
   return earningsComparison
@@ -297,35 +273,24 @@ export const calculateEarningsComparisonByPeriod = async ({ period }) => {
 
 // Chart Profit
 export const calculateProfitComparisonByHour = async () => {
-  const today = dayjs().startOf('day')
-  const yesterday = dayjs().subtract(1, 'day').startOf('day')
+  const now = dayjs()
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
   const profitComparison = await Promise.all(
     hours.map(async (hour) => {
-      const startOfTodayHour = today.add(hour, 'hour').format(DATE_FORMAT)
-      const endOfTodayHour = today.add(hour + 1, 'hour').format(DATE_FORMAT)
-      const startOfYesterdayHour = yesterday
-        .add(hour, 'hour')
-        .format(DATE_FORMAT)
-      const endOfYesterdayHour = yesterday
-        .add(hour + 1, 'hour')
-        .format(DATE_FORMAT)
+      const startOfHour = now.subtract(24 - hour, 'hour').format(DATE_FORMAT)
+      const endOfHour = now.subtract(23 - hour, 'hour').format(DATE_FORMAT)
 
-      const todayProfit = await calculateProfit({
-        startDateString: startOfTodayHour,
-        endDateString: endOfTodayHour,
-      })
-
-      const yesterdayProfit = await calculateProfit({
-        startDateString: startOfYesterdayHour,
-        endDateString: endOfYesterdayHour,
+      const profit = await calculateProfit({
+        startDateString: startOfHour,
+        endDateString: endOfHour,
       })
 
       return {
-        name: today.add(hour, 'hour').format('HH:mm'),
-        today: todayProfit,
-        yesterday: yesterdayProfit,
+        name: `${now.subtract(23 - hour, 'hour').format('DD/MM')} ${now
+          .subtract(23 - hour, 'hour')
+          .format('HH')}h`,
+        profit: profit,
       }
     })
   )
@@ -334,96 +299,81 @@ export const calculateProfitComparisonByHour = async () => {
 }
 
 export const calculateProfitComparisonByWeek = async () => {
-  const startOfThisWeek = dayjs().startOf('week')
-  const startOfLastWeek = dayjs().subtract(1, 'week').startOf('week')
+  const now = dayjs()
   const days = Array.from({ length: 7 }, (_, i) => i)
 
-  const profitComparison = []
-  for (const day of days) {
-    const startOfThisDay = startOfThisWeek.add(day, 'day').format(DATE_FORMAT)
-    const endOfThisDay = startOfThisWeek.add(day + 1, 'day').format(DATE_FORMAT)
-    const startOfLastDay = startOfLastWeek.add(day, 'day').format(DATE_FORMAT)
-    const endOfLastDay = startOfLastWeek.add(day + 1, 'day').format(DATE_FORMAT)
-    const profitThisWeek = await calculateProfit({
-      startDateString: startOfThisDay,
-      endDateString: endOfThisDay,
+  const profitComparison = await Promise.all(
+    days.map(async (day) => {
+      const startOfDay = now
+        .subtract(6 - day, 'day')
+        .startOf('day')
+        .format(DATE_FORMAT)
+      const endOfDay = now
+        .subtract(6 - day, 'day')
+        .endOf('day')
+        .format(DATE_FORMAT)
+
+      const profit = await calculateProfit({
+        startDateString: startOfDay,
+        endDateString: endOfDay,
+      })
+
+      return {
+        name: now.subtract(6 - day, 'day').format('DD/MM'),
+        profit: profit,
+      }
     })
-    const profitLastWeek = await calculateProfit({
-      startDateString: startOfLastDay,
-      endDateString: endOfLastDay,
-    })
-    profitComparison.push({
-      name: startOfThisWeek.add(day, 'day').format('dddd'),
-      thisWeek: profitThisWeek,
-      lastWeek: profitLastWeek,
-    })
-  }
+  )
   return profitComparison
 }
 
 export const calculateProfitComparisonByMonth = async () => {
-  const startOfThisMonth = dayjs().startOf('month')
-  const startOfLastMonth = dayjs().subtract(1, 'month').startOf('month')
+  const now = dayjs()
   const days = Array.from({ length: 30 }, (_, i) => i)
 
-  const profitComparison = []
-  for (const day of days) {
-    const startOfThisDay = startOfThisMonth.add(day, 'day').format(DATE_FORMAT)
-    const endOfThisDay = startOfThisMonth
-      .add(day + 1, 'day')
-      .format(DATE_FORMAT)
-    const startOfLastDay = startOfLastMonth.add(day, 'day').format(DATE_FORMAT)
-    const endOfLastDay = startOfLastMonth
-      .add(day + 1, 'day')
-      .format(DATE_FORMAT)
-    const earningsThisMonth = await calculateProfit({
-      startDateString: startOfThisDay,
-      endDateString: endOfThisDay,
+  const productAnalyticsData = await Promise.all(
+    days.map(async (day) => {
+      const startDateString = now
+        .subtract(29 - day, 'day')
+        .startOf('day')
+        .format(DATE_FORMAT)
+      const endDateString = now
+        .subtract(29 - day, 'day')
+        .endOf('day')
+        .format(DATE_FORMAT)
+
+      const profit = await calculateProfit({
+        startDateString,
+        endDateString,
+      })
+
+      return {
+        name: now.subtract(29 - day, 'day').format('DD/MM'),
+        profit: profit,
+      }
     })
-    const earningsLastMonth = await calculateProfit({
-      startDateString: startOfLastDay,
-      endDateString: endOfLastDay,
-    })
-    profitComparison.push({
-      name: dayjs(startOfThisDay).format('DD'),
-      thisMonth: earningsThisMonth,
-      lastMonth: earningsLastMonth,
-    })
-  }
-  return profitComparison
+  )
+  return productAnalyticsData
 }
 
 export const calculateProfitComparisonByYear = async () => {
-  const startOfThisYear = dayjs().startOf('year')
-  const startOfLastYear = dayjs().subtract(1, 'year').startOf('year')
-  const months = Array.from({ length: 12 }, (_, i) => i)
+  const startOfYear = dayjs().startOf('year')
+  const currentMonth = dayjs().month()
+  const months = Array.from({ length: currentMonth + 1 }, (_, i) => i)
 
   const profitComparison = []
   for (const month of months) {
-    const startOfThisMonth = startOfThisYear
-      .add(month, 'month')
-      .format(DATE_FORMAT)
-    const endOfThisMonth = startOfThisYear
-      .add(month + 1, 'month')
-      .format(DATE_FORMAT)
-    const startOfLastMonth = startOfLastYear
-      .add(month, 'month')
-      .format(DATE_FORMAT)
-    const endOfLastMonth = startOfLastYear
-      .add(month + 1, 'month')
-      .format(DATE_FORMAT)
-    const earningsThisMonth = await calculateProfit({
-      startDateString: startOfThisMonth,
-      endDateString: endOfThisMonth,
+    const startOfMonth = startOfYear.add(month, 'month').format(DATE_FORMAT)
+    const endOfMonth = startOfYear.add(month + 1, 'month').format(DATE_FORMAT)
+
+    const profit = await calculateProfit({
+      startDateString: startOfMonth,
+      endDateString: endOfMonth,
     })
-    const earningsLastMonth = await calculateProfit({
-      startDateString: startOfLastMonth,
-      endDateString: endOfLastMonth,
-    })
+
     profitComparison.push({
-      name: dayjs(startOfThisMonth).format('MMM'),
-      thisYear: earningsThisMonth,
-      lastYear: earningsLastMonth,
+      name: dayjs(startOfMonth).format('MMM'),
+      profit: profit,
     })
   }
   return profitComparison
@@ -455,7 +405,7 @@ export const calculateTopProductSoldComparisonInTimePeriod = async ({
         model: Order,
         as: 'order',
         where: {
-          orderStatus: { [Op.ne]: ORDER_STATUS.CANCELLED },
+          orderStatus: { [Op.eq]: ORDER_STATUS.DELIVERED },
           createdAt: {
             [Op.between]: [startDateString, endDateString],
           },
@@ -467,6 +417,7 @@ export const calculateTopProductSoldComparisonInTimePeriod = async ({
     attributes: [
       'productId',
       'product.name',
+      'product.slug',
       'product.mainImage',
       [Sequelize.fn('SUM', Sequelize.col('quantity')), 'totalSold'],
       [
@@ -520,4 +471,472 @@ export const calculateTopProductSoldComparisonByPeriod = async ({ period }) => {
     default:
       return []
   }
+}
+
+// Sale Analytics
+export const getProductSalesDataByPeriod = async ({ period }) => {
+  let startDateString
+  let endDateString
+  const now = dayjs()
+
+  switch (period) {
+    case 'day':
+      startDateString = now.subtract(24, 'hour').format(DATE_FORMAT)
+      endDateString = now.format(DATE_FORMAT)
+      return await getProductSalesData({ startDateString, endDateString })
+    case 'week':
+      startDateString = now.subtract(7, 'day').format(DATE_FORMAT)
+      endDateString = now.format(DATE_FORMAT)
+      return await getProductSalesData({ startDateString, endDateString })
+    case 'month':
+      startDateString = now.subtract(30, 'day').format(DATE_FORMAT)
+      endDateString = now.format(DATE_FORMAT)
+      return await getProductSalesData({ startDateString, endDateString })
+    case 'year':
+      startDateString = now.startOf('year').format(DATE_FORMAT)
+      endDateString = now.endOf('year').format(DATE_FORMAT)
+      return await getProductSalesData({ startDateString, endDateString })
+  }
+}
+export const getProductSalesData = async ({
+  startDateString,
+  endDateString,
+}) => {
+  const productSalesData = await Product.findAll({
+    attributes: [
+      'id',
+      'name',
+      'slug',
+      'mainImage',
+      [
+        Sequelize.fn(
+          'COALESCE',
+          Sequelize.fn('SUM', Sequelize.col('orderItems.quantity')),
+          0
+        ),
+        'totalQuantitySold',
+      ],
+      [
+        Sequelize.fn(
+          'COALESCE',
+          Sequelize.fn(
+            'SUM',
+            Sequelize.literal(
+              '`orderItems`.`price` * (1 - `orderItems`.`discount` / 100) * `orderItems`.`quantity`'
+            )
+          ),
+          0
+        ),
+        'totalRevenue',
+      ],
+      [
+        Sequelize.literal(`
+          COALESCE(
+            SUM(
+              \`orderItems\`.\`price\` * (1 - \`orderItems\`.\`discount\` / 100) * \`orderItems\`.\`quantity\` - 
+              \`orderItems->orderItemBatches\`.\`quantity\` * \`batchProducts\`.\`price\`
+            ),
+            0
+          )
+        `),
+        'totalProfit',
+      ],
+    ],
+    include: [
+      {
+        model: OrderItem,
+        as: 'orderItems',
+        attributes: [],
+        required: false,
+        include: [
+          {
+            model: Order,
+            as: 'order',
+            attributes: [],
+            required: true,
+            where: {
+              createdAt: {
+                [Op.between]: [startDateString, endDateString],
+              },
+              orderStatus: {
+                [Op.eq]: ORDER_STATUS.DELIVERED,
+              },
+            },
+          },
+          {
+            model: OrderItemBatch,
+            as: 'orderItemBatches',
+            attributes: [],
+            required: false,
+          },
+        ],
+      },
+      {
+        model: BatchProduct,
+        as: 'batchProducts',
+        attributes: [],
+        required: false,
+      },
+    ],
+    group: ['Product.id'],
+    order: [[Sequelize.literal('totalQuantitySold'), 'DESC']],
+  })
+
+  return productSalesData
+}
+
+//chart product analytics
+export const getProductAnalyticsData = async ({
+  productId,
+  startDateString,
+  endDateString,
+}) => {
+  const productAnalyticsData = await Product.findOne({
+    where: { id: productId },
+    attributes: [
+      'id',
+      'name',
+      'mainImage',
+      [
+        Sequelize.fn(
+          'COALESCE',
+          Sequelize.fn('SUM', Sequelize.col('orderItems.quantity')),
+          0
+        ),
+        'totalQuantitySold',
+      ],
+      [
+        Sequelize.fn(
+          'COALESCE',
+          Sequelize.fn(
+            'SUM',
+            Sequelize.literal(
+              '`orderItems`.`price` * (1 - `orderItems`.`discount` / 100) * `orderItems`.`quantity`'
+            )
+          ),
+          0
+        ),
+        'totalRevenue',
+      ],
+      [
+        Sequelize.literal(`
+          COALESCE(
+            SUM(
+              \`orderItems\`.\`price\` * (1 - \`orderItems\`.\`discount\` / 100) * \`orderItems\`.\`quantity\` - 
+              \`orderItems->orderItemBatches\`.\`quantity\` * \`batchProducts\`.\`price\`
+            ),
+            0
+          )
+        `),
+        'totalProfit',
+      ],
+    ],
+    include: [
+      {
+        model: OrderItem,
+        as: 'orderItems',
+        attributes: [],
+        required: false,
+        include: [
+          {
+            model: Order,
+            as: 'order',
+            attributes: [],
+            required: true,
+            where: {
+              createdAt: {
+                [Op.between]: [startDateString, endDateString],
+              },
+              orderStatus: {
+                [Op.eq]: ORDER_STATUS.DELIVERED,
+              },
+            },
+          },
+          {
+            model: OrderItemBatch,
+            as: 'orderItemBatches',
+            attributes: [],
+            required: false,
+          },
+        ],
+      },
+      {
+        model: BatchProduct,
+        as: 'batchProducts',
+        attributes: [],
+        required: false,
+      },
+    ],
+    group: ['Product.id'],
+    order: [[Sequelize.literal('totalQuantitySold'), 'DESC']],
+  })
+
+  return productAnalyticsData.toJSON()
+}
+
+export const getChartProductAnalyticsDataByPeriod = async ({
+  period,
+  productId,
+}) => {
+  switch (period) {
+    case 'day':
+      return await getChartProductAnalyticsDataInDay({ productId })
+    case 'week':
+      return await getChartProductAnalyticsDataInWeek({ productId })
+    case 'month':
+      return await getChartProductAnalyticsDataInMonth({ productId })
+    case 'year':
+      return await getChartProductAnalyticsDataInYear({ productId })
+    default:
+      return []
+  }
+}
+
+export const getChartProductAnalyticsDataInDay = async ({ productId }) => {
+  const now = dayjs()
+  const hours = Array.from({ length: 24 }, (_, i) => i)
+
+  const productAnalyticsData = await Promise.all(
+    hours.map(async (hour) => {
+      const startDateString = now
+        .subtract(23 - hour, 'hour')
+        .startOf('hour')
+        .format(DATE_FORMAT)
+      const endDateString = now
+        .subtract(22 - hour, 'hour')
+        .startOf('hour')
+        .format(DATE_FORMAT)
+
+      const productAnalyticsData = await getProductAnalyticsData({
+        productId,
+        startDateString,
+        endDateString,
+      })
+      return {
+        name: `${now.subtract(23 - hour, 'hour').format('DD/MM')} ${now
+          .subtract(23 - hour, 'hour')
+          .format('HH:00')}`,
+        totalQuantitySold: productAnalyticsData.totalQuantitySold,
+        totalRevenue: productAnalyticsData.totalRevenue,
+        totalProfit: productAnalyticsData.totalProfit,
+      }
+    })
+  )
+  return productAnalyticsData
+}
+
+export const getChartProductAnalyticsDataInWeek = async ({ productId }) => {
+  const now = dayjs()
+  const days = Array.from({ length: 7 }, (_, i) => i)
+
+  const productAnalyticsData = await Promise.all(
+    days.map(async (day) => {
+      const startDateString = now
+        .subtract(6 - day, 'day')
+        .startOf('day')
+        .format(DATE_FORMAT)
+      const endDateString = now
+        .subtract(6 - day, 'day')
+        .endOf('day')
+        .format(DATE_FORMAT)
+
+      const productAnalyticsData = await getProductAnalyticsData({
+        productId,
+        startDateString,
+        endDateString,
+      })
+      return {
+        name: now.subtract(6 - day, 'day').format('DD/MM'),
+        totalQuantitySold: productAnalyticsData.totalQuantitySold,
+        totalRevenue: productAnalyticsData.totalRevenue,
+        totalProfit: productAnalyticsData.totalProfit,
+      }
+    })
+  )
+  return productAnalyticsData
+}
+
+export const getChartProductAnalyticsDataInMonth = async ({ productId }) => {
+  const now = dayjs()
+  const days = Array.from({ length: 30 }, (_, i) => i)
+
+  const productAnalyticsData = await Promise.all(
+    days.map(async (day) => {
+      const startDateString = now
+        .subtract(29 - day, 'day')
+        .startOf('day')
+        .format(DATE_FORMAT)
+      const endDateString = now
+        .subtract(29 - day, 'day')
+        .endOf('day')
+        .format(DATE_FORMAT)
+
+      const productAnalyticsData = await getProductAnalyticsData({
+        productId,
+        startDateString,
+        endDateString,
+      })
+      return {
+        name: now.subtract(29 - day, 'day').format('DD/MM'),
+        totalQuantitySold: productAnalyticsData.totalQuantitySold,
+        totalRevenue: productAnalyticsData.totalRevenue,
+        totalProfit: productAnalyticsData.totalProfit,
+      }
+    })
+  )
+  return productAnalyticsData
+}
+
+export const getChartProductAnalyticsDataInYear = async ({ productId }) => {
+  const startOfYear = dayjs().startOf('year')
+  const months = Array.from({ length: 12 }, (_, i) => i)
+
+  const productAnalyticsData = await Promise.all(
+    months.map(async (month) => {
+      const startDateString = startOfYear
+        .add(month, 'month')
+        .format(DATE_FORMAT)
+      const endDateString = startOfYear
+        .add(month, 'month')
+        .endOf('month')
+        .format(DATE_FORMAT)
+      const productAnalyticsData = await getProductAnalyticsData({
+        productId,
+        startDateString,
+        endDateString,
+      })
+      return {
+        name: startOfYear.add(month, 'month').format('MMM'),
+        totalQuantitySold: productAnalyticsData.totalQuantitySold,
+        totalRevenue: productAnalyticsData.totalRevenue,
+        totalProfit: productAnalyticsData.totalProfit,
+      }
+    })
+  )
+  return productAnalyticsData
+}
+
+export const getProductPriceHistory = async ({ productId }) => {
+  const priceHistories = await PriceHistory.findAll({
+    where: { productId },
+    include: [
+      {
+        model: Product,
+        as: 'product',
+        attributes: ['name', 'mainImage'],
+      },
+    ],
+    order: [['changedAt', 'DESC']],
+  })
+
+  const priceHistoryWithMetrics = await Promise.all(
+    priceHistories.map(async (history) => {
+      const nextHistory = await PriceHistory.findOne({
+        where: {
+          productId,
+          changedAt: { [Op.gt]: history.changedAt },
+        },
+        order: [['changedAt', 'ASC']],
+      })
+
+      const endDate = nextHistory
+        ? nextHistory.changedAt
+        : dayjs().format(DATE_FORMAT)
+
+      // Get sales and revenue
+      const salesMetrics = await OrderItem.findOne({
+        attributes: [
+          [
+            Sequelize.fn('SUM', Sequelize.col('OrderItem.quantity')),
+            'totalQuantitySold',
+          ],
+          [
+            Sequelize.fn(
+              'SUM',
+              Sequelize.literal(
+                '`OrderItem`.`price` * (1 - `OrderItem`.`discount` / 100) * `OrderItem`.`quantity`'
+              )
+            ),
+            'totalRevenue',
+          ],
+        ],
+        include: [
+          {
+            model: Order,
+            as: 'order',
+            attributes: [],
+            required: true,
+            where: {
+              createdAt: {
+                [Op.between]: [history.changedAt, endDate],
+              },
+              orderStatus: ORDER_STATUS.DELIVERED,
+            },
+          },
+        ],
+        where: { productId },
+        raw: true,
+      })
+
+      const orderItemBatches = await OrderItemBatch.findAll({
+        attributes: ['quantity'],
+        include: [
+          {
+            model: OrderItem,
+            as: 'orderItem',
+            required: true,
+            include: [
+              {
+                model: Order,
+                as: 'order',
+                required: true,
+                where: {
+                  createdAt: {
+                    [Op.between]: [history.changedAt, endDate],
+                  },
+                  orderStatus: ORDER_STATUS.DELIVERED,
+                },
+              },
+            ],
+            where: { productId },
+          },
+          {
+            model: Batch,
+            as: 'batch',
+            required: true,
+            include: [
+              {
+                model: BatchProduct,
+                as: 'batchProducts',
+                required: true,
+                where: { productId },
+                attributes: ['price'],
+              },
+            ],
+          },
+        ],
+      })
+
+      let totalCogs = 0
+      for (const batch of orderItemBatches) {
+        totalCogs += batch.quantity * batch.batch.batchProducts[0].price
+      }
+
+      return {
+        id: history.id,
+        oldPrice: history.oldPrice,
+        newPrice: history.newPrice,
+        changedAt: history.changedAt,
+        changedBy: history.changedBy,
+        product: history.product,
+        periodStart: history.changedAt,
+        periodEnd: endDate,
+        totalQuantitySold: parseInt(salesMetrics?.totalQuantitySold || 0),
+        totalRevenue: parseFloat(salesMetrics?.totalRevenue || 0),
+        totalProfit: parseFloat((salesMetrics?.totalRevenue || 0) - totalCogs),
+      }
+    })
+  )
+
+  return priceHistoryWithMetrics
 }

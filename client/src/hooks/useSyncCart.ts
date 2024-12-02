@@ -9,9 +9,13 @@ const useAutoSyncCart = () => {
   const cart = useAppSelector((state) => state.cart.cart)
 
   useEffect(() => {
-    socket.on('cartUpdated', (data) => {
-      dispatch(cartActions.setCarts(data))
-    })
+    if (user) {
+      socket.connect()
+      socket.emit('registerUser', user?.email)
+      socket.on('cartUpdated', (data) => {
+        dispatch(cartActions.setCarts(data))
+      })
+    }
     return () => {
       socket.off('cartUpdated')
     }

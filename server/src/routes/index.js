@@ -13,7 +13,7 @@ import { batchRouter } from './batch'
 import { discountRouter } from './discount'
 import { reviewRouter } from './review'
 import { dashboardRouter } from './dashboard'
-
+import { permissionRouter } from './permission'
 export const route = (app) => {
   app.use('/api/brands', brandRouter)
   app.use('/api/auth', authRouter)
@@ -30,4 +30,5 @@ export const route = (app) => {
   app.use('/api/discounts', discountRouter)
   app.use('/api/reviews', reviewRouter)
   app.use('/api/dashboard', dashboardRouter)
+  app.use('/api/permissions', permissionRouter)
 }

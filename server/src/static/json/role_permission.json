@@ -1,0 +1,110 @@
+[
+  {
+    "roleId": "2",
+    "permissionName": "REFRESH_TOKEN"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "LOGOUT"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "SYNC_FAVORITES"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "GET_USER_FAVORITES"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "SYNC_CART"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "GET_USER_CART"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "GET_CART_PRODUCTS_BY_IDS"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "GET_USER_ORDERS"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "ADD_ORDER_INFO"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "UPDATE_ORDER_INFO"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "DELETE_ORDER_INFO"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "UPDATE_PROFILE"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "CHANGE_PASSWORD_REQUEST"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "CHANGE_PASSWORD"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "RESEND_CHANGE_PASSWORD_CODE"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "GET_ORDER"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "CANCEL_ORDER"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "USER_CREATE_ORDER"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "CREATE_REVIEW"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "PAYPAL_CREATE_ORDER"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "PAYPAL_VERIFY_ORDER"
+  },
+  {
+    "roleId": "2",
+    "permissionName": "RETRY_PAYPAL_ORDER"
+  },
+  {
+    "roleId": "3",
+    "permissionName": "REFRESH_TOKEN"
+  },
+  {
+    "roleId": "3",
+    "permissionName": "LOGOUT"
+  },
+  {
+    "roleId": "3",
+    "permissionName": "GET_ORDERS"
+  },
+  {
+    "roleId": "3",
+    "permissionName": "GET_ORDER"
+  },
+  {
+    "roleId": "3",
+    "permissionName": "UPDATE_ORDER_STATUS"
+  }
+]

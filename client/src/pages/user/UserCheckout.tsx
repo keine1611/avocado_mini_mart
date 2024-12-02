@@ -273,7 +273,7 @@ const UserCheckout: React.FC = () => {
             Your Products
           </h2>
           <div className='w-full flex flex-col gap-4'>
-            <div className='px-4'>
+            <div className='px-4 max-h-[40vh] overflow-y-auto'>
               {cartItems?.map((item: Cart) => (
                 <div
                   key={item.product?.id}
@@ -456,7 +456,11 @@ const UserCheckout: React.FC = () => {
                 className='btn btn-secondary w-full text-white'
                 onClick={handleCreateOrder}
               >
-                {isLoadingUserCreateOrder ? <Loading /> : 'Order now'}
+                {isLoadingUserCreateOrder ? (
+                  <Loading size='loading-sm' />
+                ) : (
+                  'Order now'
+                )}
               </button>
             )}
           </div>

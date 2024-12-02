@@ -43,6 +43,8 @@ export const UserLogin = () => {
       } else {
         if (user.role.name.toLowerCase() === 'admin') {
           navigate('/admin/dashboard')
+        } else if (user.role.name.toLowerCase() === 'staff') {
+          navigate('/admin/tasks/check-orders')
         } else {
           navigate('/')
         }
@@ -88,7 +90,17 @@ export const UserLogin = () => {
       dispatch(cartActions.setCarts(result.data?.carts || []))
       setLastCartFromLocalStorage(result.data?.carts || [])
       dispatch(favoriteActions.setFavorites(result.data?.favorites || []))
-      navigate(from, { replace: true })
+      if (from) {
+        navigate(from, { replace: true })
+      } else {
+        if (user?.role.name.toLowerCase() === 'admin') {
+          navigate('/admin/dashboard')
+        } else if (user?.role.name.toLowerCase() === 'staff') {
+          navigate('/admin/tasks/check-orders')
+        } else {
+          navigate('/')
+        }
+      }
     } catch (error: any) {
       showToast.error(error.data?.message || 'Something went wrong')
     } finally {

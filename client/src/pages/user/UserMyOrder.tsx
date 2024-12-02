@@ -38,7 +38,7 @@ const UserMyOrder: React.FC = () => {
       <h1 className='text-2xl font-bold text-primary'>Your history orders</h1>
       <div role='tablist' className='tabs tabs-boxed mt-4'>
         {orderStatuses.map((status, index) => (
-          <a
+          <div
             role='tab'
             className={`tab border-2 border-base-200 rounded-lg text-black checked:bg-primary checked:text-white ${
               activeTab === status.value ? 'tab-active' : ''
@@ -47,7 +47,7 @@ const UserMyOrder: React.FC = () => {
             onClick={() => setActiveTab(status.value)}
           >
             {status.label}
-          </a>
+          </div>
         ))}
       </div>
       <div className=' max-h-[400px] h-full mt-10 overflow-y-auto px-2'>
@@ -59,7 +59,7 @@ const UserMyOrder: React.FC = () => {
           <>
             <div className='flex flex-col gap-4'>
               {ordersData.map((order) => (
-                <OrderCard order={order} />
+                <OrderCard key={order.id} order={order} />
               ))}
             </div>
           </>
@@ -139,7 +139,7 @@ const OrderCard: React.FC<{ order: Order }> = ({ order }) => {
               <h2 className='text-lg font-semibold text-gray-800'>
                 Order ID: <span className='text-gray-500'>{order.code}</span>
               </h2>
-              <p className='text-gray-600 text-sm truncate'>
+              <p className='text-gray-600 text-sm truncate max-w-[600px]'>
                 {order.orderItems.map((item) => item.product.name).join(', ')}
               </p>
               <p className='text-gray-600'>

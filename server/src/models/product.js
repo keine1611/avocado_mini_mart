@@ -89,6 +89,26 @@ export class Product extends Model {
           beforeUpdate: async (product, options) => {
             product.updatedAt = getToday()
           },
+          afterCreate: async (product, options) => {
+            await models.PriceHistory.create({
+              productId: product.id,
+              oldPrice: product.standardPrice,
+              newPrice: product.standardPrice,
+              changedAt: getToday(),
+              changedBy: null,
+            })
+          },
+          afterBulkCreate: async (products, options) => {
+            for (const product of products) {
+              await models.PriceHistory.create({
+                productId: product.id,
+                oldPrice: product.standardPrice,
+                newPrice: product.standardPrice,
+                changedAt: getToday(),
+                changedBy: '',
+              })
+            }
+          },
         },
       }
     )

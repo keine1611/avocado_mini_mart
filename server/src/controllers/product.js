@@ -8,6 +8,7 @@ import {
   deleteFileFromFirebase,
   formatError,
   stringToDayjs,
+  getToday,
 } from '@/utils'
 import { Op } from 'sequelize'
 import { productValidation } from '@/validation'
@@ -658,7 +659,6 @@ export const productController = {
       })
     }
   },
-
   getHomeData: async (req, res) => {
     try {
       const featuredProducts = await getFeaturedProducts()
@@ -687,6 +687,46 @@ export const productController = {
       res.status(500).json({
         message: formatError(error.message),
         data: null,
+      })
+    }
+  },
+  updateProductPrice: async (req, res) => {
+    let transaction
+    try {
+      transaction = await sequelize.transaction()
+      const { id } = req.params
+      const { standardPrice } = req.body
+      const product = await Product.findByPk(id)
+      if (!product) {
+        return res.status(404).json({
+          message: 'Product not found',
+        })
+      }
+      const updatedProduct = await Product.update(
+        { standardPrice },
+        { where: { id }, transaction }
+      )
+      const productHistory = await models.PriceHistory.create(
+        {
+          productId: id,
+          oldPrice: product.standardPrice,
+          newPrice: standardPrice,
+          changedBy: req.account.email,
+          changedAt: getToday(),
+        },
+        { transaction }
+      )
+      await transaction.commit()
+      res.status(200).json({
+        message: 'Product price updated successfully',
+        data: updatedProduct,
+      })
+    } catch (error) {
+      if (transaction) {
+        await transaction.rollback()
+      }
+      res.status(500).json({
+        message: formatError(error.message),
       })
     }
   },

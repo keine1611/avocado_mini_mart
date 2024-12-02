@@ -95,7 +95,11 @@ export class Account extends Model {
               where: { accountId: account.id },
             })
             if (!profile) {
-              await Profile.create({ accountId: account.id })
+              await Profile.create({
+                accountId: account.id,
+                avatarUrl:
+                  'https://firebasestorage.googleapis.com/v0/b/mini-mart-613a2.appspot.com/o/avartar%2Favatar_default.png?alt=media&token=ae432130-c1f8-427b-94f7-04f536c996a1',
+              })
             }
           },
           afterUpdate: async (account, options) => {

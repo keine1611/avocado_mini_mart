@@ -11,11 +11,6 @@ const UserFavorite: React.FC = () => {
         <h1 className='text-xl font-semibold text-center'>
           Your Favorite Products
         </h1>
-        {/* <ListProduct
-          productData={favoriteData?.data || []}
-          currentPage={currentPage}
-          totalPages={favoriteData?.data.totalPages || 1}
-        /> */}
       </div>
     </div>
   )

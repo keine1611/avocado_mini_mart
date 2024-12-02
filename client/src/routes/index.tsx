@@ -1,4 +1,10 @@
-import { createBrowserRouter, Outlet, useNavigate } from 'react-router-dom'
+import {
+  createBrowserRouter,
+  Navigate,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 import { useEffect } from 'react'
 import { PATH } from '@/constant'
 import {
@@ -27,27 +33,40 @@ import {
   UserOrderDetail,
   AdminCheckOrder,
   AdminDashboard,
+  AdminSaleAnalytics,
 } from '@/pages'
 import { AdminLayout, UserLayout, MyAccount } from '@/components'
 import { useAppSelector } from '@/store'
+import { AdminRole } from '@/pages/admin/AdminRole'
 
-interface PrivateRouteProps {
-  roles?: string[]
+export enum RouteRole {
+  ADMIN = 'ADMIN',
+  STAFF = 'STAFF',
+  USER = 'USER',
+}
+
+interface ProtectedRouteProps {
+  allowedRoles?: RouteRole[]
+  redirectPath?: string
   children: React.ReactNode
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ roles, children }) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  allowedRoles,
+  redirectPath = '/login',
+  children,
+}) => {
   const { user } = useAppSelector((state) => state.auth)
-  const navigate = useNavigate()
+  const location = useLocation()
 
-  useEffect(() => {
-    if (user) {
-      if (!roles?.includes(user?.role?.name || '')) navigate('/no-access')
-    } else {
-      if (roles && roles.length > 0) navigate('/login')
-      else navigate('/no-access')
-    }
-  }, [user])
+  if (!user) {
+    return <Navigate to={redirectPath} state={{ from: location }} replace />
+  }
+
+  if (!allowedRoles?.includes(user.role.name as RouteRole)) {
+    return <Navigate to='/no-access' replace />
+  }
+
   return <>{children}</>
 }
 
@@ -82,38 +101,39 @@ const router = createBrowserRouter([
           },
         ],
       },
-
+    ],
+  },
+  {
+    path: 'account',
+    element: (
+      <ProtectedRoute allowedRoles={[RouteRole.USER]}>
+        <UserLayout>
+          <MyAccount />
+        </UserLayout>
+      </ProtectedRoute>
+    ),
+    children: [
       {
-        path: 'cart',
-        element: <UserCart />,
+        path: 'orders',
+        element: <UserMyOrder />,
       },
       {
-        path: 'favorites',
-        element: <UserFavorite />,
+        path: 'orders/:orderCode',
+        element: <UserOrderDetail />,
       },
       {
-        path: 'account',
-        element: <MyAccount />,
-        children: [
-          {
-            path: 'orders',
-            element: <UserMyOrder />,
-          },
-          {
-            path: 'orders/:orderCode',
-            element: <UserOrderDetail />,
-          },
-          {
-            path: 'profile',
-            element: <UserProfile />,
-          },
-        ],
+        path: 'profile',
+        element: <UserProfile />,
       },
     ],
   },
   {
     path: 'checkout',
-    element: <UserCheckout />,
+    element: (
+      <ProtectedRoute allowedRoles={[RouteRole.USER]}>
+        <UserCheckout />
+      </ProtectedRoute>
+    ),
   },
   {
     path: PATH.user.login,
@@ -130,9 +150,9 @@ const router = createBrowserRouter([
   {
     path: '/admin',
     element: (
-      <PrivateRoute roles={['ADMIN']}>
+      <ProtectedRoute allowedRoles={[RouteRole.ADMIN, RouteRole.STAFF]}>
         <AdminLayout />
-      </PrivateRoute>
+      </ProtectedRoute>
     ),
     children: [
       {
@@ -141,6 +161,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'databases',
+        element: (
+          <ProtectedRoute allowedRoles={[RouteRole.ADMIN]}>
+            <Outlet />
+          </ProtectedRoute>
+        ),
         children: [
           {
             path: 'brands',
@@ -178,6 +203,10 @@ const router = createBrowserRouter([
             path: 'discounts',
             element: <AdminDiscount />,
           },
+          {
+            path: 'roles',
+            element: <AdminRole />,
+          },
         ],
       },
       {
@@ -189,13 +218,28 @@ const router = createBrowserRouter([
           },
         ],
       },
+
       {
         path: 'dashboard',
-        element: <AdminDashboard />,
-      },
-      {
-        path: 'products-analytics',
-        element: <AdminBatchProduct />,
+        element: (
+          <ProtectedRoute allowedRoles={[RouteRole.ADMIN]}>
+            <Outlet />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <AdminDashboard />,
+          },
+          {
+            path: 'inventory-analytics',
+            element: <AdminBatchProduct />,
+          },
+          {
+            path: 'sales-analytics',
+            element: <AdminSaleAnalytics />,
+          },
+        ],
       },
     ],
   },

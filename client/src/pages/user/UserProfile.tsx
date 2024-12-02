@@ -97,7 +97,7 @@ const UserProfile: React.FC = () => {
 
   return (
     <div className='container mx-auto'>
-      <Card className='shadow-lg rounded-lg' bodyStyle={{ padding: '24px' }}>
+      <Card className='shadow-lg rounded-lg' style={{ padding: '24px' }}>
         <div className='flex items-center'>
           <Avatar
             size={80}
@@ -165,7 +165,10 @@ const UserProfile: React.FC = () => {
                 <Text className='text-lg'>No address</Text>
               )}
               {user?.orderInfos.map((orderInfo) => (
-                <div className='flex justify-between border px-4 py-2 border-gray-200 items-center'>
+                <div
+                  key={orderInfo.id}
+                  className='flex justify-between border px-4 py-2 border-gray-200 items-center'
+                >
                   <div className='flex flex-col gap-2'>
                     <span className='text-lg'>
                       {orderInfo.fullName}
@@ -321,8 +324,6 @@ export const ModalAddAddress: React.FC<{
       setSelectedProvince(editOrderInfo.provinceCode)
       setSelectedDistrict(editOrderInfo.districtCode)
       setSelectedWard(editOrderInfo.wardCode)
-    } else {
-      form.resetFields()
     }
   }, [editOrderInfo, form, open])
 
@@ -556,7 +557,6 @@ const ModalUpdateProfile: React.FC<{
 
   useEffect(() => {
     if (user) {
-      form.setFieldsValue(user)
       setFileList(
         user.avatarUrl
           ? [
@@ -610,7 +610,12 @@ const ModalUpdateProfile: React.FC<{
     >
       <div className='bg-white p-4'>
         <h2 className='text-2xl font-bold mb-6 text-primary'>Edit User</h2>
-        <Form form={form} layout='vertical' className='space-y-4'>
+        <Form
+          form={form}
+          layout='vertical'
+          className='space-y-4'
+          initialValues={user || {}}
+        >
           <Form.Item name='avatar' label=''>
             <div className='flex justify-center'>
               <Upload
@@ -762,10 +767,6 @@ const ModalChangePassword: React.FC<{
       if (timer) clearInterval(timer)
     }
   }, [resendTimer])
-
-  useEffect(() => {
-    console.log(verificationCode)
-  }, [verificationCode])
 
   const handleVerificationCodeChange = (index: number, value: string) => {
     const newCode = verificationCode.split('')

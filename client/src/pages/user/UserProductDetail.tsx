@@ -130,16 +130,6 @@ const UserProductDetail: React.FC = () => {
                 autoplay={false}
                 arrows
                 beforeChange={handleBeforeChange}
-                nextArrow={
-                  <div className='bg-black rounded-full p-1'>
-                    <FaChevronRight className='text-black' size={20} />
-                  </div>
-                }
-                prevArrow={
-                  <div className='bg-black rounded-full p-1'>
-                    <FaChevronLeft className='text-black' size={20} />
-                  </div>
-                }
                 className='border-2 bg-white border-gray-200 rounded-lg h-full m-0 p-0'
               >
                 {images.map((image, index) => (
@@ -150,7 +140,7 @@ const UserProductDetail: React.FC = () => {
                     <img
                       src={image.url}
                       alt='Product'
-                      className='w-full h-full object-cover '
+                      className='w-full h-full object-contain '
                     />
                   </div>
                 ))}
@@ -161,7 +151,7 @@ const UserProductDetail: React.FC = () => {
                     key={index}
                     src={image.url}
                     alt='Thumbnail'
-                    className={`w-24 h-24 object-cover rounded-lg mx-1 cursor-pointer ${
+                    className={`w-24 h-24 object-contain rounded-lg mx-1 cursor-pointer ${
                       index === currentImageIndex
                         ? 'border-2 border-primary'
                         : ''

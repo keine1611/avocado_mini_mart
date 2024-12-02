@@ -3,12 +3,14 @@ import { socket } from '@/socket'
 import { useEffect } from 'react'
 
 const useWebSocket = () => {
-  const userEmail = useAppSelector((state) => state.auth.user?.email)
+  const { user } = useAppSelector((state) => state.auth)
 
   useEffect(() => {
-    if (!userEmail) return
-    socket.emit('registerUser', userEmail)
-  }, [userEmail])
+    if (user) {
+      socket.connect()
+      socket.emit('registerUser', user?.email)
+    }
+  }, [user])
 }
 
 export { useWebSocket }

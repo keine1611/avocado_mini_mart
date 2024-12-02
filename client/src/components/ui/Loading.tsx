@@ -19,7 +19,9 @@ export const Loading: React.FC<LoadingProps> = ({
             ? 'w-16 h-16'
             : size === 'loading-md'
             ? 'w-8 h-8'
-            : 'w-6 h-6'
+            : size === 'loading-sm'
+            ? 'w-6 h-6'
+            : 'w-8 h-8'
         } ${color}`}
       ></span>
     </div>

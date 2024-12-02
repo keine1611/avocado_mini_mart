@@ -25,6 +25,22 @@ export const dashboardApi = createApi({
     getProfitComparisonByPeriod: builder.query<any, { period: string }>({
       query: ({ period }) => `/profit-comparison-by-period?period=${period}`,
     }),
+    getProductSalesDataByPeriod: builder.query<any, { period: string }>({
+      query: ({ period }) => `/product-sales-data-by-period?period=${period}`,
+    }),
+    getChartProductAnalyticsDataByPeriod: builder.query<
+      any,
+      { period: string; productId: string }
+    >({
+      query: ({ period, productId }) =>
+        `/chart-product-analytics-data-by-period/${productId}?period=${period}`,
+    }),
+    getProductPriceHistory: builder.query<any, { productId: number }>({
+      query: ({ productId }) => `/product-price-history/${productId}`,
+    }),
+    getProductData: builder.query<any, { productId: number }>({
+      query: ({ productId }) => `/product-data/${productId}`,
+    }),
   }),
 })
 
@@ -33,4 +49,8 @@ export const {
   useGetEarningsComparisonByPeriodQuery,
   useGetTopProductSoldComparisonByPeriodQuery,
   useGetProfitComparisonByPeriodQuery,
+  useGetProductSalesDataByPeriodQuery,
+  useGetChartProductAnalyticsDataByPeriodQuery,
+  useGetProductPriceHistoryQuery,
+  useGetProductDataQuery,
 } = dashboardApi

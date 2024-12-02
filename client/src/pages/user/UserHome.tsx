@@ -26,30 +26,31 @@ const mainCategories = [
     name: 'Fast Food',
     slug: 'fast-food',
     image: mainCategoryImage.fastFood,
-    link: '/products?category=fast-food',
+    link: '/products/fast-food',
   },
   {
     name: 'Fresh Produce',
     slug: 'fresh-produce',
     image: mainCategoryImage.freshProduce,
+    link: '/products/fresh-produce',
   },
   {
     name: 'Beverages',
     slug: 'beverages',
     image: mainCategoryImage.beverages,
-    link: '/products?category=beverages',
+    link: '/products/beverages',
   },
   {
     name: 'Fresh Food',
     slug: 'fresh-food',
     image: mainCategoryImage.freshFood,
-    link: '/products?category=fresh-food',
+    link: '/products/fresh-food',
   },
   {
     name: 'Condiments',
     slug: 'condiments',
     image: mainCategoryImage.condiments,
-    link: '/products?category=condiments',
+    link: '/products/condiments',
   },
 ]
 
@@ -58,7 +59,7 @@ export const UserHome: React.FC = () => {
   const navigate = useNavigate()
   return isLoadingHomeData ? (
     <div className='w-full h-screen flex justify-center items-center'>
-      <Loading size='loading-xl' />
+      <Loading size='loading-lg' />
     </div>
   ) : (
     <div className='w-full flex flex-col '>

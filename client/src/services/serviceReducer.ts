@@ -11,6 +11,8 @@ import { discountCodeApi } from './discountCode'
 import { batchApi } from './batch'
 import { discountApi } from './discount'
 import { dashboardApi } from './dashboard'
+import { permissionApi } from './permission'
+
 export const serviceReducer = {
   [brandApi.reducerPath]: brandApi.reducer,
   [authApi.reducerPath]: authApi.reducer,
@@ -25,6 +27,7 @@ export const serviceReducer = {
   [batchApi.reducerPath]: batchApi.reducer,
   [discountApi.reducerPath]: discountApi.reducer,
   [dashboardApi.reducerPath]: dashboardApi.reducer,
+  [permissionApi.reducerPath]: permissionApi.reducer,
 }
 
 export const serviceMiddleware = [
@@ -41,4 +44,5 @@ export const serviceMiddleware = [
   batchApi.middleware,
   discountApi.middleware,
   dashboardApi.middleware,
+  permissionApi.middleware,
 ]

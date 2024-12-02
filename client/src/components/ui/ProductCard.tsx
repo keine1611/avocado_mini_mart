@@ -41,7 +41,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div
       key={product.id}
-      className='relative max-w-xs w-full mx-auto block bg-white shadow-md rounded-xl'
+      className='relative max-w-xs w-full border border-gray-200 mx-auto block bg-white shadow-md rounded-xl'
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -56,7 +56,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <img
             src={product.mainImage}
             alt='Product'
-            className={`lg:w-40 lg:h-40 w-44 h-44 mx-auto object-cover p-5 border-none ${
+            className={`lg:w-40 lg:h-40 w-44 h-44 mx-auto object-contain p-5 border-none ${
               isHovered ? ' scale-110' : ''
             } transition-all duration-700 `}
           />
@@ -65,7 +65,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <img
                 src='/images/sold-out.png'
                 alt='Sold Out'
-                className={`w-32 h-32 ${
+                className={`w-36 h-36 ${
                   isHovered ? 'scale-110' : 'scale-100'
                 } transition-all duration-700`}
               />

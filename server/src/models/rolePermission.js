@@ -10,7 +10,7 @@ export class RolePermission extends Model {
           allowNull: false,
         },
         permissionName: {
-          type: DataTypes.STRING(30),
+          type: DataTypes.STRING(100),
           allowNull: false,
         },
       },

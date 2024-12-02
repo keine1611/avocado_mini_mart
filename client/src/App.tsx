@@ -8,6 +8,7 @@ import {
   useAppDispatch,
   authActions,
   cartActions,
+  useAppSelector,
 } from './store'
 import { useRefreshMutation } from '@/services'
 import Cookies from 'js-cookie'
@@ -30,6 +31,7 @@ const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
   const [refresh] = useRefreshMutation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(true)
+  const user = useAppSelector((state) => state.auth.user)
 
   useEffect(() => {
     const refreshToken = async () => {
@@ -53,7 +55,7 @@ const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
         setLoading(false)
       }
     }
-    const refreshTokenId = setInterval(refreshToken, 1000 * 60 * 9)
+    const refreshTokenId = setInterval(refreshToken, 1000 * 60 * 8)
     refreshToken()
 
     return () => {

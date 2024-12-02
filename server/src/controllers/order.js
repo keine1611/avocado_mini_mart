@@ -5,6 +5,8 @@ import {
   Product,
   Discount,
   DiscountCode,
+  OrderItemBatch,
+  BatchProduct,
 } from '@/models'
 import { formatError } from '@/utils'
 import { sequelize } from '@/config'
@@ -24,6 +26,8 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 dayjs.extend(customParseFormat)
 
+import { refundOrder } from '@/controllers/payment'
+
 const DATE_FORMAT = process.env.DATE_FORMAT
 
 const orderController = {
@@ -31,8 +35,36 @@ const orderController = {
     try {
       const orders = await Order.findAll({
         include: [
-          { model: models.OrderItem, as: 'orderItems', include: ['product'] },
+          {
+            model: models.OrderItem,
+            as: 'orderItems',
+            include: [
+              { model: models.Product, as: 'product' },
+              {
+                model: models.OrderItemBatch,
+                as: 'orderItemBatches',
+                include: [
+                  {
+                    model: models.Batch,
+                    as: 'batch',
+                    include: [
+                      {
+                        model: models.BatchProduct,
+                        as: 'batchProducts',
+                        required: false,
+                        where: sequelize.literal(
+                          '`orderItems->product`.`id` = `orderItems->orderItemBatches->batch->batchProducts`.`productId`'
+                        ),
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          { model: models.OrderLog, as: 'orderLogs' },
         ],
+        order: [['createdAt', 'DESC']],
       })
       res.json({
         message: 'Get orders successfully',
@@ -40,7 +72,7 @@ const orderController = {
       })
     } catch (error) {
       res.status(500).json({
-        message: formatError(error),
+        message: formatError(error.toString()) || 'Failed to get orders',
         data: null,
       })
     }
@@ -78,9 +110,50 @@ const orderController = {
           .status(400)
           .json({ message: 'Order code and order status are required' })
       }
-      const order = await Order.findOne({ where: { code: orderCode } })
+      const order = await Order.findOne({
+        where: { code: orderCode },
+        include: [
+          {
+            model: models.OrderItem,
+            as: 'orderItems',
+            include: [
+              {
+                model: models.OrderItemBatch,
+                as: 'orderItemBatches',
+              },
+            ],
+          },
+        ],
+      })
       if (!order) {
         return res.status(404).json({ message: 'Order not found' })
+      }
+      if (order.orderStatus === ORDER_STATUS.CANCELLED) {
+        return res.status(400).json({ message: 'Order is cancelled' })
+      }
+      if (order.orderStatus === ORDER_STATUS.DELIVERED) {
+        return res.status(400).json({ message: 'Order is delivered' })
+      }
+      if (
+        orderStatus === ORDER_STATUS.CANCELLED ||
+        orderStatus === ORDER_STATUS.REJECTED
+      ) {
+        for (const orderItem of order.orderItems) {
+          for (const orderItemBatch of orderItem.orderItemBatches) {
+            const batchProduct = await BatchProduct.findOne({
+              where: {
+                batchId: orderItemBatch.batchId,
+                productId: orderItem.productId,
+              },
+            })
+            if (batchProduct) {
+              await batchProduct.update(
+                { quantity: batchProduct.quantity + orderItemBatch.quantity },
+                { transaction }
+              )
+            }
+          }
+        }
       }
       order.orderStatus = orderStatus
       await order.save({ transaction })
@@ -92,9 +165,21 @@ const orderController = {
         },
         { transaction }
       )
+      if (orderStatus === ORDER_STATUS.REJECTED) {
+        if (order.paymentStatus === PAYMENT_STATUS.PAID) {
+          await refundOrder({
+            captureId: order.paymentId,
+            amount: order.totalAmount + order.shippingFee - order.discount || 0,
+          })
+          order.paymentStatus = PAYMENT_STATUS.REFUNDED
+        }
+      }
       await transaction.commit()
       res.json({ message: 'Update order status successfully' })
     } catch (error) {
+      if (transaction) {
+        await transaction.rollback()
+      }
       res.status(500).json({
         message:
           formatError(error.toString()) || 'Failed to update order status',

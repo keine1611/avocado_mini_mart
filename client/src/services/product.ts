@@ -171,6 +171,16 @@ export const productApi = createApi({
         method: 'GET',
       }),
     }),
+    updateProductPrice: builder.mutation<
+      ApiResponse<Product>,
+      { id: number; standardPrice: number }
+    >({
+      query: ({ id, standardPrice }) => ({
+        url: `/${id}/price`,
+        method: 'PUT',
+        body: { standardPrice },
+      }),
+    }),
   }),
 })
 
@@ -187,4 +197,5 @@ export const {
   useLazyGetExpiredProductQuery,
   useGetListProductByIdsQuery,
   useGetHomeDataQuery,
+  useUpdateProductPriceMutation,
 } = productApi

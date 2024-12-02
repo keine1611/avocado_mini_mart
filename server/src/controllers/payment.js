@@ -113,7 +113,10 @@ const paymentController = {
         intent: 'CAPTURE',
         purchase_units: [
           {
-            amount: { value: paymentAmount.toString(), currency_code: 'USD' },
+            amount: {
+              value: paymentAmount.toFixed(2).toString(),
+              currency_code: 'USD',
+            },
             address: {
               country_code: 'VN',
             },
@@ -226,6 +229,10 @@ const paymentController = {
           captureId: order.paymentId,
           amount: order.totalAmount + order.shippingFee - order.discount || 0,
         })
+        await order.update(
+          { paymentStatus: PAYMENT_STATUS.REFUNDED },
+          { transaction }
+        )
       }
       await order.update(
         {
@@ -311,7 +318,7 @@ const paymentController = {
 
 export { paymentController }
 
-const refundOrder = async ({ captureId, amount }) => {
+export const refundOrder = async ({ captureId, amount }) => {
   try {
     const request = new paypal.payments.CapturesRefundRequest(captureId)
     request.requestBody({ amount: { value: amount, currency_code: 'USD' } })

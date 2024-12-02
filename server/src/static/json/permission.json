@@ -1,0 +1,488 @@
+[
+  {
+    "name": "GET_BRANDS",
+    "path": "/api/brands",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "CREATE_BRAND",
+    "path": "/api/brands",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "UPDATE_BRAND",
+    "path": "/api/brands/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "IMPORT_EXCEL_BRAND",
+    "path": "/api/brands/import-excel",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "DELETE_BRAND",
+    "path": "/api/brands/:id",
+    "method": "DELETE",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_PRODUCTS",
+    "path": "/api/products",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "GET_ALL_PRODUCTS_NO_PAGINATION",
+    "path": "/api/products/all",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "GET_NEARLY_EXPIRED_PRODUCTS",
+    "path": "/api/products/nearly-expired",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_LOW_STOCK_PRODUCTS",
+    "path": "/api/products/low-stock",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_EXPIRED_PRODUCTS",
+    "path": "/api/products/expired",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "CREATE_PRODUCT",
+    "path": "/api/products",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_HOME_DATA",
+    "path": "/api/products/home-data",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "GET_PRODUCTS_BY_IDS",
+    "path": "/api/products/ids",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "UPDATE_PRODUCT",
+    "path": "/api/products/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "DELETE_PRODUCT",
+    "path": "/api/products/:id",
+    "method": "DELETE",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_PRODUCT_DETAIL",
+    "path": "/api/products/:slug",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "GET_BATCH_PRODUCT",
+    "path": "/api/products/:id/batch-product",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_MAIN_CATEGORIES",
+    "path": "/api/main-categories",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "CREATE_MAIN_CATEGORY",
+    "path": "/api/main-categories",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "UPDATE_MAIN_CATEGORY",
+    "path": "/api/main-categories/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "DELETE_MAIN_CATEGORY",
+    "path": "/api/main-categories/:id",
+    "method": "DELETE",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_SUB_CATEGORIES",
+    "path": "/api/sub-categories",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "GET_SUB_CATEGORY",
+    "path": "/api/sub-categories/:id",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "CREATE_SUB_CATEGORY",
+    "path": "/api/sub-categories",
+    "method": "POST",
+    "isPublic": "1"
+  },
+  {
+    "name": "UPDATE_SUB_CATEGORY",
+    "path": "/api/sub-categories/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "DELETE_SUB_CATEGORY",
+    "path": "/api/sub-categories/:id",
+    "method": "DELETE",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_DASHBOARD_DATA",
+    "path": "/api/dashboard",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_EARNINGS_COMPARISON",
+    "path": "/api/dashboard/earnings-comparison-by-period",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_TOP_PRODUCT_SOLD_COMPARISON",
+    "path": "/api/dashboard/top-product-sold-comparison-by-period",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_PROFIT_COMPARISON",
+    "path": "/api/dashboard/profit-comparison-by-period",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_PRODUCT_SALES_DATA",
+    "path": "/api/dashboard/product-sales-data-by-period",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_CHART_PRODUCT_ANALYTICS",
+    "path": "/api/dashboard/chart-product-analytics-data-by-period/:productId",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_PERMISSIONS",
+    "path": "/api/permissions",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_ROLES",
+    "path": "/api/roles",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "UPDATE_ROLE",
+    "path": "/api/roles/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_DISCOUNTS",
+    "path": "/api/discounts",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "CREATE_DISCOUNT",
+    "path": "/api/discounts",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "UPDATE_DISCOUNT",
+    "path": "/api/discounts/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "DELETE_DISCOUNT",
+    "path": "/api/discounts/:id",
+    "method": "DELETE",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_DISCOUNT_CODES",
+    "path": "/api/discount-codes",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "CREATE_DISCOUNT_CODE",
+    "path": "/api/discount-codes",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "UPDATE_DISCOUNT_CODE",
+    "path": "/api/discount-codes/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "DELETE_DISCOUNT_CODE",
+    "path": "/api/discount-codes/:id",
+    "method": "DELETE",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_DISCOUNT_CODE_BY_CODE",
+    "path": "/api/discount-codes/:code",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "GET_BATCHES",
+    "path": "/api/batches",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "CREATE_BATCH",
+    "path": "/api/batches",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "UPDATE_BATCH",
+    "path": "/api/batches/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "DELETE_BATCH",
+    "path": "/api/batches/:id",
+    "method": "DELETE",
+    "isPublic": "0"
+  },
+  {
+    "name": "REGISTER",
+    "path": "/api/auth/register",
+    "method": "POST",
+    "isPublic": "1"
+  },
+  {
+    "name": "VERIFY",
+    "path": "/api/auth/verify",
+    "method": "POST",
+    "isPublic": "1"
+  },
+  {
+    "name": "LOGIN",
+    "path": "/api/auth/login",
+    "method": "POST",
+    "isPublic": "1"
+  },
+  {
+    "name": "REFRESH_TOKEN",
+    "path": "/api/auth/refresh",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "LOGOUT",
+    "path": "/api/auth/logout",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "SYNC_FAVORITES",
+    "path": "/api/auth/sync-favorites",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_USER_FAVORITES",
+    "path": "/api/auth/user-favorites",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "SYNC_CART",
+    "path": "/api/auth/sync-cart",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_USER_CART",
+    "path": "/api/auth/user-cart",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_CART_PRODUCTS_BY_IDS",
+    "path": "/api/auth/user-cart/products/product-ids",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_USER_ORDERS",
+    "path": "/api/auth/user-orders",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "ADD_ORDER_INFO",
+    "path": "/api/auth/add-order-info",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "UPDATE_ORDER_INFO",
+    "path": "/api/auth/update-order-info/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "DELETE_ORDER_INFO",
+    "path": "/api/auth/delete-order-info/:id",
+    "method": "DELETE",
+    "isPublic": "0"
+  },
+  {
+    "name": "UPDATE_PROFILE",
+    "path": "/api/auth/update-profile",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "CHANGE_PASSWORD_REQUEST",
+    "path": "/api/auth/change-password-request",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "CHANGE_PASSWORD",
+    "path": "/api/auth/change-password",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "RESEND_CHANGE_PASSWORD_CODE",
+    "path": "/api/auth/resend-change-password-code",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_ORDER",
+    "path": "/api/orders/:orderCode",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_ORDERS",
+    "path": "/api/orders",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "CANCEL_ORDER",
+    "path": "/api/orders/:orderCode/cancel",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "UPDATE_ORDER_STATUS",
+    "path": "/api/orders/update-status/:orderCode",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "USER_CREATE_ORDER",
+    "path": "/api/orders/user-create-order",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "CREATE_REVIEW",
+    "path": "/api/reviews",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_REVIEWS",
+    "path": "/api/reviews/:productId",
+    "method": "GET",
+    "isPublic": "1"
+  },
+  {
+    "name": "PAYPAL_CREATE_ORDER",
+    "path": "/api/payment/paypal/create-order",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "PAYPAL_VERIFY_ORDER",
+    "path": "/api/payment/paypal/verify-order",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "RETRY_PAYPAL_ORDER",
+    "path": "/api/payment/paypal/retry-order/:orderCode",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_ACCOUNTS",
+    "path": "/api/accounts",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "GET_ACCOUNT",
+    "path": "/api/accounts/:id",
+    "method": "GET",
+    "isPublic": "0"
+  },
+  {
+    "name": "CREATE_ACCOUNT",
+    "path": "/api/accounts",
+    "method": "POST",
+    "isPublic": "0"
+  },
+  {
+    "name": "UPDATE_ACCOUNT",
+    "path": "/api/accounts/:id",
+    "method": "PUT",
+    "isPublic": "0"
+  },
+  {
+    "name": "DELETE_ACCOUNT",
+    "path": "/api/accounts/:id",
+    "method": "DELETE",
+    "isPublic": "0"
+  }
+]
