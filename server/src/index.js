@@ -15,7 +15,7 @@ const app = express()
 const server = http.createServer(app)
 
 const corsOptions = {
-  origin: process.env.CLIENT_URL,
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
