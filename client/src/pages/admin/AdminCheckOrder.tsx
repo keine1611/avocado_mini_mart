@@ -67,7 +67,6 @@ const AdminCheckOrder: React.FC = () => {
   } = useGetOrdersQuery(undefined, {
     refetchOnMountOrArgChange: true,
   })
-  const [updateOrder] = useUpdateOrderMutation()
   const [updateOrderStatus, { isLoading: isUpdatingStatus }] =
     useUpdateOrderStatusMutation()
   const [viewOrder, setViewOrder] = useState<Order | null>(null)
