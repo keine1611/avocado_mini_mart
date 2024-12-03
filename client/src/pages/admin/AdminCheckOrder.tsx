@@ -2,11 +2,7 @@ import React, { useState, useRef, useMemo } from 'react'
 import { Table, Button, Modal, Form, Input, Tag, Select } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import { Order, OrderItem } from '@/types'
-import {
-  useGetOrdersQuery,
-  useUpdateOrderStatusMutation,
-  useUpdateOrderMutation,
-} from '@/services'
+import { useGetOrdersQuery, useUpdateOrderStatusMutation } from '@/services'
 import { EditOutlined } from '@ant-design/icons'
 import { ColumnsType } from 'antd/es/table'
 import {
