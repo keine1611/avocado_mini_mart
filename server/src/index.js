@@ -9,8 +9,8 @@ import { setupWebSocket } from './socket'
 import http from 'http'
 import { logRequest, delayResponse, authenticateToken } from './middlewares'
 
-const port = 1611
 dotenv.config()
+const port = process.env.PORT
 const app = express()
 const server = http.createServer(app)
 
@@ -27,7 +27,7 @@ app.use(express.json())
 app.use(cors(corsOptions))
 
 connectToDB()
-// syncDatabase()
+syncDatabase()
 
 const io = setupWebSocket(server)
 
