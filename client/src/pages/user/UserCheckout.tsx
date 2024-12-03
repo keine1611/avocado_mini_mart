@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Form, Button, Select, Radio, Divider, Tooltip, Space } from 'antd'
+import { Form, Button, Select, Radio, Divider, Space } from 'antd'
 import { useAppSelector } from '@/store'
 import {
-  useGetListCartProductsByIdsQuery,
   useGetListProductByIdsQuery,
   useLazyGetDiscountCodeByCodeQuery,
   useUserCreateOrderMutation,
@@ -11,7 +10,7 @@ import {
 import { Loading, PayPalButton, showToast } from '@/components'
 import { DISCOUNT_TYPE } from '@/enum'
 import { ModalAddAddress } from './UserProfile'
-import { Cart, OrderInfo, Product } from '@/types'
+import { Cart, OrderInfo } from '@/types'
 import { getCheckedCartFromLocalStorage, formatCurrency } from '@/utils'
 import { FaRegTrashAlt } from 'react-icons/fa'
 const { Option } = Select
@@ -138,8 +137,6 @@ const UserCheckout: React.FC = () => {
   const [userCreateOrder, { isLoading: isLoadingUserCreateOrder }] =
     useUserCreateOrderMutation()
 
-  const [isCreatingOrder, setIsCreatingOrder] = useState(false)
-
   const handleCreateOrder = async () => {
     if (isLoadingUserCreateOrder) return
     try {
@@ -159,7 +156,7 @@ const UserCheckout: React.FC = () => {
         showToast.error('Please select a shipping method')
         return
       }
-      const res = await userCreateOrder({
+      await userCreateOrder({
         items: JSON.stringify(cartItems),
         discountCode: discountCodeData?.data?.code || '',
         ...selectedAddress,
@@ -171,8 +168,6 @@ const UserCheckout: React.FC = () => {
       }, 2000)
     } catch (error: any) {
       showToast.error(error?.data?.message || 'Failed to create order')
-    } finally {
-      setIsCreatingOrder(false)
     }
   }
 

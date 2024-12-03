@@ -1,12 +1,10 @@
 import { cartActions, useAppDispatch, useAppSelector } from '@/store'
-import { useEffect, useLayoutEffect } from 'react'
-import { Cart } from '@/types'
+import { useEffect } from 'react'
 import { socket } from '@/socket'
 
 const useAutoSyncCart = () => {
   const dispatch = useAppDispatch()
   const user = useAppSelector((state) => state.auth.user)
-  const cart = useAppSelector((state) => state.cart.cart)
 
   useEffect(() => {
     if (user) {
@@ -23,7 +21,6 @@ const useAutoSyncCart = () => {
 }
 
 const useSyncCart = () => {
-  const user = useAppSelector((state) => state.auth.user)
   const cart = useAppSelector((state) => state.cart.cart)
   const isCartUpdated = useAppSelector((state) => state.cart.isCartUpdated)
   const dispatch = useAppDispatch()

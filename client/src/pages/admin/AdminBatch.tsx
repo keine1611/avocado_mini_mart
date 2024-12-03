@@ -44,7 +44,7 @@ const AdminBatch: React.FC = () => {
     isFetching: isFetchingBatch,
   } = useGetAllBatchQuery()
   const [updateBatch, { isLoading: isUpdating }] = useUpdateBatchMutation()
-  const [deleteBatch, { isLoading: isDeleting }] = useDeleteBatchMutation()
+  const [deleteBatch] = useDeleteBatchMutation()
   const [editBatch, setEditBatch] = useState<Batch | null>(null)
   const [batchProducts, setBatchProducts] = useState<BatchProduct[]>([])
   const [isViewBatchVisible, setIsViewBatchVisible] = useState(false)
@@ -242,7 +242,7 @@ const AdminBatch: React.FC = () => {
     },
     {
       title: 'Action',
-      render: (text: string, record: Batch) => (
+      render: (_, record: Batch) => (
         <div className='flex flex-row items-center gap-2'>
           <button
             onClick={() => handleViewBatch(record)}
@@ -277,7 +277,7 @@ const AdminBatch: React.FC = () => {
     {
       title: 'Barcode',
       dataIndex: 'product.barcode',
-      render: (text: string, record: BatchProduct) => record.product?.barcode,
+      render: (_, record: BatchProduct) => record.product?.barcode,
       width: 150,
     },
     ...(editBatch
@@ -429,7 +429,7 @@ const AdminBatch: React.FC = () => {
     },
     {
       title: 'Action',
-      render: (text: string, record: BatchProduct) => (
+      render: (_, record: BatchProduct) => (
         <Button onClick={() => handleDeleteBatchProduct(record.productId)}>
           Delete
         </Button>
@@ -441,7 +441,7 @@ const AdminBatch: React.FC = () => {
     {
       title: '',
       dataIndex: 'product.mainImage',
-      render: (text: string, record: BatchProduct) => (
+      render: (_, record: BatchProduct) => (
         <img
           src={record.product?.mainImage}
           alt={record.product?.name}
@@ -453,12 +453,12 @@ const AdminBatch: React.FC = () => {
     {
       title: 'Product',
       dataIndex: 'name',
-      render: (text: string, record: BatchProduct) => record.product?.name,
+      render: (_, record: BatchProduct) => record.product?.name,
     },
     {
       title: 'Barcode',
       dataIndex: 'barcode',
-      render: (text: string, record: BatchProduct) => record.product?.barcode,
+      render: (_, record: BatchProduct) => record.product?.barcode,
       width: 150,
     },
     {

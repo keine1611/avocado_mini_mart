@@ -18,33 +18,26 @@ import {
   useGetAllProductWithoutPaginationQuery,
 } from '@/services'
 import { ColumnType } from 'antd/es/table/interface'
-import { stringToDate, stringToDateTime } from '@/utils'
+import { stringToDateTime } from '@/utils'
 import { showToast } from '@/components'
 import dayjs from 'dayjs'
 import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
-const {
-  VITE_DATE_FORMAT_DISPLAY,
-  VITE_DATE_FORMAT_API,
-  VITE_DATE_FORMAT_DISPLAY_TIME,
-} = import.meta.env
+const { VITE_DATE_FORMAT_API, VITE_DATE_FORMAT_DISPLAY_TIME } = import.meta.env
 
 const AdminDiscount: React.FC = () => {
   const [form] = Form.useForm()
   const {
     data,
     isLoading: isLoadingDiscounts,
-    isError,
     isFetching: isFetchingDiscounts,
   } = useGetDiscountsQuery()
-  const { data: products, isLoading: isLoadingProducts } =
-    useGetAllProductWithoutPaginationQuery()
+  const { data: products } = useGetAllProductWithoutPaginationQuery()
   const [createDiscount, { isLoading: isLoadingCreateDiscount }] =
     useCreateDiscountMutation()
   const [updateDiscount, { isLoading: isLoadingUpdateDiscount }] =
     useUpdateDiscountMutation()
-  const [deleteDiscount, { isLoading: isLoadingDeleteDiscount }] =
-    useDeleteDiscountMutation()
+  const [deleteDiscount] = useDeleteDiscountMutation()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [editingDiscount, setEditingDiscount] = useState<Discount | null>(null)

@@ -1,7 +1,4 @@
-import {
-  clearCartFromLocalStorage,
-  clearFavoriteFromLocalStorage,
-} from '@/utils'
+import { clearFavoriteFromLocalStorage } from '@/utils'
 import { cartActions, favoriteActions, useAppDispatch } from '@/store'
 import { authActions } from '@/store'
 import Cookies from 'js-cookie'

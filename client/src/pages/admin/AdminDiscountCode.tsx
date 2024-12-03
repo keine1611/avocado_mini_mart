@@ -12,7 +12,7 @@ import {
   DatePicker,
   Switch,
 } from 'antd'
-import { DiscountCode, MainCategory } from '@/types'
+import { DiscountCode } from '@/types'
 import {
   useGetDiscountCodesQuery,
   useCreateDiscountCodeMutation,
@@ -28,22 +28,19 @@ import {
 import { stringToDateTime } from '@/utils'
 import { DISCOUNT_TYPE } from '@/enum'
 import dayjs from 'dayjs'
-import { loadingActions, useAppDispatch } from '@/store'
+import { useAppDispatch } from '@/store'
 
 const VITE_DATE_FORMAT_API = import.meta.env.VITE_DATE_FORMAT_API
 
 const AdminDiscountCode: React.FC = () => {
-  const dispatch = useAppDispatch()
   const [form] = Form.useForm()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [editingDiscountCode, setEditingDiscountCode] =
     useState<DiscountCode | null>(null)
-  const [searchedColumn, setSearchedColumn] = useState('')
   let searchInput: InputRef | null = null
 
   const {
     data,
-    error,
     isLoading: isLoadingDiscountCodes,
     isFetching: isFetchingDiscountCodes,
   } = useGetDiscountCodesQuery()
@@ -51,8 +48,7 @@ const AdminDiscountCode: React.FC = () => {
     useCreateDiscountCodeMutation()
   const [updateDiscountCode, { isLoading: isUpdating }] =
     useUpdateDiscountCodeMutation()
-  const [deleteDiscountCode, { isLoading: isDeleting }] =
-    useDeleteDiscountCodeMutation()
+  const [deleteDiscountCode] = useDeleteDiscountCodeMutation()
 
   const handleCreate = () => {
     setEditingDiscountCode(null)
@@ -113,7 +109,6 @@ const AdminDiscountCode: React.FC = () => {
 
   const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
     confirm()
-    setSearchedColumn(dataIndex)
   }
 
   const handleReset = (clearFilters: any) => {

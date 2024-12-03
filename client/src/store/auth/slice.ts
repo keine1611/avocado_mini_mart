@@ -63,5 +63,4 @@ export const { actions: authActions, reducer: authReducer } = createSlice({
       }
     },
   },
-  extraReducers: (builder) => {},
 })

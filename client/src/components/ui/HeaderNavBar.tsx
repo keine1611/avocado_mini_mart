@@ -10,11 +10,7 @@ import { auth } from '@/hooks'
 import { Cart } from '@/types'
 import { useAppDispatch } from '@/store'
 import { cartActions } from '@/store'
-import {
-  setCheckedCartFromLocalStorage,
-  clearCheckedCartFromLocalStorage,
-  getCheckedCartFromLocalStorage,
-} from '@/utils'
+import { setCheckedCartFromLocalStorage } from '@/utils'
 import { showToast } from '@/components'
 import { FaRegTrashAlt } from 'react-icons/fa'
 

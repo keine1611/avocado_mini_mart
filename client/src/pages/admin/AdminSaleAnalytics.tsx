@@ -5,14 +5,9 @@ import {
   useGetProductPriceHistoryQuery,
   useGetProductSalesDataByPeriodQuery,
 } from '@/services/dashboard'
-import {
-  useGetProductDetailQuery,
-  useUpdateProductMutation,
-  useUpdateProductPriceMutation,
-} from '@/services/product'
-import { Product } from '@/types'
+import { useUpdateProductPriceMutation } from '@/services/product'
 import { formatCurrency } from '@/utils/currency'
-import { stringToDate, stringToDateTime } from '@/utils/date'
+import { stringToDateTime } from '@/utils/date'
 import { Modal, Table, Rate, Form, Input } from 'antd'
 import { ColumnType } from 'antd/es/table/interface'
 import { useState, useEffect } from 'react'
@@ -47,7 +42,7 @@ const AdminSaleAnalytics = () => {
     {
       title: 'Product',
       dataIndex: 'product',
-      render: (data, record) => (
+      render: (_, record) => (
         <div className='flex items-center gap-2'>
           <img
             className='w-16 h-16 rounded-md'
@@ -115,7 +110,6 @@ const AdminSaleAnalytics = () => {
         open={openModalProductAnalytics}
         onClose={() => setOpenModalProductAnalytics(false)}
         productId={selectedProductAnalytics?.id || null}
-        productSlug={selectedProductAnalytics?.slug || ''}
       />
     </div>
   )
@@ -125,12 +119,10 @@ const ModalProductAnalytics = ({
   open,
   onClose,
   productId,
-  productSlug,
 }: {
   open: boolean
   onClose: () => void
   productId: number | null
-  productSlug: string | null
 }) => {
   const [period, setPeriod] = useState<'day' | 'week' | 'month' | 'year'>('day')
 
@@ -495,7 +487,7 @@ const ModalChangePrice = ({
 
   const handleSubmit = async () => {
     try {
-      const values = await form.validateFields()
+      await form.validateFields()
       await updateProductPrice({
         id: productId,
         standardPrice: newPrice,

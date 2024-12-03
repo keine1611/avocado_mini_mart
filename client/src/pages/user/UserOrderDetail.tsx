@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import {
   useGetOrderByCodeQuery,
   usePaypalVerifyOrderMutation,
@@ -13,7 +13,7 @@ import {
   OrderStep,
   showToast,
 } from '@/components'
-import { Button, Divider, Modal, Table } from 'antd'
+import { Divider, Modal, Table } from 'antd'
 import { ColumnType } from 'antd/es/table/interface'
 import { OrderItem } from '@/types/OrderItem'
 import {
@@ -319,7 +319,7 @@ const ModalRetryPayment: React.FC<{
   const [verifyPaypalOrder, { isLoading: isVerifying }] =
     usePaypalVerifyOrderMutation()
 
-  const onCreateOrder = async (data: any, actions: any) => {
+  const onCreateOrder = async (_: any, actions: any) => {
     try {
       const res = await retryPayment(orderCode).unwrap()
       return res.paymentOrderID
@@ -328,7 +328,7 @@ const ModalRetryPayment: React.FC<{
       actions.reject()
     }
   }
-  const onApprove = async (data: any, actions: any) => {
+  const onApprove = async (_: any, actions: any) => {
     try {
       const capture = await actions.order.capture()
       const res = await verifyPaypalOrder({
@@ -345,7 +345,7 @@ const ModalRetryPayment: React.FC<{
       actions.reject()
     }
   }
-  const onCancel = (data: any, actions: any) => {
+  const onCancel = (_: any, actions: any) => {
     showToast.error('Payment cancelled')
     actions.reject()
   }

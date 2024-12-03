@@ -1,12 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useGetProductDetailQuery } from '@/services'
 import { Breadcrumb, Loading, ProductCard, showToast } from '@/components'
-import {
-  FaHeartCircleCheck,
-  FaHeart,
-  FaChevronRight,
-  FaChevronLeft,
-} from 'react-icons/fa6'
+import { FaHeartCircleCheck, FaHeart } from 'react-icons/fa6'
 import {
   cartActions,
   favoriteActions,
@@ -14,8 +9,8 @@ import {
   useAppSelector,
 } from '@/store'
 import { useState, useRef } from 'react'
-import { Favorite, Product } from '@/types'
-import { Carousel, ConfigProvider, Rate } from 'antd'
+import { Product } from '@/types'
+import { Carousel, Rate } from 'antd'
 import { CarouselRef } from 'antd/es/carousel'
 import { formatCurrency } from '@/utils'
 import { ProductReview } from '@/components/ui/ProductReview'

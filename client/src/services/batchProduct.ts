@@ -1,4 +1,4 @@
-import { Batch, BatchProduct } from '@/types'
+import { BatchProduct } from '@/types'
 import { ApiResponse } from '@/types'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 

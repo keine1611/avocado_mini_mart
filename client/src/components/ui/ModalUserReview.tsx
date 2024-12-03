@@ -1,18 +1,8 @@
 import React, { useState } from 'react'
-import {
-  Modal,
-  Rate,
-  Input,
-  Upload,
-  Checkbox,
-  Button,
-  UploadProps,
-  Form,
-} from 'antd'
-import { UploadOutlined, StarFilled } from '@ant-design/icons'
+import { Modal, Rate, Input, Upload, Button, UploadProps, Form } from 'antd'
+import { UploadOutlined } from '@ant-design/icons'
 import { useForm } from 'antd/es/form/Form'
 import { useCreateReviewMutation } from '@/services/review'
-import { Review } from '@/types'
 import { showToast } from './MyToast'
 type UploadFile = UploadProps['fileList']
 
@@ -22,7 +12,7 @@ const ModalUserReview: React.FC<{
   orderItemId: number
   productId: number
   refetch: any
-}> = ({ open, onClose, orderItemId, productId, refetch }) => {
+}> = ({ open, onClose, orderItemId, refetch }) => {
   const [form] = useForm()
   const [rating, setRating] = useState(0)
   const [review, setReview] = useState('')

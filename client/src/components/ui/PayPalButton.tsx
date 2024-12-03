@@ -38,7 +38,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
     orderCodeRef.current = orderCode
   }, [orderCode])
 
-  const createOrder = async (data: any, actions: any) => {
+  const createOrder = async (_: any, actions: any) => {
     try {
       if (!selectedOrderInfo) {
         showToast.error('Please select an address')
@@ -68,7 +68,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
     }
   }
 
-  const onApprove = async (data: any, actions: any) => {
+  const onApprove = async (_: any, actions: any) => {
     try {
       const capture = await actions.order.capture()
       const res = await verifyPaypalOrder({

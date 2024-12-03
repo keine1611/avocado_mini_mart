@@ -1,14 +1,6 @@
-import {
-  Account,
-  Cart,
-  Favorite,
-  LoginResponse,
-  Order,
-  OrderInfo,
-  Product,
-} from '@/types'
+import { Account, Cart, Favorite, Order, OrderInfo, Product } from '@/types'
 import { ApiResponse } from '@/types/ApiResponse'
-import { decodeBase64, encodeBase64 } from '@/utils'
+import { encodeBase64 } from '@/utils'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const BASE_URL = import.meta.env.VITE_API_URL

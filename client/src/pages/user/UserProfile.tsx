@@ -59,8 +59,7 @@ const UserProfile: React.FC = () => {
   const [modalChangePasswordOpen, setModalChangePasswordOpen] =
     useState<boolean>(false)
   const [editOrderInfo, setEditOrderInfo] = useState<OrderInfo | null>(null)
-  const [deleteOrderInfo, { isLoading: isDeletingOrderInfo }] =
-    useDeleteOrderInfoMutation()
+  const [deleteOrderInfo] = useDeleteOrderInfoMutation()
   const dispatch = useAppDispatch()
 
   const handleEditOrderInfo = (orderInfo: OrderInfo) => {
@@ -249,11 +248,9 @@ export const ModalAddAddress: React.FC<{
   const [updateOrderInfo, { isLoading: isUpdatingOrderInfo }] =
     useUpdateOrderInfoMutation()
   const [form] = Form.useForm()
-  const state = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
-  const [provinces, setProvinces] = useState(
-    cities.sort((a, b) => a.name.localeCompare(b.name))
-  )
+  const provinces = cities.sort((a, b) => a.name.localeCompare(b.name))
+
   const [districts, setDistricts] = useState<any[]>([])
   const [wards, setWards] = useState<any[]>([])
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null)
@@ -436,7 +433,7 @@ export const ModalAddAddress: React.FC<{
             rules={[
               { required: true, message: 'Please select your location' },
               {
-                validator: (_, value) => {
+                validator: () => {
                   if (selectedWard && selectedDistrict && selectedProvince) {
                     return Promise.resolve()
                   }
@@ -450,7 +447,7 @@ export const ModalAddAddress: React.FC<{
               onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
               onMouseEnter={(e) => e.stopPropagation()}
-              dropdownRender={(menu) => (
+              dropdownRender={() => (
                 <div className='w-full px-2'>
                   <Tabs
                     activeKey={activeTab}
@@ -836,7 +833,7 @@ const ModalChangePassword: React.FC<{
     await form.validateFields().then(async (values) => {
       if (!verified) {
         try {
-          const res = await changePasswordRequest({
+          await changePasswordRequest({
             oldPassword: values.oldPassword,
             newPassword: values.newPassword,
           }).unwrap()
@@ -861,7 +858,7 @@ const ModalChangePassword: React.FC<{
           return
         }
         try {
-          const res = await changePassword({
+          await changePassword({
             verificationCode,
           }).unwrap()
           showToast.success('Password changed successfully')

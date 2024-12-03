@@ -7,10 +7,9 @@ import {
   useUpdateOrderStatusMutation,
   useUpdateOrderMutation,
 } from '@/services'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { EditOutlined } from '@ant-design/icons'
 import { ColumnsType } from 'antd/es/table'
 import {
-  enumToArray,
   formatCurrency,
   formatPhoneNumber,
   getLocation,
@@ -44,7 +43,6 @@ import {
   ShoppingOutlined,
   HistoryOutlined,
   DollarOutlined,
-  CreditCardOutlined,
   ShoppingCartOutlined,
 } from '@ant-design/icons'
 import { IoCashOutline } from 'react-icons/io5'
@@ -64,13 +62,12 @@ const AdminCheckOrder: React.FC = () => {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
   const {
     data,
-    error,
     isLoading,
     isFetching: isFetchingOrders,
   } = useGetOrdersQuery(undefined, {
     refetchOnMountOrArgChange: true,
   })
-  const [updateOrder, { isLoading: isUpdating }] = useUpdateOrderMutation()
+  const [updateOrder] = useUpdateOrderMutation()
   const [updateOrderStatus, { isLoading: isUpdatingStatus }] =
     useUpdateOrderStatusMutation()
   const [viewOrder, setViewOrder] = useState<Order | null>(null)
@@ -130,13 +127,13 @@ const AdminCheckOrder: React.FC = () => {
             onChange={(e) =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
-            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            onPressEnter={() => handleSearch(confirm)}
             style={{ marginBottom: 8, display: 'block' }}
           />
         )}
         <Button
           type='primary'
-          onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onClick={() => handleSearch(confirm)}
           icon={<SearchOutlined />}
           size='small'
           style={{ width: 90, marginRight: 8 }}
@@ -175,11 +172,7 @@ const AdminCheckOrder: React.FC = () => {
     },
   })
 
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: () => void,
-    dataIndex: string
-  ) => {
+  const handleSearch = (confirm: () => void) => {
     confirm()
   }
 
@@ -230,21 +223,6 @@ const AdminCheckOrder: React.FC = () => {
         </Tag>
       )
     }
-  }
-
-  const handleModalOk = () => {
-    form.validateFields().then(async (values) => {
-      try {
-        if (editingOrder) {
-          await updateOrder({ id: editingOrder.id, ...values }).unwrap()
-          message.success('Order updated successfully')
-        }
-        setIsModalVisible(false)
-        form.resetFields()
-      } catch (err: any) {
-        message.error(err.data?.message || 'Failed to save order')
-      }
-    })
   }
 
   const columns: ColumnsType<Order> = [

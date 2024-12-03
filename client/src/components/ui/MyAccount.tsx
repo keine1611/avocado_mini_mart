@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { UserOutlined, ShoppingCartOutlined } from '@ant-design/icons'
-import { Breadcrumb } from './Breadcrumb'
 
 const MyAccount: React.FC = () => {
   const { pathname } = useLocation()

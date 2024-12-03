@@ -1,5 +1,6 @@
-import { Breadcrumb, ListProduct } from '@/components'
+import { Breadcrumb } from '@/components'
 import { useGetUserFavoriteProductsQuery } from '@/services'
+import { Empty } from 'antd'
 import React from 'react'
 
 const UserFavorite: React.FC = () => {
@@ -11,6 +12,7 @@ const UserFavorite: React.FC = () => {
         <h1 className='text-xl font-semibold text-center'>
           Your Favorite Products
         </h1>
+        {favoriteData && favoriteData.data.length > 0 ? <></> : <Empty />}
       </div>
     </div>
   )

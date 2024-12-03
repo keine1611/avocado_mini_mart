@@ -26,15 +26,14 @@ import {
 import { Account, Role } from '@/types'
 import dayjs from 'dayjs'
 import { UploadOutlined } from '@ant-design/icons'
-import { loadingActions, useAppDispatch } from '@/store'
+import { useAppDispatch } from '@/store'
 import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 
 import { showToast } from '@/components'
 import { stringToDateTime } from '@/utils'
-import { RcFile } from 'antd/es/upload'
 import { Gender } from '@/enum/gender'
 
-const { VITE_DATE_FORMAT_API, VITE_DATE_FORMAT_DISPLAY } = import.meta.env
+const { VITE_DATE_FORMAT_API } = import.meta.env
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 
@@ -46,11 +45,7 @@ const AdminUser: React.FC = () => {
     isFetching: isFetchingAccounts,
     error,
   } = useGetAllAccountQuery()
-  const {
-    data: roles,
-    isLoading: isLoadingRoles,
-    error: errorRole,
-  } = useGetAllRoleQuery()
+  const { data: roles } = useGetAllRoleQuery()
   const [createAccount, { isLoading: isLoadingCreateAccount }] =
     useCreateAccountMutation()
   const [updateAccount, { isLoading: isLoadingUpdateAccount }] =
@@ -59,12 +54,10 @@ const AdminUser: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [editingAccount, setEditingAccount] = useState<Account | null>(null)
   const [filelist, setFileList] = useState<UploadFile[]>([])
-  const dispatch = useAppDispatch()
   const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] =
     useState(false)
 
   const [isEditingProfile, setIsEditingProfile] = useState(false)
-  const [searchedColumn, setSearchedColumn] = useState('')
 
   useEffect(() => {
     if (error) {
@@ -169,9 +162,8 @@ const AdminUser: React.FC = () => {
     return isJpgOrPng && isLt2M
   }
 
-  const handleSearch = (confirm: any, dataIndex: any) => {
+  const handleSearch = (confirm: any) => {
     confirm()
-    setSearchedColumn(dataIndex)
   }
 
   const handleReset = (clearFilters: any) => {
@@ -210,13 +202,13 @@ const AdminUser: React.FC = () => {
             onChange={(e) =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
-            onPressEnter={() => handleSearch(confirm, dataIndex)}
+            onPressEnter={() => handleSearch(confirm)}
             style={{ marginBottom: 8, display: 'block' }}
           />
         )}
         <Button
           type='primary'
-          onClick={() => handleSearch(confirm, dataIndex)}
+          onClick={() => handleSearch(confirm)}
           icon={<SearchOutlined />}
           size='small'
           style={{ width: 90, marginRight: 8 }}

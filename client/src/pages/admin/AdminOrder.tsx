@@ -1,13 +1,8 @@
 import React, { useState } from 'react'
-import { Table, Button, Modal, Form, Input, message, Tag, Select } from 'antd'
+import { Table, Button, Modal, Form, message, Tag, Select } from 'antd'
 import { Order } from '@/types'
-import {
-  useGetOrdersQuery,
-  useCreateOrderMutation,
-  useUpdateOrderMutation,
-} from '@/services'
+import { useGetOrdersQuery, useUpdateOrderMutation } from '@/services'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { ColumnsType } from 'antd/es/table'
 import { enumToArray, formatCurrency, formatPhoneNumber } from '@/utils'
 import { FaEye, FaShippingFast } from 'react-icons/fa'
 import {
@@ -24,6 +19,7 @@ import {
   MdCheckCircle,
 } from 'react-icons/md'
 import { IoCashOutline } from 'react-icons/io5'
+import { ColumnsType } from 'antd/es/table'
 
 const AdminOrder: React.FC = () => {
   const [form] = Form.useForm()
@@ -32,32 +28,14 @@ const AdminOrder: React.FC = () => {
   const [modalDescriptionInvisible, setModalDescriptionInvisible] =
     useState(false)
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
-  const { data, error, isLoading } = useGetOrdersQuery()
-  const [updateOrder, { isLoading: isUpdating }] = useUpdateOrderMutation()
+  const { data, isLoading } = useGetOrdersQuery()
+  const [updateOrder] = useUpdateOrderMutation()
   const [viewOrder, setViewOrder] = useState<Order | null>(null)
 
   const handleEdit = (order: Order) => {
     setEditingOrder(order)
     form.setFieldsValue(order)
     setIsModalVisible(true)
-  }
-
-  const handleDelete = (id: number) => {
-    Modal.confirm({
-      title: 'Are you sure you want to delete this order?',
-      content: 'This action cannot be undone.',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
-      onOk: async () => {
-        // try {
-        //   await deleteOrder(id).unwrap()
-        //   message.success('Order deleted successfully')
-        // } catch (err: any) {
-        //   message.error(err.data?.message || 'Failed to delete order')
-        // }
-      },
-    })
   }
 
   const handleModalOk = () => {
@@ -120,7 +98,7 @@ const AdminOrder: React.FC = () => {
               {record.orderStatus}
             </Tag>
           )
-        } else if (record.orderStatus === ORDER_STATUS.SHIPPED) {
+        } else if (record.orderStatus === ORDER_STATUS.SHIPPING) {
           return (
             <Tag icon={<FaShippingFast />} color='orange' className='uppercase'>
               {record.orderStatus}
@@ -246,11 +224,6 @@ const AdminOrder: React.FC = () => {
             className=' hover:text-primary '
           />
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Button
-            icon={<DeleteOutlined />}
-            onClick={() => confirmDelete(record.id)}
-            danger
-          />
         </div>
       ),
     },

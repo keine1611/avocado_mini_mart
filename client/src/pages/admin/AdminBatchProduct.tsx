@@ -12,11 +12,8 @@ import { ColumnsType } from 'antd/es/table'
 import { formatCurrency, formatQuantity, stringToDate } from '@/utils'
 import { exportExcel } from '@/utils'
 
-const { VITE_DATE_FORMAT_API } = import.meta.env
-
 const AdminBatchProduct: React.FC = () => {
-  const { data: products, isLoading: isProductsLoading } =
-    useGetAllProductWithoutPaginationQuery()
+  const { data: products } = useGetAllProductWithoutPaginationQuery()
   const [
     getBatchProduct,
     { isLoading: isBatchProductLoading, isFetching: isBatchProductFetching },
@@ -286,11 +283,9 @@ const TableNearlyExpiredProduct: React.FC = () => {
     },
   ] = useLazyGetNearlyExpiredProductQuery()
 
-  const [selectedDays, setSelectedDays] = useState<number | null>(null)
   const [expandedRowKey, setExpandedRowKey] = useState<number | null>(null)
 
   const handleNearlyExpiredProductSelect = (value: string | null) => {
-    setSelectedDays(Number(value))
     getNearlyExpiredProduct({ days: Number(value) })
     setExpandedRowKey(null)
   }
@@ -451,11 +446,9 @@ const TabExpiredProduct: React.FC = () => {
     },
   ] = useLazyGetExpiredProductQuery()
 
-  const [selectedDays, setSelectedDays] = useState<number | null>(null)
   const [expandedRowKey, setExpandedRowKey] = useState<number | null>(null)
 
   const handleExpiredProductSelect = (value: string | null) => {
-    setSelectedDays(Number(value))
     getExpiredProduct({ days: Number(value) })
     setExpandedRowKey(null)
   }

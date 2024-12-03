@@ -27,27 +27,23 @@ import {
 } from '@ant-design/icons'
 import { stringToDateTime } from '@/utils'
 
-const { Option } = Select
-
 const AdminBrand: React.FC = () => {
   const [form] = Form.useForm()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null)
   const [fileList, setFileList] = useState<UploadFile[]>([])
-  const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   let searchInput: InputRef | null = null
   const [previewVisible, setPreviewVisible] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
   const {
     data,
-    error,
     isLoading: isLoadingBrand,
     isFetching: isFetchingBrand,
   } = useGetAllBrandQuery()
   const [createBrand, { isLoading: isCreating }] = useCreateBrandMutation()
   const [updateBrand, { isLoading: isUpdating }] = useUpdateBrandMutation()
-  const [deleteBrand, { isLoading: isDeleting }] = useDeleteBrandMutation()
+  const [deleteBrand] = useDeleteBrandMutation()
 
   const handleCreate = () => {
     setEditingBrand(null)
@@ -123,13 +119,11 @@ const AdminBrand: React.FC = () => {
 
   const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
     confirm()
-    setSearchText(selectedKeys[0])
     setSearchedColumn(dataIndex)
   }
 
   const handleReset = (clearFilters: any) => {
     clearFilters()
-    setSearchText('')
   }
 
   const getColumnSearchProps = (dataIndex: string) => ({

@@ -25,11 +25,10 @@ import {
   useDeleteSubCategoryMutation,
 } from '@/services'
 import { useGetAllMainCategoryQuery } from '@/services'
-import { loadingActions, useAppDispatch } from '@/store'
+import { useAppDispatch } from '@/store'
 
 const AdminSubCategory: React.FC = () => {
   const [form] = Form.useForm()
-  const dispatch = useAppDispatch()
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [editingSubCategory, setEditingSubCategory] =
@@ -41,17 +40,12 @@ const AdminSubCategory: React.FC = () => {
     isLoading: isLoadingSubCategory,
     isFetching: isFetchingSubCategory,
   } = useGetAllSubCategoryQuery()
-  const {
-    data: mainCategories,
-    isLoading: isLoadingMainCategory,
-    isFetching: isFetchingMainCategory,
-  } = useGetAllMainCategoryQuery()
+  const { data: mainCategories } = useGetAllMainCategoryQuery()
   const [createSubCategory, { isLoading: isLoadingCreateSubCategory }] =
     useCreateSubCategoryMutation()
   const [updateSubCategory, { isLoading: isLoadingUpdateSubCategory }] =
     useUpdateSubCategoryMutation()
-  const [deleteSubCategory, { isLoading: isLoadingDeleteSubCategory }] =
-    useDeleteSubCategoryMutation()
+  const [deleteSubCategory] = useDeleteSubCategoryMutation()
 
   const handleCreate = () => {
     setEditingSubCategory(null)
@@ -104,7 +98,7 @@ const AdminSubCategory: React.FC = () => {
     })
   }
 
-  const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
+  const handleSearch = (confirm: any, dataIndex: any) => {
     confirm()
     setSearchedColumn(dataIndex)
   }
@@ -147,12 +141,12 @@ const AdminSubCategory: React.FC = () => {
             onChange={(e) =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
-            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            onPressEnter={() => handleSearch(confirm, dataIndex)}
             style={{ marginBottom: 8, display: 'block' }}
           />
         )}
         <button
-          onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onClick={() => handleSearch(confirm, dataIndex)}
           className=' btn btn-square btn-sm border border-primary text-primary hover:border hover:border-primary hover:text-primary'
         >
           <SearchOutlined className='text-primary' />
@@ -216,7 +210,7 @@ const AdminSubCategory: React.FC = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (text, record) => (
+      render: (_, record) => (
         <Space direction='horizontal'>
           <Button
             icon={<EditOutlined />}

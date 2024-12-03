@@ -17,7 +17,7 @@ export const reviewApi = createApi({
         method: 'POST',
         body: formData,
       }),
-      async onQueryStarted(data, { queryFulfilled, dispatch }) {
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
         await queryFulfilled
         dispatch(
           orderApi.util.invalidateTags([

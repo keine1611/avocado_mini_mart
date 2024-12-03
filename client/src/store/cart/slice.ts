@@ -1,4 +1,3 @@
-import { useSyncCart } from '@/hooks'
 import { Cart, Product } from '@/types'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
@@ -81,5 +80,4 @@ export const { actions: cartActions, reducer: cartReducer } = createSlice({
       state.isCartUpdated = payload
     },
   },
-  extraReducers: (builder) => {},
 })

@@ -27,7 +27,7 @@ export const orderApi = createApi({
     }),
     getOrderByCode: builder.query<ApiResponse<Order>, string>({
       query: (orderCode) => `/${orderCode}`,
-      providesTags(result, error, orderCode) {
+      providesTags() {
         return [{ type: 'orderApi', id: 'ORDERDETAIL' }]
       },
     }),

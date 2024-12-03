@@ -3,9 +3,7 @@ import { ApiResponse } from '@/types/ApiResponse'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { encodeBase64 } from '@/utils'
 
-
 const BASE_URL = import.meta.env.VITE_API_URL
-
 
 export const brandApi = createApi({
   reducerPath: 'brandApi',
@@ -15,7 +13,10 @@ export const brandApi = createApi({
   }),
   tagTypes: ['brandApi'],
   endpoints: (builder) => ({
-    getAllBrand: builder.query<ApiResponse<Brand[]>, {page: number, limit: number, name: string} | void>({
+    getAllBrand: builder.query<
+      ApiResponse<Brand[]>,
+      { page: number; limit: number; name: string } | void
+    >({
       query: (params) => {
         if (params) {
           const encodedParams = encodeBase64(JSON.stringify(params))
@@ -31,13 +32,13 @@ export const brandApi = createApi({
         }
       },
       providesTags(result) {
-        if(result?.data){
+        if (result?.data) {
           return [
-            ...result.data.map(({id}) => ({type: 'brandApi' as const, id})),
-            {type: 'brandApi' as const, id: 'LIST'}
+            ...result.data.map(({ id }) => ({ type: 'brandApi' as const, id })),
+            { type: 'brandApi' as const, id: 'LIST' },
           ]
         }
-        return [{type: 'brandApi' as const, id: 'LIST'}]
+        return [{ type: 'brandApi' as const, id: 'LIST' }]
       },
     }),
     createBrand: builder.mutation<ApiResponse<Brand>, FormData>({
@@ -46,24 +47,32 @@ export const brandApi = createApi({
         method: 'POST',
         body: brand,
       }),
-      invalidatesTags: (result) => [{type: 'brandApi' as const, id: 'LIST'}],
+      invalidatesTags: ['brandApi'],
     }),
-    updateBrand: builder.mutation<ApiResponse<Brand>, { id: number, data: FormData }>({
+    updateBrand: builder.mutation<
+      ApiResponse<Brand>,
+      { id: number; data: FormData }
+    >({
       query: ({ id, data }) => ({
         url: `/${id}`,
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: (result) => [{type: 'brandApi' as const, id: 'LIST'}],
+      invalidatesTags: ['brandApi'],
     }),
     deleteBrand: builder.mutation<ApiResponse<Brand>, number>({
       query: (id: number) => ({
         url: `/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['brandApi'], 
+      invalidatesTags: ['brandApi'],
     }),
   }),
 })
 
-export const { useGetAllBrandQuery, useCreateBrandMutation, useUpdateBrandMutation, useDeleteBrandMutation } = brandApi
+export const {
+  useGetAllBrandQuery,
+  useCreateBrandMutation,
+  useUpdateBrandMutation,
+  useDeleteBrandMutation,
+} = brandApi

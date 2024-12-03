@@ -32,7 +32,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons'
 import { stringToDateTime, formatCurrency } from '@/utils'
-import { loadingActions, useAppDispatch } from '@/store'
+import { useAppDispatch } from '@/store'
 import { ProductViewModal } from '@/components'
 
 const { Option } = Select
@@ -46,11 +46,9 @@ const AdminProduct: React.FC = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [mainImage, setMainImage] = useState<UploadFile | null>(null)
 
-  const [searchedColumn, setSearchedColumn] = useState('')
   const [previewVisible, setPreviewVisible] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
   let searchInput: InputRef | null = null
-  const dispatch = useAppDispatch()
 
   const {
     data,
@@ -183,7 +181,6 @@ const AdminProduct: React.FC = () => {
 
   const handleSearch = (confirm: any, dataIndex: any) => {
     confirm()
-    setSearchedColumn(dataIndex)
   }
 
   const handleReset = (clearFilters: any) => {

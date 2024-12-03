@@ -5,7 +5,7 @@ import { Loading, ListProduct } from '@/components'
 
 const ListProductsPage: React.FC = () => {
   const { slugmaincategory, slugsubcategory } = useParams()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const currentPage = parseInt(searchParams.get('page') || '1')
   const pageSize = parseInt(searchParams.get('size') || '12')
 

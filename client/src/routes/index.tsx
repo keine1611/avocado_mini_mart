@@ -3,9 +3,7 @@ import {
   Navigate,
   Outlet,
   useLocation,
-  useNavigate,
 } from 'react-router-dom'
-import { useEffect } from 'react'
 import { PATH } from '@/constant'
 import {
   AdminHome,
@@ -21,9 +19,7 @@ import {
   AdminOrder,
   UserProductDetail,
   UserProduct,
-  UserCart,
   UserCheckout,
-  UserFavorite,
   AdminDiscountCode,
   AdminBatch,
   AdminBatchProduct,

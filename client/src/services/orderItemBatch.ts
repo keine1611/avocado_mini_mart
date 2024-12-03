@@ -1,4 +1,4 @@
-import { ApiResponse, OrderItem, OrderItemBatch } from '@/types'
+import { ApiResponse, OrderItemBatch } from '@/types'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const BASE_URL = import.meta.env.VITE_API_URL

@@ -5,16 +5,9 @@ import {
   useGetProfitComparisonByPeriodQuery,
   useGetTopProductSoldComparisonByPeriodQuery,
 } from '@/services/dashboard'
-import {
-  FaShoppingCart,
-  FaCheckCircle,
-  FaDollarSign,
-  FaMoneyBill,
-  FaShoppingBag,
-} from 'react-icons/fa'
+import { FaMoneyBill, FaShoppingBag } from 'react-icons/fa'
 import { FaArrowTrendUp, FaArrowTrendDown } from 'react-icons/fa6'
 import { FaChartLine } from 'react-icons/fa6'
-import { FcShipped } from 'react-icons/fc'
 import { formatCurrency } from '@/utils/currency'
 import {
   LineChart,
@@ -23,7 +16,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts'
 import { Loading } from '@/components'
@@ -523,11 +515,8 @@ const ChartProfit: React.FC = () => {
 }
 
 const TableTopProductSold: React.FC = () => {
-  const {
-    data: topProductSoldData,
-    isLoading,
-    error,
-  } = useGetTopProductSoldComparisonByPeriodQuery({ period: 'month' })
+  const { data: topProductSoldData } =
+    useGetTopProductSoldComparisonByPeriodQuery({ period: 'month' })
   return (
     <div className='overflow-x-auto px-2 bg-white p-6 rounded-2xl shadow-lg'>
       <table className='table w-full table-fixed'>

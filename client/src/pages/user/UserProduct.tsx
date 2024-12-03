@@ -1,12 +1,6 @@
-import { useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import { Breadcrumb, FilterSide, ListProductsPage } from '@/components'
-import { useGetAllMainCategoryQuery } from '@/services'
 
 const UserProduct: React.FC = () => {
-  const { data: mainCategory } = useGetAllMainCategoryQuery()
-  const [searchParams, setSearchParams] = useSearchParams()
-
   return (
     <div className=' flex flex-col gap-4 bg-white'>
       <Breadcrumb />

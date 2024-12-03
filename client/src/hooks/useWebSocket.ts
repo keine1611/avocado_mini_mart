@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from '@/store'
+import { useAppSelector } from '@/store'
 import { socket } from '@/socket'
 import { useEffect } from 'react'
 

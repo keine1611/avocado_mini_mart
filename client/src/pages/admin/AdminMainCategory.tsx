@@ -33,7 +33,6 @@ const AdminMainCategory: React.FC = () => {
 
   const {
     data,
-    error,
     isLoading: isLoadingMainCategory,
     isFetching: isFetchingMainCategory,
   } = useGetAllMainCategoryQuery()
@@ -41,8 +40,7 @@ const AdminMainCategory: React.FC = () => {
     useCreateMainCategoryMutation()
   const [updateMainCategory, { isLoading: isUpdating }] =
     useUpdateMainCategoryMutation()
-  const [deleteMainCategory, { isLoading: isDeleting }] =
-    useDeleteMainCategoryMutation()
+  const [deleteMainCategory] = useDeleteMainCategoryMutation()
 
   const handleCreate = () => {
     setEditingMainCategory(null)
@@ -95,7 +93,7 @@ const AdminMainCategory: React.FC = () => {
     })
   }
 
-  const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
+  const handleSearch = (confirm: any, dataIndex: any) => {
     confirm()
     setSearchedColumn(dataIndex)
   }
@@ -121,12 +119,12 @@ const AdminMainCategory: React.FC = () => {
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onPressEnter={() => handleSearch(confirm, dataIndex)}
           style={{ marginBottom: 8, display: 'block' }}
         />
         <Button
           type='primary'
-          onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onClick={() => handleSearch(confirm, dataIndex)}
           icon={<SearchOutlined />}
           size='small'
           style={{ width: 90, marginRight: 8 }}

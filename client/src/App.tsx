@@ -1,4 +1,4 @@
-import { RouterProvider, useLocation } from 'react-router-dom'
+import { RouterProvider } from 'react-router-dom'
 import { router } from './routes'
 import './index.css'
 import { MyToast } from './components'
@@ -8,22 +8,11 @@ import {
   useAppDispatch,
   authActions,
   cartActions,
-  useAppSelector,
 } from './store'
 import { useRefreshMutation } from '@/services'
 import Cookies from 'js-cookie'
 import { useEffect, useState } from 'react'
-import {
-  useAutoSyncCart,
-  useAutoSyncFavorites,
-  useSyncCart,
-  useSyncFavorites,
-  useWebSocket,
-} from './hooks'
-import {
-  setLastFavoriteFromLocalStorage,
-  setLastCartFromLocalStorage,
-} from './utils'
+import { useAutoSyncCart, useSyncCart } from './hooks'
 
 const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -31,7 +20,6 @@ const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
   const [refresh] = useRefreshMutation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(true)
-  const user = useAppSelector((state) => state.auth.user)
 
   useEffect(() => {
     const refreshToken = async () => {

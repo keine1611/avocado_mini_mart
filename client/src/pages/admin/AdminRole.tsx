@@ -173,13 +173,13 @@ const AdminRoleModal: React.FC<{
             onChange={(e) =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
-            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            onPressEnter={() => handleSearch(confirm)}
             style={{ marginBottom: 8, display: 'block' }}
           />
         )}
         <Button
           type='primary'
-          onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onClick={() => handleSearch(confirm)}
           icon={<SearchOutlined />}
           size='small'
           style={{ width: 90, marginRight: 8 }}
@@ -218,11 +218,7 @@ const AdminRoleModal: React.FC<{
     },
   })
 
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: () => void,
-    dataIndex: string
-  ) => {
+  const handleSearch = (confirm: () => void) => {
     confirm()
   }
 
@@ -302,7 +298,7 @@ const AdminRoleModal: React.FC<{
               }}
               showSearch
               className='w-full'
-              dropdownRender={(menu) => (
+              dropdownRender={() => (
                 <div className='w-full px-2 h-[280px] overflow-y-auto flex flex-col gap-2'>
                   {permissions?.data.map((permission) => {
                     const isPermissionSelected = selectedPermissions.some(

@@ -9,7 +9,7 @@ export const LoadingOverlay: React.FC = () => {
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'>
-      <Loading size='large' color='text-white' />
+      <Loading size='loading-lg' color='text-white' />
     </div>
   )
 }

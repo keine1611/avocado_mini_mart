@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Tabs, Card, Row, Col } from 'antd'
-import { Order } from '@/types' // Assuming you have an Order type defined
-import { enumToArray, formatCurrency, stringToDate } from '@/utils' // Assuming you have a utility to format currency
-import { Breadcrumb, Loading } from '@/components'
+import { Order } from '@/types'
+import { enumToArray, formatCurrency, stringToDate } from '@/utils'
+import { Loading } from '@/components'
 import { useGetUserOrdersQuery } from '@/services'
 import { ORDER_STATUS } from '@/enum'
-import { EyeOutlined, ArrowRightOutlined } from '@ant-design/icons'
+import { ArrowRightOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 
 const UserMyOrder: React.FC = () => {

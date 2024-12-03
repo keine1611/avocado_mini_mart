@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Rate, Modal } from 'antd'
+import { Rate, Modal } from 'antd'
 import { Review } from '@/types'
 import { stringToDateTime } from '@/utils'
 import { PlayCircleOutlined } from '@ant-design/icons'
