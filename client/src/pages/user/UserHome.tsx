@@ -163,6 +163,7 @@ export const UserHome: React.FC = () => {
             <Swiper
               spaceBetween={16}
               slidesPerView={1}
+              autoplay={{ delay: 1500 }}
               breakpoints={{
                 640: { slidesPerView: 2 },
                 768: { slidesPerView: 3 },
@@ -194,7 +195,7 @@ export const UserHome: React.FC = () => {
               }}
               navigation
               modules={[Navigation, Autoplay, Scrollbar]}
-              autoplay={{ delay: 1000 }}
+              autoplay={{ delay: 1500 }}
               className='rounded-box gap-4 py-2 w-full'
             >
               {homeData?.data.fastFoodProducts.map((product: Product) => (
@@ -297,6 +298,7 @@ export const UserHome: React.FC = () => {
                 768: { slidesPerView: 3 },
                 1024: { slidesPerView: 4 },
               }}
+              autoplay={{ delay: 1500 }}
               navigation
               modules={[Navigation, Autoplay, Scrollbar]}
               className='rounded-box gap-4 p-2 w-full'

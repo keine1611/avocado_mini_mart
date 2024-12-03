@@ -1,4 +1,4 @@
-import { authController } from '@/controllers'
+import { authController, forgotPasswordController } from '@/controllers'
 import express from 'express'
 import multer from 'multer'
 
@@ -37,3 +37,7 @@ authRouter.post(
   '/resend-change-password-code',
   authController.resendChangePasswordCode
 )
+
+authRouter.post('/forgot-password', forgotPasswordController.sendResetCode)
+authRouter.post('/verify-reset-code', forgotPasswordController.verifyResetCode)
+authRouter.post('/reset-password', forgotPasswordController.resetPassword)

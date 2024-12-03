@@ -34,6 +34,7 @@ import {
 import { AdminLayout, UserLayout, MyAccount } from '@/components'
 import { useAppSelector } from '@/store'
 import { AdminRole } from '@/pages/admin/AdminRole'
+import { UserForgotPassword } from '@/pages/user/UserForgotPassword'
 
 export enum RouteRole {
   ADMIN = 'ADMIN',
@@ -53,10 +54,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
 }) => {
   const { user } = useAppSelector((state) => state.auth)
-  const location = useLocation()
 
   if (!user) {
-    return <Navigate to={redirectPath} state={{ from: location }} replace />
+    return <Navigate to={redirectPath} replace />
   }
 
   if (!allowedRoles?.includes(user.role.name as RouteRole)) {
@@ -138,6 +138,10 @@ const router = createBrowserRouter([
   {
     path: PATH.user.register,
     element: <UserRegister />,
+  },
+  {
+    path: '/forgot-password',
+    element: <UserForgotPassword />,
   },
   {
     path: '/no-access',

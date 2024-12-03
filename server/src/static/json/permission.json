@@ -484,5 +484,23 @@
     "path": "/api/accounts/:id",
     "method": "DELETE",
     "isPublic": "0"
+  },
+  {
+    "name": "FORGOT_PASSWORD",
+    "path": "/api/auth/forgot-password",
+    "method": "POST",
+    "isPublic": "1"
+  },
+  {
+    "name": "VERIFY-RESET-CODE",
+    "path": "/api/auth/verify-reset-code",
+    "method": "POST",
+    "isPublic": "1"
+  },
+  {
+    "name": "RESET_PASSWORD",
+    "path": "/api/auth/reset-password",
+    "method": "POST",
+    "isPublic": "1"
   }
 ]

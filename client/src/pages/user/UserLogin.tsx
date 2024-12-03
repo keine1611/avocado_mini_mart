@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { logo } from '@/constant'
 import { useLoginMutation } from '@/services'
 import { showToast } from '@/components'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { authActions } from '@/store/auth'
 import { FiMail, FiLock, FiLogIn } from 'react-icons/fi'
 import { loadingActions } from '@/store/loading'
@@ -196,12 +196,21 @@ export const UserLogin = () => {
         <div className='text-center'>
           <p className='text-sm text-base-content'>
             Don't have an account?{' '}
-            <a
-              href='/register'
+            <Link
+              to='/register'
               className='font-medium text-primary hover:text-primary-focus'
             >
               Register here
-            </a>
+            </Link>
+          </p>
+          <p className='text-sm text-base-content'>
+            {' '}
+            <Link
+              to='/forgot-password'
+              className='text-primary text-sm hover:text-primary-focus'
+            >
+              Forgot password?
+            </Link>
           </p>
         </div>
       </div>
