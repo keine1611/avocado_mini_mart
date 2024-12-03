@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Table, Button, Modal, Form, message, Tag, Select } from 'antd'
 import { Order } from '@/types'
 import { useGetOrdersQuery, useUpdateOrderMutation } from '@/services'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { EditOutlined } from '@ant-design/icons'
 import { enumToArray, formatCurrency, formatPhoneNumber } from '@/utils'
 import { FaEye, FaShippingFast } from 'react-icons/fa'
 import {

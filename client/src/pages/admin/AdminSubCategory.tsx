@@ -25,7 +25,6 @@ import {
   useDeleteSubCategoryMutation,
 } from '@/services'
 import { useGetAllMainCategoryQuery } from '@/services'
-import { useAppDispatch } from '@/store'
 
 const AdminSubCategory: React.FC = () => {
   const [form] = Form.useForm()

@@ -1,9 +1,4 @@
-import {
-  createBrowserRouter,
-  Navigate,
-  Outlet,
-  useLocation,
-} from 'react-router-dom'
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom'
 import { PATH } from '@/constant'
 import {
   AdminHome,

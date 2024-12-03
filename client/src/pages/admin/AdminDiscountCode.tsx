@@ -28,7 +28,6 @@ import {
 import { stringToDateTime } from '@/utils'
 import { DISCOUNT_TYPE } from '@/enum'
 import dayjs from 'dayjs'
-import { useAppDispatch } from '@/store'
 
 const VITE_DATE_FORMAT_API = import.meta.env.VITE_DATE_FORMAT_API
 
@@ -107,7 +106,7 @@ const AdminDiscountCode: React.FC = () => {
     })
   }
 
-  const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
+  const handleSearch = (confirm: any) => {
     confirm()
   }
 
@@ -132,12 +131,12 @@ const AdminDiscountCode: React.FC = () => {
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onPressEnter={() => handleSearch(confirm)}
           style={{ marginBottom: 8, display: 'block' }}
         />
         <Button
           type='primary'
-          onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onClick={() => handleSearch(confirm)}
           icon={<SearchOutlined />}
           size='small'
           style={{ width: 90, marginRight: 8 }}

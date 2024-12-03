@@ -9,7 +9,6 @@ import {
   Upload,
   message,
   InputRef,
-  Select,
 } from 'antd'
 import type { RcFile, UploadFile } from 'antd/es/upload'
 import { Brand } from '@/types'
@@ -117,7 +116,7 @@ const AdminBrand: React.FC = () => {
     })
   }
 
-  const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
+  const handleSearch = (confirm: any, dataIndex: any) => {
     confirm()
     setSearchedColumn(dataIndex)
   }
@@ -143,12 +142,12 @@ const AdminBrand: React.FC = () => {
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onPressEnter={() => handleSearch(confirm, dataIndex)}
           style={{ marginBottom: 8, display: 'block' }}
         />
         <Button
           type='primary'
-          onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onClick={() => handleSearch(confirm, dataIndex)}
           icon={<SearchOutlined />}
           size='small'
           style={{ width: 90, marginRight: 8 }}

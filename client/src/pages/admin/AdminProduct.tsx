@@ -32,7 +32,6 @@ import {
   EyeOutlined,
 } from '@ant-design/icons'
 import { stringToDateTime, formatCurrency } from '@/utils'
-import { useAppDispatch } from '@/store'
 import { ProductViewModal } from '@/components'
 
 const { Option } = Select
@@ -179,7 +178,7 @@ const AdminProduct: React.FC = () => {
     })
   }
 
-  const handleSearch = (confirm: any, dataIndex: any) => {
+  const handleSearch = (confirm: any) => {
     confirm()
   }
 
@@ -223,13 +222,13 @@ const AdminProduct: React.FC = () => {
             onChange={(e) =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
-            onPressEnter={() => handleSearch(confirm, title)}
+            onPressEnter={() => handleSearch(confirm)}
             style={{ marginBottom: 8, display: 'block' }}
           />
         )}
         <Button
           type='primary'
-          onClick={() => handleSearch(confirm, title)}
+          onClick={() => handleSearch(confirm)}
           icon={<SearchOutlined />}
           size='small'
           style={{ width: 90, marginRight: 8 }}

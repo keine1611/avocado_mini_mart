@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { EyeIcon, EyeSlashIcon } from '@/resources'
 import { logo } from '@/constant'
-import { FiMail, FiLock, FiKey } from 'react-icons/fi'
+import { FiMail, FiLock } from 'react-icons/fi'
 import { Loading, showToast } from '@/components'
 import {
   useForgotPasswordMutation,

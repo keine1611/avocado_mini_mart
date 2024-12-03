@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-import { Modal, Rate, Input, Upload, Button, UploadProps, Form } from 'antd'
+import { Modal, Rate, Input, Upload, UploadProps, Form } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import { useForm } from 'antd/es/form/Form'
 import { useCreateReviewMutation } from '@/services/review'
 import { showToast } from './MyToast'
+import { Loading } from './Loading'
 type UploadFile = UploadProps['fileList']
 
 const ModalUserReview: React.FC<{
@@ -18,7 +19,7 @@ const ModalUserReview: React.FC<{
   const [review, setReview] = useState('')
   const [fileList, setFileList] = useState<UploadFile>([])
 
-  const [createReview, { isLoading, error }] = useCreateReviewMutation()
+  const [createReview, { isLoading }] = useCreateReviewMutation()
 
   const handleSubmit = () => {
     form.validateFields().then(async (values) => {
@@ -115,14 +116,13 @@ const ModalUserReview: React.FC<{
             </Upload>
           </Form.Item>
         </Form>
-        <Button
-          type='primary'
-          onClick={handleSubmit}
-          loading={isLoading}
-          disabled={isLoading}
-        >
-          Submit review
-        </Button>
+        <button className='primary' onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? (
+            <Loading size='loading-sm' color='text-white' />
+          ) : (
+            'Submit review'
+          )}
+        </button>
       </div>
     </Modal>
   )
