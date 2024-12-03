@@ -17,10 +17,6 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/scrollbar'
 
-const bgTitleLink1 = '/src/assets/images/home/bg-title-link-1.jpg'
-const bgTitleLink2 = '/src/assets/images/home/bg-title-link-2.jpg'
-const bgTitleLink3 = '/src/assets/images/home/bg-title-link-3.jpg'
-
 const mainCategories = [
   {
     name: 'Fast Food',
@@ -128,8 +124,7 @@ export const UserHome: React.FC = () => {
       <section className='w-full px-4 md:px-32 mt-16'>
         <div className='grid grid-cols-12 gap-4'>
           <div
-            className={`lg:col-span-3 md:col-span-4 col-span-12 bg-cover bg-center rounded-lg flex flex-col justify-between`}
-            style={{ backgroundImage: `url(${bgTitleLink1})` }}
+            className={`lg:col-span-3 bg-[url("/images/home/bg-title-link-1.jpg")] md:col-span-4 col-span-12 bg-cover bg-center rounded-lg flex flex-col justify-between`}
           >
             <ul className='menu rounded-box'>
               <li>
@@ -207,7 +202,9 @@ export const UserHome: React.FC = () => {
           </div>
           <div
             className={`lg:col-span-3 md:col-span-4 col-span-12 bg-cover bg-center rounded-lg flex flex-col justify-between`}
-            style={{ backgroundImage: `url(${bgTitleLink2})` }}
+            style={{
+              backgroundImage: `url("/images/home/bg-title-link-2.jpg")`,
+            }}
           >
             <ul className='menu rounded-box'>
               <li>
@@ -251,7 +248,9 @@ export const UserHome: React.FC = () => {
         <div className='grid grid-cols-12 gap-4'>
           <div
             className={`lg:col-span-3 md:col-span-4 col-span-12 bg-cover bg-center rounded-lg flex flex-col justify-between`}
-            style={{ backgroundImage: `url(${bgTitleLink3})` }}
+            style={{
+              backgroundImage: `url("/images/home/bg-title-link-3.jpg")`,
+            }}
           >
             <ul className='menu rounded-box'>
               <li>
