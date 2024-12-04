@@ -10,7 +10,11 @@ const transporter = nodemailer.createTransport({
   },
 })
 const compileTemplate = async (templateName, context) => {
-  const filePath = path.resolve(__dirname, '../static', `${templateName}.ejs`)
+  const filePath = path.resolve(
+    __dirname,
+    '../../static',
+    `${templateName}.ejs`
+  )
   try {
     const html = await ejs.renderFile(filePath, context)
     return html

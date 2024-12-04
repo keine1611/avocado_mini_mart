@@ -86,7 +86,7 @@ export const syncDatabase = async () => {
 
 const importDataFromJson = async (fileName, model) => {
   try {
-    const dataPath = path.join(__dirname, '../../static/json', fileName)
+    const dataPath = path.resolve(__dirname, '../../../static/json', fileName)
     const data = await fs.readFile(dataPath, 'utf8')
     const jsonData = JSON.parse(data)
     return await model.bulkCreate(jsonData)
