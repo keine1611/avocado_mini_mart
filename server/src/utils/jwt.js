@@ -25,7 +25,7 @@ export const setTokenCookie = ({
   res.cookie(name, data, {
     path: '/',
     domain:
-      process.env.PRODUCTION === 'true' ? 'localhost' : process.env.CLIENT_URL,
+      process.env.PRODUCTION === 'true' ? process.env.CLIENT_URL : 'localhost',
     httpOnly: false,
     sameSite: 'none',
     maxAge: isSession
