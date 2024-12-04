@@ -3,6 +3,9 @@ import jwt from 'jsonwebtoken'
 import fs from 'fs'
 import { Role } from '@/models/role'
 import { models } from '@/models'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 export const createAccessToken = ({ id, email }) => {
   const token = jwt.sign({ id, email }, process.env.ACCESS_TOKEN_SECRET, {
@@ -32,8 +35,7 @@ export const setTokenCookie = ({
       ? expiresIn * 60 * 1000
       : 30 * 24 * 60 * 60 * 1000,
     secure: process.env.PRODUCTION == 'true' ? true : false,
-    domain:
-      process.env.PRODUCTION == 'true' ? process.env.CLIENT_URL : 'localhost',
+    domain: process.env.COOKIE_DOMAIN,
   })
 }
 
