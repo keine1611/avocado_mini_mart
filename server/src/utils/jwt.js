@@ -31,7 +31,7 @@ export const setTokenCookie = ({
       : expiresIn
       ? expiresIn * 60 * 1000
       : 30 * 24 * 60 * 60 * 1000,
-    secure: 'development',
+    secure: process.env.PRODUCTION === 'true' ? 'secure' : 'development',
   })
 }
 
