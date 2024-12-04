@@ -27,14 +27,14 @@ export const setTokenCookie = ({
 }) => {
   res.cookie(name, data, {
     path: '/',
-    httpOnly: process.env.PRODUCTION == 'true' ? true : false,
+    httpOnly: false,
     sameSite: process.env.PRODUCTION == 'true' ? 'none' : 'lax',
     maxAge: isSession
       ? null
       : expiresIn
       ? expiresIn * 60 * 1000
       : 30 * 24 * 60 * 60 * 1000,
-    secure: process.env.PRODUCTION == 'true' ? true : false,
+    secure: false,
     domain: process.env.COOKIE_DOMAIN,
   })
 }
