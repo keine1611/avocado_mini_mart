@@ -26,6 +26,8 @@ const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
       try {
         const refreshToken = Cookies.get('refreshToken')
         const rememberMe = Cookies.get('rememberMe')
+        console.log(rememberMe)
+        console.log(refreshToken)
         if (refreshToken) {
           const res = await refresh({
             rememberMe: rememberMe === 'true',
