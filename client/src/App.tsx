@@ -24,6 +24,7 @@ const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const refreshToken = async () => {
       try {
+        console.log('refreshToken')
         const refreshToken = Cookies.get('refreshToken')
         const rememberMe = Cookies.get('rememberMe')
         console.log(rememberMe)
