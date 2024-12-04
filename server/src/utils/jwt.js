@@ -26,7 +26,6 @@ export const setTokenCookie = ({
   isSession = false,
 }) => {
   res.cookie(name, data, {
-    path: '/',
     httpOnly: false,
     sameSite: process.env.PRODUCTION == 'true' ? 'none' : 'lax',
     maxAge: isSession
