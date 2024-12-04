@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer'
 import path from 'path'
 import ejs from 'ejs'
-import fs from 'fs'
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -11,26 +10,13 @@ const transporter = nodemailer.createTransport({
   },
 })
 const compileTemplate = async (templateName, context) => {
-  const rootDir = path.join(__dirname, '..')
-  const filePath = path.join(rootDir, '/src/static', `${templateName}.ejs`)
-
+  const filePath = path.resolve(__dirname, '../static', `${templateName}.ejs`)
   try {
-    // Check if file exists
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`Template file not found at: ${filePath}`)
-    }
-
     const html = await ejs.renderFile(filePath, context)
     return html
   } catch (err) {
-    console.error('Failed to compile template:', {
-      error: err.message,
-      path: filePath,
-      dirname: __dirname,
-      templateName,
-      exists: fs.existsSync(filePath),
-    })
-    throw new Error(`Failed to compile template: ${err.message}`)
+    console.error('Failed to compile template:', err)
+    throw new Error('Failed to compile template')
   }
 }
 
