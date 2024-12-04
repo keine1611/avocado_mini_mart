@@ -24,20 +24,13 @@ const RefreshToken: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const refreshToken = async () => {
       try {
-        const refreshToken = Cookies.get('refreshToken')
         const rememberMe = Cookies.get('rememberMe')
-        console.log(rememberMe)
-        console.log(refreshToken)
-        if (refreshToken) {
-          const res = await refresh({
-            rememberMe: rememberMe === 'true',
-          }).unwrap()
-          if (res.data) {
-            dispatch(authActions.setUser(res.data))
-            dispatch(cartActions.setCarts(res.data.carts))
-          }
-        } else {
-          dispatch(authActions.clear())
+        const res = await refresh({
+          rememberMe: rememberMe === 'true',
+        }).unwrap()
+        if (res.data) {
+          dispatch(authActions.setUser(res.data))
+          dispatch(cartActions.setCarts(res.data.carts))
         }
       } catch (error) {
         dispatch(authActions.clear())
