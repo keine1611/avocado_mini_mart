@@ -1,6 +1,8 @@
 import { io } from 'socket.io-client'
 
-const socket = io('http://localhost:1611', {
+const apiSocket = import.meta.env.VITE_API_SOCKET
+
+const socket = io(apiSocket, {
   withCredentials: true,
   autoConnect: false,
 })

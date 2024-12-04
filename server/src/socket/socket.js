@@ -4,10 +4,12 @@ import cookie from 'cookie'
 import { verifyAccessToken } from '@/utils'
 import { cartService } from '@/services/cart'
 
+const clientUrl = process.env.CLIENT_URL
+
 const setupWebSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: 'http://localhost:5173',
+      origin: clientUrl,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: 'Content-Type,Authorization',
       credentials: true,
