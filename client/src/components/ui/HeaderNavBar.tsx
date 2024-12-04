@@ -13,7 +13,7 @@ import { cartActions } from '@/store'
 import { setCheckedCartFromLocalStorage } from '@/utils'
 import { showToast } from '@/components'
 import { FaRegTrashAlt } from 'react-icons/fa'
-
+import Cookies from 'js-cookie'
 const favoritesMenu: MenuProps['items'] = [
   {
     key: '1',
@@ -79,6 +79,7 @@ const HeaderNavBar: React.FC = () => {
   ]
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(Cookies.get('refreshToken'))
     setSearchTerm(e.target.value)
   }
 

@@ -53,7 +53,7 @@ export const authController = {
           res,
           name: 'refreshToken',
           data: refreshToken,
-          expiresIn: 30,
+          expiresIn: 30 * 24 * 60,
         })
       } else {
         setTokenCookie({
