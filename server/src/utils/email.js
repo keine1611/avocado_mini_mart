@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 })
 const compileTemplate = async (templateName, context) => {
   const rootDir = path.join(__dirname, '..')
-  const filePath = path.join(rootDir, 'static', `${templateName}.ejs`)
+  const filePath = path.join(rootDir, '/src/static', `${templateName}.ejs`)
 
   try {
     // Check if file exists
