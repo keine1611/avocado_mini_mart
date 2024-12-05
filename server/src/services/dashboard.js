@@ -15,13 +15,6 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { Sequelize } from 'sequelize'
 import { ORDER_STATUS } from '@/enum'
 
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
-
-dayjs.extend(utc)
-dayjs.extend(timezone)
-const DEFAULT_TIMEZONE = 'Asia/Ho_Chi_Minh'
-dayjs.tz.setDefault(DEFAULT_TIMEZONE)
 dayjs.extend(customParseFormat)
 
 const { DATE_FORMAT } = process.env
@@ -155,7 +148,7 @@ export const getTotalNewCustomers = async ({
 
 // Chart Earnings(Revenue)
 export const calculateEarningsComparisonByHour = async () => {
-  const now = dayjs()
+  const now = global.dayjs()
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
   const earningsComparison = await Promise.all(
@@ -181,7 +174,7 @@ export const calculateEarningsComparisonByHour = async () => {
 }
 
 export const calculateEarningsComparisonByWeek = async () => {
-  const now = dayjs()
+  const now = global.dayjs()
   const days = Array.from({ length: 7 }, (_, i) => i)
 
   const earningsComparison = await Promise.all(
@@ -210,7 +203,7 @@ export const calculateEarningsComparisonByWeek = async () => {
 }
 
 export const calculateEarningsComparisonByMonth = async () => {
-  const now = dayjs()
+  const now = global.dayjs()
   const days = Array.from({ length: 30 }, (_, i) => i)
 
   const earningsComparison = await Promise.all(
@@ -240,8 +233,8 @@ export const calculateEarningsComparisonByMonth = async () => {
 }
 
 export const calculateEarningsComparisonByYear = async () => {
-  const startOfYear = dayjs().startOf('year')
-  const currentMonth = dayjs().month()
+  const startOfYear = global.dayjs().startOf('year')
+  const currentMonth = global.dayjs().month()
   const months = Array.from({ length: currentMonth + 1 }, (_, i) => i)
 
   const earningsComparison = []
@@ -279,7 +272,7 @@ export const calculateEarningsComparisonByPeriod = async ({ period }) => {
 
 // Chart Profit
 export const calculateProfitComparisonByHour = async () => {
-  const now = dayjs()
+  const now = global.dayjs()
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
   const profitComparison = await Promise.all(
@@ -305,7 +298,7 @@ export const calculateProfitComparisonByHour = async () => {
 }
 
 export const calculateProfitComparisonByWeek = async () => {
-  const now = dayjs()
+  const now = global.dayjs()
   const days = Array.from({ length: 7 }, (_, i) => i)
 
   const profitComparison = await Promise.all(
@@ -334,7 +327,7 @@ export const calculateProfitComparisonByWeek = async () => {
 }
 
 export const calculateProfitComparisonByMonth = async () => {
-  const now = dayjs()
+  const now = global.dayjs()
   const days = Array.from({ length: 30 }, (_, i) => i)
 
   const productAnalyticsData = await Promise.all(
@@ -363,8 +356,8 @@ export const calculateProfitComparisonByMonth = async () => {
 }
 
 export const calculateProfitComparisonByYear = async () => {
-  const startOfYear = dayjs().startOf('year')
-  const currentMonth = dayjs().month()
+  const startOfYear = global.dayjs().startOf('year')
+  const currentMonth = global.dayjs().month()
   const months = Array.from({ length: currentMonth + 1 }, (_, i) => i)
 
   const profitComparison = []
@@ -447,29 +440,29 @@ export const calculateTopProductSoldComparisonByPeriod = async ({ period }) => {
   let endDateString
   switch (period) {
     case 'day':
-      startDateString = dayjs().startOf('day').format(DATE_FORMAT)
-      endDateString = dayjs().endOf('day').format(DATE_FORMAT)
+      startDateString = global.dayjs().startOf('day').format(DATE_FORMAT)
+      endDateString = global.dayjs().endOf('day').format(DATE_FORMAT)
       return await calculateTopProductSoldComparisonInTimePeriod({
         startDateString,
         endDateString,
       })
     case 'week':
-      startDateString = dayjs().startOf('week').format(DATE_FORMAT)
-      endDateString = dayjs().endOf('week').format(DATE_FORMAT)
+      startDateString = global.dayjs().startOf('week').format(DATE_FORMAT)
+      endDateString = global.dayjs().endOf('week').format(DATE_FORMAT)
       return await calculateTopProductSoldComparisonInTimePeriod({
         startDateString,
         endDateString,
       })
     case 'month':
-      startDateString = dayjs().startOf('month').format(DATE_FORMAT)
-      endDateString = dayjs().endOf('month').format(DATE_FORMAT)
+      startDateString = global.dayjs().startOf('month').format(DATE_FORMAT)
+      endDateString = global.dayjs().endOf('month').format(DATE_FORMAT)
       return await calculateTopProductSoldComparisonInTimePeriod({
         startDateString,
         endDateString,
       })
     case 'year':
-      startDateString = dayjs().startOf('year').format(DATE_FORMAT)
-      endDateString = dayjs().endOf('year').format(DATE_FORMAT)
+      startDateString = global.dayjs().startOf('year').format(DATE_FORMAT)
+      endDateString = global.dayjs().endOf('year').format(DATE_FORMAT)
       return await calculateTopProductSoldComparisonInTimePeriod({
         startDateString,
         endDateString,
@@ -483,7 +476,7 @@ export const calculateTopProductSoldComparisonByPeriod = async ({ period }) => {
 export const getProductSalesDataByPeriod = async ({ period }) => {
   let startDateString
   let endDateString
-  const now = dayjs()
+  const now = global.dayjs()
 
   switch (period) {
     case 'day':
@@ -699,7 +692,7 @@ export const getChartProductAnalyticsDataByPeriod = async ({
 }
 
 export const getChartProductAnalyticsDataInDay = async ({ productId }) => {
-  const now = dayjs()
+  const now = global.dayjs()
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
   const productAnalyticsData = await Promise.all(
@@ -732,7 +725,7 @@ export const getChartProductAnalyticsDataInDay = async ({ productId }) => {
 }
 
 export const getChartProductAnalyticsDataInWeek = async ({ productId }) => {
-  const now = dayjs()
+  const now = global.dayjs()
   const days = Array.from({ length: 7 }, (_, i) => i)
 
   const productAnalyticsData = await Promise.all(
@@ -763,7 +756,7 @@ export const getChartProductAnalyticsDataInWeek = async ({ productId }) => {
 }
 
 export const getChartProductAnalyticsDataInMonth = async ({ productId }) => {
-  const now = dayjs()
+  const now = global.dayjs()
   const days = Array.from({ length: 30 }, (_, i) => i)
 
   const productAnalyticsData = await Promise.all(
@@ -794,7 +787,7 @@ export const getChartProductAnalyticsDataInMonth = async ({ productId }) => {
 }
 
 export const getChartProductAnalyticsDataInYear = async ({ productId }) => {
-  const startOfYear = dayjs().startOf('year')
+  const startOfYear = global.dayjs().startOf('year')
   const months = Array.from({ length: 12 }, (_, i) => i)
 
   const productAnalyticsData = await Promise.all(
@@ -847,7 +840,7 @@ export const getProductPriceHistory = async ({ productId }) => {
 
       const endDate = nextHistory
         ? nextHistory.changedAt
-        : dayjs().format(DATE_FORMAT)
+        : global.dayjs().format(DATE_FORMAT)
 
       // Get sales and revenue
       const salesMetrics = await OrderItem.findOne({
