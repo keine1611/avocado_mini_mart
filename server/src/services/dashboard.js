@@ -14,8 +14,15 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { Sequelize } from 'sequelize'
 import { ORDER_STATUS } from '@/enum'
-import { groupBy, gte } from 'lodash'
-import { mode } from 'crypto-js'
+
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
+const DEFAULT_TIMEZONE = 'Asia/Ho_Chi_Minh'
+global.dayjs = (date) => dayjs(date).tz(DEFAULT_TIMEZONE)
+
 dayjs.extend(customParseFormat)
 
 const { DATE_FORMAT } = process.env
