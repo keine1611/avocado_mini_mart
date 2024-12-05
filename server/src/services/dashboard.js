@@ -21,8 +21,7 @@ import timezone from 'dayjs/plugin/timezone'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 const DEFAULT_TIMEZONE = 'Asia/Ho_Chi_Minh'
-global.dayjs = (date) => dayjs(date).tz(DEFAULT_TIMEZONE)
-
+dayjs.tz.setDefault(DEFAULT_TIMEZONE)
 dayjs.extend(customParseFormat)
 
 const { DATE_FORMAT } = process.env
