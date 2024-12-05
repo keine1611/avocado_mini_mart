@@ -9,6 +9,15 @@ import { setupWebSocket } from './socket'
 import http from 'http'
 import { logRequest, delayResponse, authenticateToken } from './middlewares'
 
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
+const DEFAULT_TIMEZONE = 'Asia/Ho_Chi_Minh'
+global.dayjs = (date) => dayjs(date).tz(DEFAULT_TIMEZONE)
+
 dotenv.config()
 const port = process.env.PORT
 const app = express()

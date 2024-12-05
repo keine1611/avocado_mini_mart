@@ -83,7 +83,25 @@ const orderController = {
       const order = await Order.findOne({
         where: { code: orderCode },
         include: [
-          { model: models.OrderItem, as: 'orderItems', include: ['product'] },
+          {
+            model: models.OrderItem,
+            as: 'orderItems',
+            include: [
+              {
+                model: models.Product,
+                as: 'product',
+                include: [
+                  {
+                    model: models.SubCategory,
+                    as: 'subCategory',
+                    include: [
+                      { model: models.MainCategory, as: 'mainCategory' },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
           { model: models.OrderLog, as: 'orderLogs' },
         ],
       })

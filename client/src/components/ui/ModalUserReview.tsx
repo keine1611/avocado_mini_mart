@@ -19,11 +19,14 @@ const ModalUserReview: React.FC<{
   const [review, setReview] = useState('')
   const [fileList, setFileList] = useState<UploadFile>([])
 
-  const [createReview, { isLoading }] = useCreateReviewMutation()
+  const [isLoading, setIsLoading] = useState(false)
+  const [createReview, { isLoading: isCreatingReview }] =
+    useCreateReviewMutation()
 
   const handleSubmit = () => {
     form.validateFields().then(async (values) => {
       try {
+        setIsLoading(true)
         if (!fileList) return
         const formData = new FormData()
         formData.append('rating', values.rating.toString())
@@ -42,7 +45,9 @@ const ModalUserReview: React.FC<{
 
         onClose()
       } catch (err: any) {
-        showToast.error(err.data.message || 'Failed to create review')
+        showToast.error(err.data?.message || 'Failed to create review')
+      } finally {
+        setIsLoading(false)
       }
     })
   }
@@ -116,9 +121,13 @@ const ModalUserReview: React.FC<{
             </Upload>
           </Form.Item>
         </Form>
-        <button className='primary' onClick={handleSubmit} disabled={isLoading}>
+        <button
+          className='btn btn-primary w-full text-white disabled:bg-gray-200 disabled:text-gray-500'
+          onClick={handleSubmit}
+          disabled={isLoading}
+        >
           {isLoading ? (
-            <Loading size='loading-sm' color='text-white' />
+            <Loading size='loading-sm' color='text-primary' />
           ) : (
             'Submit review'
           )}

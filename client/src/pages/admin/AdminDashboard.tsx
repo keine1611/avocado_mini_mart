@@ -516,7 +516,13 @@ const ChartProfit: React.FC = () => {
 
 const TableTopProductSold: React.FC = () => {
   const { data: topProductSoldData } =
-    useGetTopProductSoldComparisonByPeriodQuery({ period: 'month' })
+    useGetTopProductSoldComparisonByPeriodQuery(
+      { period: 'month' },
+      {
+        skip: undefined,
+        refetchOnMountOrArgChange: true,
+      }
+    )
   return (
     <div className='overflow-x-auto px-2 bg-white p-6 rounded-2xl shadow-lg'>
       <table className='table w-full table-fixed'>

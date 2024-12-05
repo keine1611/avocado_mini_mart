@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   useGetOrderByCodeQuery,
   usePaypalVerifyOrderMutation,
@@ -67,23 +67,22 @@ const UserOrderDetail: React.FC = () => {
 
   const columns: ColumnType<OrderItem>[] = [
     {
-      title: '',
-      dataIndex: 'image',
+      title: 'Product',
+      dataIndex: 'product',
       render: (_, record: OrderItem) => (
-        <div className='flex flex-row items-center'>
+        <Link
+          to={`/products/${record.product.subCategory?.mainCategory?.slug}/${record.product.subCategory?.slug}/${record.product.slug}`}
+          className='flex flex-row items-center gap-2 hover:text-primary'
+        >
           <img
             className='h-16 w-16 object-cover'
             src={record.product.mainImage}
           ></img>
-        </div>
+          <span className='text-md line-clamp-2'>{record.product.name}</span>
+        </Link>
       ),
-      width: '100px',
     },
-    {
-      title: 'Product Name',
-      dataIndex: 'product.name',
-      render: (_, record: OrderItem) => record.product.name,
-    },
+
     {
       title: 'Quantity',
       dataIndex: 'quantity',

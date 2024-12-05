@@ -251,7 +251,7 @@ const HeaderNavBar: React.FC = () => {
         ) : (
           <Link
             to='/login'
-            state={{ from: location.pathname }}
+            state={{ from: null }}
             className='text-md hover:text-secondary transition duration-200 text-white'
           >
             Login

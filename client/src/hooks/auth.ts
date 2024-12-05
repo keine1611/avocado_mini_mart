@@ -17,7 +17,7 @@ const auth = () => {
     clearFavoriteFromLocalStorage()
     Cookies.remove('refreshToken')
     Cookies.remove('accessToken')
-    navigate('/login', { replace: true })
+    navigate('/login', { replace: true, state: { from: null } })
   }
 
   return { logout }
