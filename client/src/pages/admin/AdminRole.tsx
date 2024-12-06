@@ -19,7 +19,7 @@ const AdminRole: React.FC = () => {
   }
 
   const handleDelete = (id: number) => {
-    return
+    return id
   }
   const handleCloseModalEdit = () => {
     setEditRole(null)
