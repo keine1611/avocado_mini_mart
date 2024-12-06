@@ -769,7 +769,13 @@ const AdminCheckOrder: React.FC = () => {
                 </div>
                 <div className='flex justify-between'>
                   <p className='text-gray-500'>Profit</p>
-                  <p className='font-medium'>
+                  <p
+                    className={`font-medium ${
+                      viewOrder?.profit && viewOrder?.profit > 0
+                        ? 'text-green-500'
+                        : 'text-red-500'
+                    }`}
+                  >
                     {formatCurrency(viewOrder?.profit || 0)}
                   </p>
                 </div>
