@@ -261,7 +261,7 @@ const orderController = {
           where: {
             code: discountCode,
             isActive: true,
-            expiryDate: { [Op.gte]: dayjs().format(DATE_FORMAT) },
+            expiryDate: { [Op.gte]: global.dayjs().format(DATE_FORMAT) },
             timesUsed: { [Op.lt]: sequelize.col('usageLimit') },
           },
         })

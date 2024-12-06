@@ -22,14 +22,16 @@ const { DATE_FORMAT } = process.env
 const dashboardController = {
   getDashboardData: async (req, res) => {
     try {
-      const startOfMonth = dayjs().startOf('month').format(DATE_FORMAT)
-      const endOfMonth = dayjs().endOf('month').format(DATE_FORMAT)
+      const startOfMonth = global.dayjs().startOf('month').format(DATE_FORMAT)
+      const endOfMonth = global.dayjs().endOf('month').format(DATE_FORMAT)
 
-      const lastMonthStartOfMonth = dayjs()
+      const lastMonthStartOfMonth = global
+        .dayjs()
         .subtract(1, 'month')
         .startOf('month')
         .format(DATE_FORMAT)
-      const lastMonthEndOfMonth = dayjs()
+      const lastMonthEndOfMonth = global
+        .dayjs()
         .subtract(1, 'month')
         .endOf('month')
         .format(DATE_FORMAT)
@@ -234,7 +236,7 @@ const dashboardController = {
       let totalValue = 0
 
       batchProducts.forEach((batch) => {
-        if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(dayjs())) {
+        if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(global.dayjs())) {
           totalQuantity += batch.quantity
           totalValue += batch.quantity * batch.price
         }
