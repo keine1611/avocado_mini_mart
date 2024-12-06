@@ -66,9 +66,30 @@ const orderController = {
         ],
         order: [['createdAt', 'DESC']],
       })
+
+      const ordersWithMetrics = orders.map((order) => {
+        let totalCost = 0
+        let revenue = order.totalAmount - order.discount
+
+        order.orderItems.forEach((orderItem) => {
+          orderItem.orderItemBatches.forEach((orderItemBatch) => {
+            const batchProduct = orderItemBatch.batch.batchProducts[0]
+            if (batchProduct) {
+              totalCost += orderItemBatch.quantity * batchProduct.price
+            }
+          })
+        })
+
+        return {
+          ...order.toJSON(),
+          totalCost,
+          profit: revenue - totalCost,
+        }
+      })
+
       res.json({
         message: 'Get orders successfully',
-        data: orders,
+        data: ordersWithMetrics,
       })
     } catch (error) {
       res.status(500).json({
@@ -153,6 +174,15 @@ const orderController = {
         return res.status(400).json({ message: 'Order is delivered' })
       }
       if (
+        orderStatus === ORDER_STATUS.PENDING &&
+        order.paymentMethod === PAYMENT_METHOD.PAYPAL &&
+        order.paymentStatus === PAYMENT_STATUS.PENDING
+      ) {
+        return res
+          .status(400)
+          .json({ message: 'Order is waiting for payment!' })
+      }
+      if (
         orderStatus === ORDER_STATUS.CANCELLED ||
         orderStatus === ORDER_STATUS.REJECTED
       ) {
@@ -174,6 +204,12 @@ const orderController = {
         }
       }
       order.orderStatus = orderStatus
+      if (
+        orderStatus === ORDER_STATUS.DELIVERED &&
+        order.paymentMethod === PAYMENT_METHOD.COD
+      ) {
+        order.paymentStatus = PAYMENT_STATUS.PAID
+      }
       await order.save({ transaction })
       await OrderLog.create(
         {

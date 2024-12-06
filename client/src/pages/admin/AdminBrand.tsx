@@ -244,18 +244,24 @@ const AdminBrand: React.FC = () => {
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
+      width: '500px',
+      render: (text: string) => (
+        <p className='w-full text-wrap line-clamp-3 truncate'>{text}</p>
+      ),
     },
     {
       title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (text: string) => stringToDateTime(text),
+      sorter: (a, b) => Number(a.createdAt) - Number(b.createdAt),
     },
     {
       title: 'Updated At',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       render: (text: string) => stringToDateTime(text),
+      sorter: (a, b) => Number(a.updatedAt) - Number(b.updatedAt),
     },
     {
       title: 'Actions',
@@ -364,6 +370,7 @@ const AdminBrand: React.FC = () => {
                 type='primary'
                 className='px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark'
                 loading={isCreating || isUpdating}
+                disabled={isCreating || isUpdating}
               >
                 {editingBrand ? 'Update' : 'Create'}
               </Button>

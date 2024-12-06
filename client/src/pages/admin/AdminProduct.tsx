@@ -266,7 +266,7 @@ const AdminProduct: React.FC = () => {
       dataIndex: 'mainImage',
       key: 'mainImage',
       render: (url: string) => (
-        <img src={url} alt='product' className='w-16 h-16 object-cover' />
+        <img src={url} alt='product' className='w-16 h-16 object-contain' />
       ),
       width: 100,
     },
@@ -337,12 +337,14 @@ const AdminProduct: React.FC = () => {
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (text: any) => stringToDateTime(text),
+      sorter: (a, b) => Number(a.createdAt) - Number(b.createdAt),
     },
     {
       title: 'Updated At',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       render: (text: any) => stringToDateTime(text),
+      sorter: (a, b) => Number(a.updatedAt) - Number(b.updatedAt),
     },
     {
       title: 'Actions',
@@ -477,6 +479,15 @@ const AdminProduct: React.FC = () => {
                 label='Standard Price'
                 rules={[
                   { required: true, message: 'Please enter a standard price' },
+
+                  {
+                    validator: (_, value) => {
+                      if (value <= 0) {
+                        return Promise.reject('Price must be greater than 0')
+                      }
+                      return Promise.resolve()
+                    },
+                  },
                 ]}
               >
                 <Input
@@ -587,6 +598,7 @@ const AdminProduct: React.FC = () => {
                 onClick={handleModalOk}
                 type='primary'
                 className='px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark'
+                disabled={isLoadingCreateProduct || isLoadingUpdateProduct}
               >
                 {editingProduct ? 'Update' : 'Create'}
               </Button>

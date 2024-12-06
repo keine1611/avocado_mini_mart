@@ -102,7 +102,7 @@ export const productApi = createApi({
     ),
     getBatchProduct: builder.query<
       ApiResponse<{
-        product: Product & { stock: number }
+        product: Product & { stock: number; expectedStock: number }
         batchProduct: BatchProduct[]
       }>,
       number

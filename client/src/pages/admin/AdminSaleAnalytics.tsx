@@ -23,6 +23,7 @@ import {
 import { LineChart } from 'recharts'
 import { EditOutlined } from '@ant-design/icons'
 import { showToast } from '@/components'
+
 const AdminSaleAnalytics = () => {
   const [period, setPeriod] = useState<'day' | 'month' | 'year'>('day')
   const [selectedProductAnalytics, setSelectedProductAnalytics] = useState<
@@ -52,6 +53,13 @@ const AdminSaleAnalytics = () => {
           <span className='text-sm truncate line-clamp-1'>{record.name}</span>
         </div>
       ),
+    },
+    {
+      title: 'Rating',
+      dataIndex: 'averageRating',
+      render: (value) => <Rate value={value} disabled />,
+      sorter: (a, b) => a.averageRating - b.averageRating,
+      width: 150,
     },
     {
       title: 'Total Sold',
@@ -332,6 +340,20 @@ const TableProductPriceHistory = ({
   isLoadingProductPriceHistory: boolean
   isFetchingProductPriceHistory: boolean
 }) => {
+  const calculateGrowthPercentage = (
+    currentValue: number,
+    prevValue: number
+  ): number => {
+    if (prevValue === 0 && currentValue === 0) {
+      return 0
+    }
+
+    if (prevValue === 0) {
+      return currentValue > 0 ? 100 : -100
+    }
+
+    return ((currentValue - prevValue) / prevValue) * 100
+  }
   const columns: ColumnType<any>[] = [
     {
       title: 'Price',
@@ -351,6 +373,35 @@ const TableProductPriceHistory = ({
     {
       title: 'Total Quantity Sold',
       dataIndex: 'totalQuantitySold',
+      render: (value, _, index) => {
+        const prevValue =
+          index < productPriceHistory?.length - 1
+            ? productPriceHistory[index + 1].totalQuantitySold
+            : value
+
+        const growthPercentage = calculateGrowthPercentage(value, prevValue)
+
+        return (
+          <div className='flex items-center gap-2'>
+            <span>{value}</span>
+            {index < productPriceHistory?.length - 1 && (
+              <span
+                className={`text-xs font-medium ${
+                  growthPercentage > 0
+                    ? 'text-green-500'
+                    : growthPercentage < 0
+                    ? 'text-red-500'
+                    : 'text-gray-500'
+                }`}
+              >
+                {growthPercentage > 0 ? '↑' : growthPercentage < 0 ? '↓' : ''}
+                {Math.abs(growthPercentage).toFixed(1)}%
+              </span>
+            )}
+          </div>
+        )
+      },
+      width: 200,
     },
     {
       title: 'Total Revenue',
@@ -361,6 +412,12 @@ const TableProductPriceHistory = ({
       title: 'Total Profit',
       dataIndex: 'totalProfit',
       render: (value) => formatCurrency(value),
+    },
+    {
+      title: 'Changed By',
+      dataIndex: 'changedBy',
+      render: (value) => <span className='text-green-500'>{value}</span>,
+      width: 150,
     },
   ]
 
@@ -535,6 +592,11 @@ const ModalChangePrice = ({
                 validator: (_, value) => {
                   if (value <= 0) {
                     return Promise.reject('Price must be greater than 0')
+                  }
+                  if (value == standardPrice) {
+                    return Promise.reject(
+                      'Price change cannot be the same as current price'
+                    )
                   }
                   if (value < averagePurchasePrice) {
                     return Promise.reject(

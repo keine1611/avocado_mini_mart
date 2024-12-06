@@ -63,6 +63,7 @@ const AdminCheckOrder: React.FC = () => {
   } = useGetOrdersQuery(undefined, {
     refetchOnMountOrArgChange: true,
   })
+
   const [updateOrderStatus, { isLoading: isUpdatingStatus }] =
     useUpdateOrderStatusMutation()
   const [viewOrder, setViewOrder] = useState<Order | null>(null)
@@ -760,6 +761,18 @@ const AdminCheckOrder: React.FC = () => {
                     </p>
                   </div>
                 </div>
+                <div className='flex justify-between mt-2 border-t pt-2'>
+                  <p className='text-gray-500'>Total Cost</p>
+                  <p className='font-medium'>
+                    {formatCurrency(viewOrder?.totalCost || 0)}
+                  </p>
+                </div>
+                <div className='flex justify-between'>
+                  <p className='text-gray-500'>Profit</p>
+                  <p className='font-medium'>
+                    {formatCurrency(viewOrder?.profit || 0)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -849,6 +862,7 @@ const AdminCheckOrder: React.FC = () => {
               onRow={(record) => ({
                 onClick: () => handleViewOrderItemBatchDetail(record),
               })}
+              key='orderItems'
             />
           </div>
 
@@ -934,6 +948,8 @@ const OrderItemBatchDetailModal: React.FC<OrderItemDetailModalProps> = ({
           <Table
             dataSource={orderItem?.orderItemBatches}
             pagination={false}
+            rowKey='batchId'
+            key='orderItemBatches'
             columns={[
               {
                 title: 'Batch Code',
@@ -945,6 +961,13 @@ const OrderItemBatchDetailModal: React.FC<OrderItemDetailModalProps> = ({
                 title: 'Quantity',
                 dataIndex: 'quantity',
                 key: 'quantity',
+              },
+              {
+                title: 'Import Price / Unit',
+                dataIndex: 'importPrice',
+                key: 'importPrice',
+                render: (_, record) =>
+                  formatCurrency(record.batch.batchProducts[0].price),
               },
               {
                 title: 'Expired Date',

@@ -547,7 +547,7 @@ const TableTopProductSold: React.FC = () => {
                 <img
                   src={product.product.mainImage}
                   alt={product.name}
-                  className='h-20 w-20 rounded-full'
+                  className='h-20 w-20 rounded-full object-contain'
                 />
                 <span className='ml-2 truncate line-clamp-2 text-wrap '>
                   {product.product.name}

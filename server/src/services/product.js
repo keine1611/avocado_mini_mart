@@ -33,6 +33,7 @@ export const createOrderItems = async (orderItems, transaction, orderId) => {
         include: {
           model: models.Batch,
           as: 'batch',
+          where: { arrivalDate: { [Op.lt]: getToday() } },
         },
         order: [['expiredDate', 'ASC']],
       })

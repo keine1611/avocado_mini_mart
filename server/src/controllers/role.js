@@ -22,7 +22,6 @@ const roleController = {
   update: async (req, res) => {
     const { id } = req.params
     const { name, permissions } = req.body
-    console.log(permissions)
     try {
       const role = await models.Role.findByPk(id)
       if (!role) {

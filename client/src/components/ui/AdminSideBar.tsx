@@ -128,11 +128,7 @@ export const AdminSideBar: React.FC = () => {
                       title='Discount Codes'
                       isActive={isActiveLink('/admin/databases/discount-codes')}
                     />
-                    <SidebarSubItem
-                      to='/admin/databases/shippings'
-                      title='Shippings'
-                      isActive={isActiveLink('/admin/databases/shippings')}
-                    />
+
                     <SidebarSubItem
                       to='/admin/databases/roles'
                       title='Roles'

@@ -3,7 +3,7 @@ import Joi from 'joi'
 const productValidation = {
   create: Joi.object({
     name: Joi.string()
-      .max(50)
+      .max(100)
       .min(10)
       .required()
       .error((errors) => {
@@ -16,7 +16,7 @@ const productValidation = {
               error.message = 'Name is required'
               break
             case 'string.max':
-              error.message = 'Name must be at most 50 characters long'
+              error.message = 'Name must be at most 100 characters long'
               break
             default:
               break
@@ -43,19 +43,19 @@ const productValidation = {
         return errors
       }),
     slug: Joi.string()
-      .max(50)
-      .min(3)
+      .max(200)
+      .min(10)
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
             case 'string.min':
-              error.message = 'Slug must be at least 3 characters long'
+              error.message = 'Slug must be at least 10 characters long'
               break
             case 'any.required':
               error.message = 'Slug is required'
               break
             case 'string.max':
-              error.message = 'Slug must be at most 50 characters long'
+              error.message = 'Slug must be at most 200 characters long'
               break
             default:
               break
@@ -140,7 +140,7 @@ const productValidation = {
   }),
   update: Joi.object({
     name: Joi.string()
-      .max(50)
+      .max(100)
       .min(10)
       .error((errors) => {
         errors.forEach((error) => {
@@ -149,7 +149,7 @@ const productValidation = {
               error.message = 'Name must be at least 10 characters long'
               break
             case 'string.max':
-              error.message = 'Name must be at most 50 characters long'
+              error.message = 'Name must be at most 100 characters long'
               break
             default:
               break
@@ -172,16 +172,16 @@ const productValidation = {
         return errors
       }),
     slug: Joi.string()
-      .max(50)
-      .min(3)
+      .max(200)
+      .min(10)
       .error((errors) => {
         errors.forEach((error) => {
           switch (error.code) {
             case 'string.min':
-              error.message = 'Slug must be at least 3 characters long'
+              error.message = 'Slug must be at least 10 characters long'
               break
             case 'string.max':
-              error.message = 'Slug must be at most 50 characters long'
+              error.message = 'Slug must be at most 200 characters long'
               break
             default:
               break

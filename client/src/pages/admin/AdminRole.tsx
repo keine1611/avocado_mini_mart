@@ -19,7 +19,7 @@ const AdminRole: React.FC = () => {
   }
 
   const handleDelete = (id: number) => {
-    console.log(id)
+    return
   }
   const handleCloseModalEdit = () => {
     setEditRole(null)
@@ -290,7 +290,6 @@ const AdminRoleModal: React.FC<{
               onMouseDown={(e) => e.stopPropagation()}
               onMouseEnter={(e) => e.stopPropagation()}
               filterOption={(input, option) => {
-                console.log(option)
                 return (option?.label ?? '')
                   .toString()
                   .toLowerCase()

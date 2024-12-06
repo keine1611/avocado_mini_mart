@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BatchProduct, Product } from '@/types'
-import { Select, Table, Tabs } from 'antd'
+import { Select, Table, Tabs, Tooltip } from 'antd'
 import {
   useGetAllProductWithoutPaginationQuery,
   useLazyGetBatchProductQuery,
@@ -11,6 +11,7 @@ import {
 import { ColumnsType } from 'antd/es/table'
 import { formatCurrency, formatQuantity, stringToDate } from '@/utils'
 import { exportExcel } from '@/utils'
+import dayjs from 'dayjs'
 
 const AdminBatchProduct: React.FC = () => {
   const { data: products } = useGetAllProductWithoutPaginationQuery()
@@ -21,7 +22,7 @@ const AdminBatchProduct: React.FC = () => {
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [batchProduct, setBatchProduct] = useState<{
-    product: Product & { stock: number }
+    product: Product & { stock: number; expectedStock: number }
     batchProduct: BatchProduct[]
   } | null>(null)
   const [activeTab, setActiveTab] = useState<
@@ -87,7 +88,39 @@ const AdminBatchProduct: React.FC = () => {
       dataIndex: 'expiredDate',
       key: 'expiredDate',
       render: (_, record) => {
-        return stringToDate(record.expiredDate)
+        const expiryDate = dayjs(record.expiredDate)
+        const today = dayjs()
+        const daysUntilExpiry = expiryDate.diff(today, 'day')
+
+        let className = 'px-3 py-1 rounded-full font-medium'
+        let tooltipColor = ''
+
+        if (daysUntilExpiry < 0) {
+          className += ' bg-red-100 text-red-700'
+          tooltipColor = 'red'
+        } else if (daysUntilExpiry <= 7) {
+          className += ' bg-orange-100 text-orange-700'
+          tooltipColor = 'orange'
+        } else if (daysUntilExpiry <= 30) {
+          className += ' bg-yellow-100 text-yellow-700'
+          tooltipColor = 'yellow'
+        } else {
+          className += ' bg-green-100 text-green-700'
+          tooltipColor = 'green'
+        }
+
+        const tooltipText =
+          daysUntilExpiry < 0
+            ? `Đã hết hạn ${Math.abs(daysUntilExpiry)} ngày trước`
+            : `Còn ${daysUntilExpiry} ngày nữa hết hạn`
+
+        return (
+          <Tooltip title={tooltipText} color={tooltipColor} placement='top'>
+            <span className={className}>
+              {stringToDate(record.expiredDate)}
+            </span>
+          </Tooltip>
+        )
       },
       sorter: (a, b) => Number(a.expiredDate) - Number(b.expiredDate),
     },
@@ -112,7 +145,7 @@ const AdminBatchProduct: React.FC = () => {
           <img
             src={record.mainImage}
             alt={record.name}
-            className='h-16 w-16 object-cover'
+            className='h-16 w-16 object-contain'
           />
         )
       },
@@ -234,6 +267,12 @@ const AdminBatchProduct: React.FC = () => {
               <div className='flex flex-row items-center justify-start gap-2'>
                 <p className='font-semibold'>Stock:</p>
                 <p className=' text-gray-500'>{batchProduct?.product.stock}</p>
+              </div>
+              <div className='flex flex-row items-center justify-start gap-2'>
+                <p className='font-semibold'>Expected Stock:</p>
+                <p className=' text-gray-500'>
+                  {batchProduct?.product.expectedStock}
+                </p>
               </div>
             </div>
           </div>

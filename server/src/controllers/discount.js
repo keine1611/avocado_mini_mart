@@ -119,7 +119,6 @@ const discountController = {
       await discount.destroy()
       res.status(200).json({ message: 'Discount deleted successfully' })
     } catch (error) {
-      console.log(error)
       res.status(500).json({ message: formatError(error.message), data: null })
     }
   },

@@ -135,6 +135,12 @@ const HeaderNavBar: React.FC = () => {
   }
 
   const handleCheckout = () => {
+    if (checkedCartItems.length === 0) {
+      showToast.warning(
+        'Your selected items are empty.Please select items to checkout.'
+      )
+      return
+    }
     setCheckedCartFromLocalStorage(checkedCartItems)
     navigate('/checkout')
   }
@@ -196,7 +202,7 @@ const HeaderNavBar: React.FC = () => {
         />
       </Link>
       <div className='flex items-center gap-4 sm:col-span-2 md:col-span-5 ml-auto'>
-        <div className='relative max-w-xs'>
+        <div className='relative max-w-xs md:block hidden'>
           <input
             type='text'
             className=' input-sm w-full p-4 border shadow rounded-full dark:text-gray-800 dark:border-gray-700 dark:bg-gray-200'

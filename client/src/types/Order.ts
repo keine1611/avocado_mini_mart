@@ -25,6 +25,8 @@ interface Order {
   orderLogs: OrderLog[]
   orderItems: OrderItem[]
   account: Account
+  totalCost: number
+  profit: number
 }
 
 export type { Order }

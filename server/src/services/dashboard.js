@@ -7,6 +7,7 @@ import {
   Account,
   OrderItemBatch,
   PriceHistory,
+  Review,
 } from '@/models'
 import { models } from '@/models'
 import { Op } from 'sequelize'
@@ -540,6 +541,15 @@ export const getProductSalesData = async ({
         `),
         'totalProfit',
       ],
+      [
+        Sequelize.literal(`
+          COALESCE(
+            AVG(reviews.rating),
+            0
+          )
+        `),
+        'averageRating',
+      ],
     ],
     include: [
       {
@@ -573,6 +583,12 @@ export const getProductSalesData = async ({
       {
         model: BatchProduct,
         as: 'batchProducts',
+        attributes: [],
+        required: false,
+      },
+      {
+        model: Review,
+        as: 'reviews',
         attributes: [],
         required: false,
       },

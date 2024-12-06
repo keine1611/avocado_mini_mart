@@ -213,6 +213,7 @@ const AdminBatch: React.FC = () => {
           showToast.error('Product not found')
           return null
         }
+
         return {
           productId: product?.id,
           initialQuantity: item.initialQuantity,
@@ -221,6 +222,19 @@ const AdminBatch: React.FC = () => {
           product: product,
         } as BatchProduct
       })
+      batchProducts
+        .filter((item) => item !== null)
+        .forEach((item) => {
+          form.setFieldValue(
+            `initialQuantity_${item.productId}`,
+            item.initialQuantity
+          )
+          form.setFieldValue(`price_${item.productId}`, item.price)
+          form.setFieldValue(
+            `expiredDate_${item.productId}`,
+            dayjs(item.expiredDate, VITE_DATE_FORMAT_API)
+          )
+        })
       setBatchProducts(batchProducts.filter((item) => item !== null))
     }
     reader.readAsArrayBuffer(file)
@@ -445,15 +459,20 @@ const AdminBatch: React.FC = () => {
         <img
           src={record.product?.mainImage}
           alt={record.product?.name}
-          className=' h-14 w-14 object-cover'
+          className=' h-16 w-16 object-contain'
         />
       ),
-      width: 50,
+      width: 100,
     },
     {
       title: 'Product',
       dataIndex: 'name',
-      render: (_, record: BatchProduct) => record.product?.name,
+      render: (_, record: BatchProduct) => (
+        <span className='text-primary text-wrap line-clamp-3 w-full'>
+          {record.product?.name}
+        </span>
+      ),
+      width: 300,
     },
     {
       title: 'Barcode',
@@ -487,7 +506,12 @@ const AdminBatch: React.FC = () => {
 
   return (
     <div className='bg-white w-full'>
-      <Button onClick={handleAddBatch}>Add Batch</Button>
+      <button
+        onClick={handleAddBatch}
+        className=' btn btn-primary  btn-sm mt-5 bg-primary text-white px-2 py-2 rounded-md ml-auto block mr-2'
+      >
+        + Add Batch
+      </button>
       <Table
         dataSource={batches?.data}
         columns={batchColumns}
@@ -500,14 +524,14 @@ const AdminBatch: React.FC = () => {
       <Modal
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        width={1200}
+        width={1400}
         footer={null}
         centered
       >
         <h1 className='text-2xl font-bold text-primary mb-7'>
           {editBatch ? 'Edit Batch' : 'Create Batch'}
         </h1>
-        <Form form={form} layout='vertical'>
+        <Form form={form} layout='vertical' className='space-y-4'>
           {!editBatch && (
             <Form.Item
               label='Code'
@@ -607,7 +631,7 @@ const AdminBatch: React.FC = () => {
       <Modal
         open={isViewBatchVisible}
         onCancel={() => setIsViewBatchVisible(false)}
-        width={1000}
+        width={1400}
         footer={null}
         centered
       >

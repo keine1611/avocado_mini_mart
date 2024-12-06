@@ -512,14 +512,29 @@ export const productController = {
         where: { productId: id },
         include: [{ model: models.Batch, as: 'batch' }],
       })
-      const productStock = batchProduct.reduce(
-        (acc, curr) => acc + curr.quantity,
-        0
-      )
+      const productStock = batchProduct.reduce((acc, curr) => {
+        if (
+          dayjs(curr.expiredDate, DATE_FORMAT).isAfter(global.dayjs()) &&
+          dayjs(curr.batch.arrivalDate, DATE_FORMAT).isBefore(global.dayjs())
+        ) {
+          return acc + curr.quantity
+        }
+        return acc
+      }, 0)
+      const expectedStock = batchProduct.reduce((acc, curr) => {
+        if (dayjs(curr.expiredDate, DATE_FORMAT).isAfter(global.dayjs())) {
+          return acc + curr.quantity
+        }
+        return acc
+      }, 0)
       res.status(200).json({
         message: 'Batch product retrieved successfully',
         data: {
-          product: { ...product.dataValues, stock: productStock },
+          product: {
+            ...product.dataValues,
+            stock: productStock,
+            expectedStock,
+          },
           batchProduct,
         },
       })
