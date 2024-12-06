@@ -138,7 +138,7 @@ export const productController = {
 
       const productsWithDetails = products.map((product) => {
         const totalQuantity = product.batchProducts.reduce((acc, batch) => {
-          if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(dayjs())) {
+          if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(global.dayjs())) {
             return acc + batch.quantity
           }
           return acc
@@ -432,7 +432,7 @@ export const productController = {
         where: { productId: product.id },
       })
       const totalQuantity = batchProducts.reduce((acc, batch) => {
-        if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(dayjs())) {
+        if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(global.dayjs())) {
           return acc + batch.quantity
         }
         return acc
@@ -632,8 +632,8 @@ export const productController = {
           batchProducts.forEach((batchProduct) => {
             const expiredDate = stringToDayjs(batchProduct.expiredDate)
             if (
-              expiredDate.isBefore(dayjs(), 'day') &&
-              expiredDate.isAfter(dayjs().subtract(days, 'day'), 'day')
+              expiredDate.isBefore(global.dayjs(), 'day') &&
+              expiredDate.isAfter(global.dayjs().subtract(days, 'day'), 'day')
             ) {
               batchProductExpiredDate.push(batchProduct)
             }

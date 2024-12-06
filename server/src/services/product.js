@@ -272,7 +272,7 @@ export const getProductById = async (productId) => {
     where: { productId: product.id },
   })
   const totalQuantity = batchProducts.reduce((acc, batch) => {
-    if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(dayjs())) {
+    if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(global.dayjs())) {
       return acc + batch.quantity
     }
     return acc
