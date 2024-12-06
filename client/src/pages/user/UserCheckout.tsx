@@ -444,6 +444,7 @@ const UserCheckout: React.FC = () => {
                   }
                 }}
               />
+
               <Button
                 className='btn btn-primary text-white'
                 onClick={handleApplyDiscount}
