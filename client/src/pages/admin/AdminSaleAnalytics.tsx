@@ -406,12 +406,66 @@ const TableProductPriceHistory = ({
     {
       title: 'Total Revenue',
       dataIndex: 'totalRevenue',
-      render: (value) => formatCurrency(value),
+      render: (value, _, index) => {
+        const prevValue =
+          index < productPriceHistory?.length - 1
+            ? productPriceHistory[index + 1].totalRevenue
+            : value
+
+        const growthPercentage = calculateGrowthPercentage(value, prevValue)
+
+        return (
+          <div className='flex items-center gap-2'>
+            <span>{formatCurrency(value)}</span>
+            {index < productPriceHistory?.length - 1 && (
+              <span
+                className={`text-xs font-medium ${
+                  growthPercentage > 0
+                    ? 'text-green-500'
+                    : growthPercentage < 0
+                    ? 'text-red-500'
+                    : 'text-gray-500'
+                }`}
+              >
+                {growthPercentage > 0 ? '↑' : growthPercentage < 0 ? '↓' : ''}
+                {Math.abs(growthPercentage).toFixed(1)}%
+              </span>
+            )}
+          </div>
+        )
+      },
     },
     {
       title: 'Total Profit',
       dataIndex: 'totalProfit',
-      render: (value) => formatCurrency(value),
+      render: (value, _, index) => {
+        const prevValue =
+          index < productPriceHistory?.length - 1
+            ? productPriceHistory[index + 1].totalProfit
+            : value
+
+        const growthPercentage = calculateGrowthPercentage(value, prevValue)
+
+        return (
+          <div className='flex items-center gap-2'>
+            <span>{formatCurrency(value)}</span>
+            {index < productPriceHistory?.length - 1 && (
+              <span
+                className={`text-xs font-medium ${
+                  growthPercentage > 0
+                    ? 'text-green-500'
+                    : growthPercentage < 0
+                    ? 'text-red-500'
+                    : 'text-gray-500'
+                }`}
+              >
+                {growthPercentage > 0 ? '↑' : growthPercentage < 0 ? '↓' : ''}
+                {Math.abs(growthPercentage).toFixed(1)}%
+              </span>
+            )}
+          </div>
+        )
+      },
     },
     {
       title: 'Changed By',
