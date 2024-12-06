@@ -365,7 +365,9 @@ export const authController = {
             include: [{ model: Product, as: 'product' }],
           },
         ],
+        order: [['createdAt', 'DESC']],
       })
+
       res.status(200).json({ message: 'success', data: orders })
     } catch (error) {
       res.status(400).json({ message: error.message, data: null })

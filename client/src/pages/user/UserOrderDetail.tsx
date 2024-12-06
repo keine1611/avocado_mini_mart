@@ -241,7 +241,9 @@ const UserOrderDetail: React.FC = () => {
               </div>
               <div className='flex justify-between gap-4'>
                 <div>Discount:</div>
-                <div>{formatCurrency(order.data.discount)}</div>
+                <div className='text-red-500'>
+                  -{formatCurrency(order.data.discount)}
+                </div>
               </div>
               <Divider />
               <div className='flex justify-between font-bold gap-4'>

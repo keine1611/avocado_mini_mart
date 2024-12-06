@@ -375,29 +375,60 @@ const UserCheckout: React.FC = () => {
             <Divider />
             <div className='mt-4'>
               <div className='flex flex-row items-center gap-2 justify-between'>
-                <span>Provisional</span>
+                <span className='font-bold text-primary'>Provisional</span>
                 <span>{formatCurrency(provisional || 0)}</span>
               </div>
               <div className='flex flex-row items-center gap-2 justify-between'>
-                <span>Shipping fee</span>
+                <span className='font-bold text-primary'>Shipping fee</span>
                 <span>
                   {shippingMethod === 'standard' ? '$5.00' : '$10.00'}
                 </span>
               </div>
               {discountInfo && (
-                <>
-                  <Divider />
-                  <div className='flex flex-row items-center gap-2 justify-between font-bold'>
-                    <span>Total</span>
+                <div className='mt-2 flex flex-row items-center justify-between gap-2'>
+                  <span className='font-bold text-primary'>Giảm giá</span>{' '}
+                  <span className='text-red-500'>
+                    -{' '}
+                    {discountInfo.discountType === DISCOUNT_TYPE.PERCENTAGE
+                      ? `${discountInfo.discountValue}%`
+                      : formatCurrency(discountInfo.discountValue)}
+                  </span>
+                </div>
+              )}
+
+              <>
+                <Divider />
+              </>
+              <div className='flex flex-row items-center gap-2 justify-between font-bold'>
+                <span className='font-bold text-primary'>Total</span>
+                {discountInfo ? (
+                  discountInfo.discountType === DISCOUNT_TYPE.PERCENTAGE ? (
+                    <span className=''>
+                      {formatCurrency(
+                        (provisional || 0) +
+                          (shippingMethod === 'standard' ? 5 : 10) -
+                          (discountInfo.discountValue / 100) *
+                            (provisional || 0)
+                      )}
+                    </span>
+                  ) : (
                     <span>
                       {formatCurrency(
                         (provisional || 0) +
-                          (shippingMethod === 'standard' ? 5 : 10)
+                          (shippingMethod === 'standard' ? 5 : 10) -
+                          discountInfo.discountValue
                       )}
                     </span>
-                  </div>
-                </>
-              )}
+                  )
+                ) : (
+                  <span>
+                    {formatCurrency(
+                      (provisional || 0) +
+                        (shippingMethod === 'standard' ? 5 : 10)
+                    )}
+                  </span>
+                )}
+              </div>
             </div>
             <div className='flex flex-row items-center gap-2'>
               <input
@@ -423,14 +454,6 @@ const UserCheckout: React.FC = () => {
               </Button>
             </div>
             {errorMessage && <div className='text-red-500'>{errorMessage}</div>}
-            {discountInfo && (
-              <div className='mt-2'>
-                <span className='font-bold text-primary'>Giảm giá:</span>{' '}
-                {discountInfo.discountType === DISCOUNT_TYPE.PERCENTAGE
-                  ? `${discountInfo.discountValue}%`
-                  : formatCurrency(discountInfo.discountValue)}
-              </div>
-            )}
           </div>
           <div className='mt-4'>
             {paymentMethod === 'paypal' && (
