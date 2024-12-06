@@ -20,8 +20,7 @@ const ModalUserReview: React.FC<{
   const [fileList, setFileList] = useState<UploadFile>([])
 
   const [isLoading, setIsLoading] = useState(false)
-  const [createReview, { isLoading: isCreatingReview }] =
-    useCreateReviewMutation()
+  const [createReview] = useCreateReviewMutation()
 
   const handleSubmit = () => {
     form.validateFields().then(async (values) => {
