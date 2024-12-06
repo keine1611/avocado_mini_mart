@@ -83,7 +83,7 @@ const orderController = {
         return {
           ...order.toJSON(),
           totalCost,
-          profit: revenue - totalCost - order.discount,
+          profit: revenue - totalCost,
         }
       })
 

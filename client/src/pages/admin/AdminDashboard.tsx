@@ -487,7 +487,13 @@ const ChartProfit: React.FC = () => {
                         {payload[0].payload.name}
                       </p>
                       <div className='space-y-2'>
-                        <p className='text-sm text-green-500'>
+                        <p
+                          className={`text-sm ${
+                            payload[0].value && payload[0].value >= 0
+                              ? 'text-green-500'
+                              : 'text-red-500'
+                          }`}
+                        >
                           {formatCurrency(payload[0].value ?? 0)}
                         </p>
                       </div>
