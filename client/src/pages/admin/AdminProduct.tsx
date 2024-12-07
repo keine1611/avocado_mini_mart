@@ -115,8 +115,8 @@ const AdminProduct: React.FC = () => {
         try {
           await deleteProduct(Number(id)).unwrap()
           message.success('Product deleted successfully')
-        } catch (err) {
-          message.error('Failed to delete product')
+        } catch (err: any) {
+          message.error(err.data?.message || 'Failed to delete product')
         }
       },
     })

@@ -369,7 +369,8 @@ export const productController = {
     } catch (error) {
       if (transaction) await transaction.rollback()
       res.status(500).json({
-        message: formatError(error.message),
+        message:
+          'Failed to delete product because of foreign key. If you want to delete this product, you must delete all related data first or change the product status to inactive.',
         data: null,
       })
     }

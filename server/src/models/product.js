@@ -121,6 +121,7 @@ export class Product extends Model {
     Product.hasMany(models.OrderItem, {
       foreignKey: 'productId',
       as: 'orderItems',
+      onDelete: 'RESTRICT',
     })
     Product.belongsTo(models.SubCategory, {
       foreignKey: 'subCategoryId',
