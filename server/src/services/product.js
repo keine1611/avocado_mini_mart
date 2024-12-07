@@ -37,15 +37,30 @@ export const createOrderItems = async (orderItems, transaction, orderId) => {
         },
         order: [['expiredDate', 'ASC']],
       })
+
       const product = await Product.findByPk(productId)
+      if (!product) {
+        throw new Error(`Product with id ${productId} not found`)
+      }
+
+      const totalAvailable = batchProducts.reduce(
+        (sum, batch) => sum + batch.quantity,
+        0
+      )
+      if (totalAvailable < quantity) {
+        throw new Error(
+          `${product.name} quantity is not enough (requested: ${quantity}, available: ${totalAvailable})`
+        )
+      }
 
       const discount = await getProductWithMaxDiscount(productId)
       const orderItem = await OrderItem.create(
         { ...item, price: product.standardPrice, discount, orderId },
         { transaction }
       )
+
       for (const batchProduct of batchProducts) {
-        if (remainingQuantity <= 0) return
+        if (remainingQuantity <= 0) break
 
         if (batchProduct.quantity >= remainingQuantity) {
           await batchProduct.update(
