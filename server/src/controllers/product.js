@@ -119,6 +119,11 @@ export const productController = {
             model: models.BatchProduct,
             as: 'batchProducts',
             attributes: ['quantity', 'expiredDate'],
+            include: {
+              model: models.Batch,
+              as: 'batch',
+              where: { arrivalDate: { [Op.lte]: getToday() } },
+            },
           },
           {
             model: models.ProductDiscount,
@@ -431,6 +436,13 @@ export const productController = {
 
       const batchProducts = await BatchProduct.findAll({
         where: { productId: product.id },
+        include: [
+          {
+            model: models.Batch,
+            as: 'batch',
+            where: { arrivalDate: { [Op.lte]: getToday() } },
+          },
+        ],
       })
       const totalQuantity = batchProducts.reduce((acc, batch) => {
         if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(global.dayjs())) {

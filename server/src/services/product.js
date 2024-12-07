@@ -6,7 +6,6 @@ import {
   ProductDiscount,
   Discount,
   OrderItemBatch,
-  Batch,
 } from '@/models'
 import { Op } from 'sequelize'
 import { getToday } from '@/utils'
@@ -158,6 +157,7 @@ export const getProductsWithDetails = async (conditions) => {
         {
           model: BatchProduct,
           as: 'batchProducts',
+
           attributes: ['quantity'],
         },
         {
@@ -286,9 +286,14 @@ export const getProductById = async (productId) => {
 
   const batchProducts = await BatchProduct.findAll({
     where: { productId: product.id },
+    include: {
+      model: models.Batch,
+      as: 'batch',
+      where: { arrivalDate: { [Op.lte]: getToday() } },
+    },
   })
   const totalQuantity = batchProducts.reduce((acc, batch) => {
-    if (dayjs(batch.expiredDate, DATE_FORMAT).isAfter(global.dayjs())) {
+    if (batch.expiredDate > getToday()) {
       return acc + batch.quantity
     }
     return acc
