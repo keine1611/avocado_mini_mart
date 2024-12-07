@@ -9,7 +9,7 @@ dotenv.config()
 const DATE_FORMAT = process.env.DATE_FORMAT
 
 export const getToday = () => {
-  return dayjs(new Date()).format(DATE_FORMAT)
+  return global.dayjs().format(DATE_FORMAT)
 }
 
 export const stringToDayjs = (stringDate) => {
