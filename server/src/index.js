@@ -39,7 +39,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 connectToDB()
-// syncDatabase()
+syncDatabase()
 
 const io = setupWebSocket(server)
 
