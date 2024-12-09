@@ -5,4 +5,5 @@ export enum ORDER_STATUS {
   CONFIRMED = 'confirmed',
   SHIPPING = 'shipping',
   DELIVERED = 'delivered',
+  RETURNED = 'returned',
 }

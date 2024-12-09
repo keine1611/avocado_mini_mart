@@ -116,6 +116,12 @@ const OrderCard: React.FC<{ order: Order }> = ({ order }) => {
                 <span className='dot text-red-500 mx-1 font-bold'>•</span>
               </span>
             )}
+            {order.orderStatus === ORDER_STATUS.RETURNED && (
+              <span className='badge badge-error'>
+                {order.orderStatus}{' '}
+                <span className='dot text-red-500 mx-1 font-bold'>•</span>
+              </span>
+            )}
             <span className='mx-2'>|</span>
             <span className='text-gray-600 text-sm'>
               {stringToDate(order.createdAt)}

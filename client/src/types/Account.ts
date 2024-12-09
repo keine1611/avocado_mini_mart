@@ -17,6 +17,8 @@ export interface Account {
   deletedBy: string
   createdAt: string
   updatedAt: string
+  status: string
+  restrictedUntil: string
   profile: Profile
   role: Role
   carts: Cart[]
@@ -30,4 +32,6 @@ export interface LoginResponse {
   avatarUrl: string
   profile: Profile
   role: Role
+  status: string
+  restrictedUntil: string
 }

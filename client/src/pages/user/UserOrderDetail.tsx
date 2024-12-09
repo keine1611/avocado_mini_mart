@@ -58,7 +58,10 @@ const UserOrderDetail: React.FC = () => {
       onOk: async () =>
         await userCancelOrder(orderCode || '')
           .unwrap()
-          .then(() => refetch())
+          .then((res) => {
+            showToast.success(res.message || 'Order cancelled')
+            refetch()
+          })
           .catch((err) => {
             showToast.error(err.data.message || 'Something went wrong')
           }),

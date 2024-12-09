@@ -27,6 +27,7 @@ import jwt from 'jsonwebtoken'
 import { FIREBASE_PATH_AVATAR } from '@/config'
 import bcrypt from 'bcrypt'
 import { cartService } from '@/services/cart'
+import { ACCOUNT_STATUS } from '@/enum'
 
 export const authController = {
   login: async (req, res, next) => {
@@ -99,7 +100,13 @@ export const authController = {
           })
           const account = await Account.findOne({
             where: { id: data.id, email: data.email },
-            attributes: ['id', 'email', 'avatarUrl'],
+            attributes: [
+              'id',
+              'email',
+              'avatarUrl',
+              'status',
+              'restrictedUntil',
+            ],
             include: [
               {
                 model: models.Role,
@@ -121,6 +128,8 @@ export const authController = {
             ],
           })
           if (!account)
+            return res.status(403).json({ message: 'Forbidden', data: {} })
+          if (account.status == ACCOUNT_STATUS.BANNED)
             return res.status(403).json({ message: 'Forbidden', data: {} })
           if (rememberMe) {
             setTokenCookie({

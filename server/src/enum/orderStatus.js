@@ -5,4 +5,5 @@ export const ORDER_STATUS = {
   DELIVERED: 'delivered',
   CANCELLED: 'cancelled',
   CONFIRMED: 'confirmed',
+  RETURNED: 'returned',
 }

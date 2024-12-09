@@ -218,6 +218,12 @@ const AdminCheckOrder: React.FC = () => {
           {status}
         </Tag>
       )
+    } else if (status === ORDER_STATUS.RETURNED) {
+      return (
+        <Tag color='purple' className='uppercase'>
+          {status}
+        </Tag>
+      )
     }
   }
 
@@ -296,6 +302,12 @@ const AdminCheckOrder: React.FC = () => {
                   {status}
                 </Tag>
               )
+            } else if (status === ORDER_STATUS.RETURNED) {
+              return (
+                <Tag color='purple' className='uppercase'>
+                  {status}
+                </Tag>
+              )
             }
           },
         }))
@@ -346,6 +358,12 @@ const AdminCheckOrder: React.FC = () => {
         } else if (record.orderStatus === ORDER_STATUS.CONFIRMED) {
           return (
             <Tag icon={<MdCheckCircle />} color='green' className='uppercase'>
+              {record.orderStatus}
+            </Tag>
+          )
+        } else if (record.orderStatus === ORDER_STATUS.RETURNED) {
+          return (
+            <Tag icon={<FaBan />} color='purple' className='uppercase'>
               {record.orderStatus}
             </Tag>
           )
@@ -540,7 +558,7 @@ const AdminCheckOrder: React.FC = () => {
       case ORDER_STATUS.CONFIRMED:
         return [ORDER_STATUS.SHIPPING]
       case ORDER_STATUS.SHIPPING:
-        return [ORDER_STATUS.DELIVERED]
+        return [ORDER_STATUS.DELIVERED, ORDER_STATUS.RETURNED]
       default:
         return []
     }
@@ -1009,6 +1027,8 @@ const OrderLogTimeline: React.FC<OrderLogTimelineProps> = ({ logs }) => {
         return <FaTimesCircle className='text-red-500' />
       case ORDER_STATUS.REJECTED:
         return <FaBan className='text-red-500' />
+      case ORDER_STATUS.RETURNED:
+        return <FaBan className='text-red-500' />
       default:
         return null
     }
@@ -1028,6 +1048,8 @@ const OrderLogTimeline: React.FC<OrderLogTimelineProps> = ({ logs }) => {
         return 'Order has been cancelled.'
       case ORDER_STATUS.REJECTED:
         return 'Order was rejected.'
+      case ORDER_STATUS.RETURNED:
+        return 'Order was returned.'
       default:
         return 'Unknown status.'
     }
@@ -1046,7 +1068,8 @@ const OrderLogTimeline: React.FC<OrderLogTimelineProps> = ({ logs }) => {
             <div
               className={`absolute w-3 h-3 rounded-full -left-1.5 border border-white ${
                 log.status === ORDER_STATUS.CANCELLED ||
-                log.status === ORDER_STATUS.REJECTED
+                log.status === ORDER_STATUS.REJECTED ||
+                log.status === ORDER_STATUS.RETURNED
                   ? 'bg-red-500'
                   : 'bg-primary'
               }`}

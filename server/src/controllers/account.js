@@ -6,7 +6,7 @@ import {
   getUniqueFilename,
   getToday,
 } from '@/utils'
-
+import { ACCOUNT_STATUS } from '@/enum'
 const { AVARTAR_DEFAULT, FIREBASE_PATH_AVATAR } = process.env
 
 export const accountController = {
@@ -94,11 +94,11 @@ export const accountController = {
   updateAccount: async (req, res) => {
     try {
       const { id } = req.params
-      const { roleId, profile, block } = req.body
+      const { roleId, profile, status } = req.body
       const { error } = accountValidate.updateAccount.validate({
         roleId,
         profile,
-        block,
+        status,
       })
       if (error) {
         return res.status(400).json({
@@ -128,7 +128,7 @@ export const accountController = {
       }
       await account.update({
         roleId,
-        ...(block && { block }),
+        ...(status && { status }),
         ...(avatarUrl && { avatarUrl }),
       })
       if (profile) {
@@ -157,7 +157,7 @@ export const accountController = {
         })
       }
       await account.update({
-        isDeleted: true,
+        status: ACCOUNT_STATUS.DELETED,
         deletedAt: getToday(),
         deletedBy: req.account.email,
       })

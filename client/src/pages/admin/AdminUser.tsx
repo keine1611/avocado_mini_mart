@@ -14,6 +14,7 @@ import {
   GetProp,
   UploadProps,
   Checkbox,
+  Tag,
 } from 'antd'
 import {
   useGetAllAccountQuery,
@@ -31,6 +32,7 @@ import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import { showToast } from '@/components'
 import { stringToDateTime } from '@/utils'
 import { Gender } from '@/enum/gender'
+import { ACCOUNT_STATUS } from '@/enum/accountStatus'
 
 const { VITE_DATE_FORMAT_API } = import.meta.env
 
@@ -43,7 +45,9 @@ const AdminUser: React.FC = () => {
     isLoading: isLoadingAccounts,
     isFetching: isFetchingAccounts,
     error,
-  } = useGetAllAccountQuery()
+  } = useGetAllAccountQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  })
   const { data: roles } = useGetAllRoleQuery()
   const [createAccount, { isLoading: isLoadingCreateAccount }] =
     useCreateAccountMutation()
@@ -73,7 +77,7 @@ const AdminUser: React.FC = () => {
           formData.append('password', values.password)
           formData.append('email', values.email)
         } else {
-          formData.append('block', values.block.toString())
+          formData.append('status', values.status)
         }
         if (isEditingProfile) {
           formData.append('profile[firstName]', values.profile.firstName ?? '')
@@ -268,32 +272,20 @@ const AdminUser: React.FC = () => {
       ...getColumnSearchProps('role', true, roles?.data || []),
     },
     {
-      title: 'Block',
-      dataIndex: 'block',
-      render: (block: boolean) => (block ? 'Blocked' : 'Unblocked'),
-      ...getColumnSearchProps('block', true, [
-        { id: true, name: 'Blocked' },
-        { id: false, name: 'Unblocked' },
-      ]),
-    },
-    {
-      title: 'Verified',
-      dataIndex: 'isVerified',
-      render: (isVerified: boolean) => (isVerified ? 'Verified' : 'Unverified'),
-    },
-    {
-      title: 'Verified At',
-      dataIndex: 'verifiedAt',
-      render: (verifiedAt: string) => stringToDateTime(verifiedAt),
-    },
-    {
-      title: 'Deleted At',
-      dataIndex: 'deletedAt',
-      render: (deletedAt: string) => stringToDateTime(deletedAt),
-    },
-    {
-      title: 'Deleted By',
-      dataIndex: 'deletedBy',
+      title: 'Status',
+      dataIndex: 'status',
+      render: (status: ACCOUNT_STATUS) => {
+        switch (status) {
+          case ACCOUNT_STATUS.ACTIVE:
+            return <Tag color='green'>Active</Tag>
+          case ACCOUNT_STATUS.RESTRICTED:
+            return <Tag color='orange'>Restricted</Tag>
+          case ACCOUNT_STATUS.BANNED:
+            return <Tag color='red'>Banned</Tag>
+          case ACCOUNT_STATUS.DELETED:
+            return <Tag color='red'>Deleted</Tag>
+        }
+      },
     },
     {
       title: 'Created At',
@@ -422,10 +414,20 @@ const AdminUser: React.FC = () => {
               />
             </Form.Item>
             {editingAccount && (
-              <Form.Item name='block' label='Block'>
+              <Form.Item name='status' label='Status'>
                 <Select>
-                  <Select.Option value={true}>Blocked</Select.Option>
-                  <Select.Option value={false}>Unblocked</Select.Option>
+                  <Select.Option value={ACCOUNT_STATUS.ACTIVE}>
+                    Active
+                  </Select.Option>
+                  <Select.Option value={ACCOUNT_STATUS.RESTRICTED}>
+                    Restricted
+                  </Select.Option>
+                  <Select.Option value={ACCOUNT_STATUS.BANNED}>
+                    Banned
+                  </Select.Option>
+                  <Select.Option value={ACCOUNT_STATUS.DELETED}>
+                    Deleted
+                  </Select.Option>
                 </Select>
               </Form.Item>
             )}

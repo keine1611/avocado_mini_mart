@@ -11,7 +11,11 @@ import { Loading, PayPalButton, showToast } from '@/components'
 import { DISCOUNT_TYPE } from '@/enum'
 import { ModalAddAddress } from './UserProfile'
 import { Cart, OrderInfo } from '@/types'
-import { getCheckedCartFromLocalStorage, formatCurrency } from '@/utils'
+import {
+  getCheckedCartFromLocalStorage,
+  formatCurrency,
+  getLocation,
+} from '@/utils'
 import { FaRegTrashAlt } from 'react-icons/fa'
 const { Option } = Select
 
@@ -209,16 +213,31 @@ const UserCheckout: React.FC = () => {
                     className='w-full max-h-[200px] overflow-auto'
                   >
                     <Space direction='vertical' className='w-full'>
-                      {user?.orderInfos?.map((orderInfo) => (
-                        <Radio key={orderInfo.id} value={orderInfo.id}>
-                          <div className=' flex flex-col text-sm font-medium gap-2 border-b border-gray-200 pb-2'>
-                            <div>Name: {orderInfo.fullName}</div>
-                            <div>Address: {orderInfo.address}</div>
-                            <div>Phone: {orderInfo.phone}</div>
-                            <div>Email: {orderInfo.email}</div>
-                          </div>
-                        </Radio>
-                      ))}
+                      {[...(user?.orderInfos || [])]
+                        ?.sort((a, b) => b.id - a.id)
+                        .map((orderInfo) => (
+                          <Radio key={orderInfo.id} value={orderInfo.id}>
+                            <div className=' flex flex-col text-sm font-medium gap-2 border-b border-gray-200 pb-2'>
+                              <p className='text-sm'>
+                                Name: {orderInfo.fullName}
+                              </p>
+                              <p className='text-sm'>
+                                Address: {orderInfo.address},{' '}
+                                {getLocation(
+                                  orderInfo.provinceCode,
+                                  orderInfo.districtCode,
+                                  orderInfo.wardCode
+                                )}
+                              </p>
+                              <p className='text-sm'>
+                                Phone: {orderInfo.phone}
+                              </p>
+                              <p className='text-sm'>
+                                Email: {orderInfo.email}
+                              </p>
+                            </div>
+                          </Radio>
+                        ))}
                     </Space>
                   </Radio.Group>
                 </Form.Item>

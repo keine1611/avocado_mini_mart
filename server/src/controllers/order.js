@@ -7,6 +7,7 @@ import {
   DiscountCode,
   OrderItemBatch,
   BatchProduct,
+  Account,
 } from '@/models'
 import { formatError } from '@/utils'
 import { sequelize } from '@/config'
@@ -16,6 +17,7 @@ import {
   PAYMENT_STATUS,
   SHIPPING_METHOD,
   DISCOUNT_TYPE,
+  ACCOUNT_STATUS,
 } from '@/enum'
 import { orderValidation } from '@/validation'
 import { generateOrderCode, sendOrderConfirmationEmail } from '@/utils'
@@ -27,7 +29,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 dayjs.extend(customParseFormat)
 
 import { refundOrder } from '@/controllers/payment'
-
+import { orderService } from '@/services'
 const DATE_FORMAT = process.env.DATE_FORMAT
 
 const orderController = {
@@ -184,7 +186,8 @@ const orderController = {
       }
       if (
         orderStatus === ORDER_STATUS.CANCELLED ||
-        orderStatus === ORDER_STATUS.REJECTED
+        orderStatus === ORDER_STATUS.REJECTED ||
+        orderStatus === ORDER_STATUS.RETURNED
       ) {
         for (const orderItem of order.orderItems) {
           for (const orderItemBatch of orderItem.orderItemBatches) {
@@ -201,6 +204,20 @@ const orderController = {
               )
             }
           }
+        }
+      }
+      if (orderStatus === ORDER_STATUS.RETURNED) {
+        const numberOfReturnedOrders =
+          await orderService.getNumberOfReturnedOrdersOfAccountIn7Days(
+            order.accountId
+          )
+        if (numberOfReturnedOrders >= 3) {
+          await Account.update(
+            {
+              status: ACCOUNT_STATUS.BANNED,
+            },
+            { where: { id: order.accountId }, transaction }
+          )
         }
       }
       order.orderStatus = orderStatus
@@ -244,6 +261,12 @@ const orderController = {
     try {
       const { items, discountCode, ...data } = req.body
       const account = req.account
+      if (account.status === ACCOUNT_STATUS.RESTRICTED) {
+        return res.status(400).json({
+          message: 'Account is restricted',
+          data: null,
+        })
+      }
       let transaction
       const itemsData = JSON.parse(items)
       if (!itemsData || !Array.isArray(itemsData)) {

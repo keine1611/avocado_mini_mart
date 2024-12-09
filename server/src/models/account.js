@@ -3,7 +3,7 @@ import { DataTypes, Model } from 'sequelize'
 import { Profile } from './profile'
 import { getToday } from '@/utils'
 import bcrypt from 'bcrypt'
-
+import { ACCOUNT_STATUS } from '@/enum'
 export class Account extends Model {
   static init(sequelize) {
     super.init(
@@ -45,10 +45,6 @@ export class Account extends Model {
           type: DataTypes.STRING(500),
           allowNull: true,
         },
-        block: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false,
-        },
         isVerified: {
           type: DataTypes.BOOLEAN,
           defaultValue: false,
@@ -58,9 +54,14 @@ export class Account extends Model {
           defaultValue: null,
           allowNull: true,
         },
-        isDeleted: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false,
+        status: {
+          type: DataTypes.ENUM(...Object.values(ACCOUNT_STATUS)),
+          defaultValue: ACCOUNT_STATUS.ACTIVE,
+        },
+        restrictedUntil: {
+          type: DataTypes.STRING(14),
+          allowNull: true,
+          defaultValue: null,
         },
         deletedAt: {
           type: DataTypes.STRING(14),

@@ -16,13 +16,19 @@ import {
   PAYMENT_STATUS,
   ORDER_STATUS,
   DISCOUNT_TYPE,
+  ACCOUNT_STATUS,
 } from '@/enum'
 import { sequelize } from '@/config'
 import { generateOrderCode } from '@/utils'
-import { createOrderItems, getProductWithMaxDiscount } from '@/services'
+import {
+  createOrderItems,
+  getProductWithMaxDiscount,
+  orderService,
+} from '@/services'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 dayjs.extend(customParseFormat)
+
 const DATE_FORMAT = process.env.DATE_FORMAT
 
 const paymentController = {
@@ -30,6 +36,12 @@ const paymentController = {
     try {
       const { items, discountCode, ...data } = req.body
       const account = req.account
+      if (account.status === ACCOUNT_STATUS.RESTRICTED) {
+        return res.status(400).json({
+          message: 'Account is restricted',
+          data: null,
+        })
+      }
       let transaction
       const itemsData = JSON.parse(items)
       if (!itemsData || !Array.isArray(itemsData)) {
@@ -266,6 +278,23 @@ const paymentController = {
         { transaction }
       )
       await order.save({ transaction })
+      const numberOfCancelledOrders =
+        await orderService.getNumberOfCancelledOrdersOfAccountIn24Hours(
+          account.id
+        )
+      if (numberOfCancelledOrders >= 5) {
+        await account.update(
+          {
+            status: ACCOUNT_STATUS.RESTRICTED,
+            restrictedUntil: global.dayjs().add(1, 'day').format(DATE_FORMAT),
+          },
+          { transaction }
+        )
+        await transaction.commit()
+        return res
+          .status(200)
+          .json({ message: 'Order cancelled. Account is restricted' })
+      }
       await transaction.commit()
       res.status(200).json({ message: 'Order cancelled' })
     } catch (error) {

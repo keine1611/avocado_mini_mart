@@ -13,7 +13,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-
+import { initCronJobs } from './cron'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
@@ -39,7 +39,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 connectToDB()
-syncDatabase()
+// syncDatabase()
 
 const io = setupWebSocket(server)
 
@@ -49,4 +49,7 @@ app.use(authenticateToken())
 
 route(app)
 
-server.listen(port, () => console.log('BE start successful'))
+server.listen(port, () => {
+  console.log('BE start successful')
+  initCronJobs()
+})

@@ -15,31 +15,54 @@ const { Step } = Steps
 const { VITE_COLOR_PRIMARY } = import.meta.env
 
 export const OrderStep: React.FC<{ status: ORDER_STATUS }> = ({ status }) => {
-  const steps = [
-    {
-      label: 'Pending',
-      status: ORDER_STATUS.PENDING,
-      icon: <FaHourglassStart />,
-    },
-    {
-      label: 'Confirmed',
-      status: ORDER_STATUS.CONFIRMED,
-      icon: <FaCheckCircle />,
-    },
-    {
-      label: 'Shipping',
-      status: ORDER_STATUS.SHIPPING,
-      icon: <FaShippingFast />,
-    },
-    { label: 'Delivered', status: ORDER_STATUS.DELIVERED, icon: <FaBoxOpen /> },
-    {
-      label: 'Cancelled',
-      status: ORDER_STATUS.CANCELLED,
-      icon: <FaTimesCircle />,
-    },
-    { label: 'Rejected', status: ORDER_STATUS.REJECTED, icon: <FaBan /> },
-  ]
+  const getSteps = () => {
+    const steps = [
+      {
+        label: 'Pending',
+        status: ORDER_STATUS.PENDING,
+        icon: <FaHourglassStart />,
+      },
+      {
+        label: 'Confirmed',
+        status: ORDER_STATUS.CONFIRMED,
+        icon: <FaCheckCircle />,
+      },
+      {
+        label: 'Shipping',
+        status: ORDER_STATUS.SHIPPING,
+        icon: <FaShippingFast />,
+      },
+      {
+        label: 'Delivered',
+        status: ORDER_STATUS.DELIVERED,
+        icon: <FaBoxOpen />,
+      },
+    ]
 
+    if (status === ORDER_STATUS.CANCELLED) {
+      steps.push({
+        label: 'Cancelled',
+        status: ORDER_STATUS.CANCELLED,
+        icon: <FaTimesCircle />,
+      })
+    } else if (status === ORDER_STATUS.REJECTED) {
+      steps.push({
+        label: 'Rejected',
+        status: ORDER_STATUS.REJECTED,
+        icon: <FaBan />,
+      })
+    } else if (status === ORDER_STATUS.RETURNED) {
+      steps.push({
+        label: 'Returned',
+        status: ORDER_STATUS.RETURNED,
+        icon: <FaBan />,
+      })
+    }
+
+    return steps
+  }
+
+  const steps = getSteps()
   const currentStepIndex = steps.findIndex((step) => step.status === status)
 
   return (
@@ -57,7 +80,8 @@ export const OrderStep: React.FC<{ status: ORDER_STATUS }> = ({ status }) => {
             status={
               index <= currentStepIndex
                 ? step.status === ORDER_STATUS.CANCELLED ||
-                  step.status === ORDER_STATUS.REJECTED
+                  step.status === ORDER_STATUS.REJECTED ||
+                  step.status === ORDER_STATUS.RETURNED
                   ? 'error'
                   : 'finish'
                 : 'wait'

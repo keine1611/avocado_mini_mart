@@ -103,13 +103,35 @@ const UserProfile: React.FC = () => {
             src={user?.avatarUrl}
             className='border-2 border-primary'
           />
-          <div className='ml-4'>
-            <Title level={3} className='mb-0 text-2xl'>
-              {`${user?.profile.firstName} ${user?.profile.lastName}`}
-            </Title>
-            <Text type='secondary' className='text-lg'>
-              {user?.email}
-            </Text>
+          <div className='ml-4 flex flex-row items-center justify-between w-full gap-2'>
+            <div className='flex flex-col gap-2'>
+              <Title level={3} className='mb-0 text-2xl'>
+                {`${user?.profile.firstName} ${user?.profile.lastName}`}
+              </Title>
+              <Text type='secondary' className='text-lg'>
+                {user?.email}
+              </Text>
+            </div>
+            {user?.status === 'restricted' && user?.restrictedUntil && (
+              <div className='mt-2 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md'>
+                <div className='flex items-center gap-2'>
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='h-5 w-5'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                  >
+                    <path
+                      fillRule='evenodd'
+                      d='M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z'
+                      clipRule='evenodd'
+                    />
+                  </svg>
+                  <span className='font-medium'>Account Restricted</span>
+                </div>
+                <RestrictedCountdown restrictedUntil={user.restrictedUntil} />
+              </div>
+            )}
           </div>
         </div>
         <Divider className='my-4' />
@@ -259,6 +281,8 @@ export const ModalAddAddress: React.FC<{
 
   const [activeTab, setActiveTab] = useState('province')
 
+  const [isSelectOpen, setIsSelectOpen] = useState(false)
+
   const handleProvinceChange = (code: string) => {
     const province = provinces.find((p) => p.code === code)
     setSelectedProvince(code)
@@ -269,6 +293,10 @@ export const ModalAddAddress: React.FC<{
     setActiveTab('district')
     form.setFieldsValue({ location: province?.name })
   }
+
+  useEffect(() => {
+    handleProvinceChange('92')
+  }, [])
 
   const handleDistrictChange = (code: string) => {
     const district = districts.find((d) => d.code === code)
@@ -299,6 +327,7 @@ export const ModalAddAddress: React.FC<{
           : ''
       }`,
     })
+    setIsSelectOpen(false)
   }
 
   const handleTabChange = (key: string) => {
@@ -444,6 +473,8 @@ export const ModalAddAddress: React.FC<{
           >
             <Select
               placeholder='Select location'
+              open={isSelectOpen}
+              onDropdownVisibleChange={(visible) => setIsSelectOpen(visible)}
               onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
               onMouseEnter={(e) => e.stopPropagation()}
@@ -454,7 +485,7 @@ export const ModalAddAddress: React.FC<{
                     onChange={handleTabChange}
                     className='w-full'
                   >
-                    <Tabs.TabPane tab='Province' key='province'>
+                    <Tabs.TabPane tab='Province' key='province' disabled={true}>
                       <List
                         className='w-full max-h-[200px] overflow-auto px-2'
                         dataSource={provinces}
@@ -1008,6 +1039,43 @@ const ModalChangePassword: React.FC<{
       </div>
     </Modal>
   )
+}
+
+const RestrictedCountdown: React.FC<{ restrictedUntil: string }> = ({
+  restrictedUntil,
+}) => {
+  const [timeLeft, setTimeLeft] = useState('')
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = dayjs()
+      const end = dayjs(restrictedUntil)
+      const diff = end.diff(now)
+
+      if (diff <= 0) {
+        return 'Restriction period ended'
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+      const hours = Math.floor(
+        (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      )
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+      return `${days}d ${hours}h ${minutes}m ${seconds}s remaining`
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft())
+    }, 1000)
+
+    setTimeLeft(calculateTimeLeft())
+
+    return () => clearInterval(timer)
+  }, [restrictedUntil])
+
+  return <div className='mt-1 text-sm'>{timeLeft}</div>
 }
 
 export { UserProfile }

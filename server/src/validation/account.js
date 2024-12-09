@@ -1,6 +1,6 @@
 import { Role, Gender } from '@/enum'
-import { StatusAccount } from '@/enum'
-import Joi, { valid } from 'joi'
+import { ACCOUNT_STATUS } from '@/enum'
+import Joi from 'joi'
 
 const accountValidate = {
   createAccount: Joi.object({
@@ -200,7 +200,21 @@ const accountValidate = {
   }),
   updateAccount: Joi.object({
     avatarUrl: Joi.string().optional(),
-    block: Joi.boolean().optional(),
+    status: Joi.string()
+      .valid(...Object.values(ACCOUNT_STATUS))
+      .required()
+      .error((errors) => {
+        errors.forEach((error) => {
+          switch (error.code) {
+            case 'any.required':
+              error.message = 'Status is required'
+              break
+            default:
+              break
+          }
+        })
+        return errors
+      }),
     roleId: Joi.number()
       .required()
       .error((errors) => {

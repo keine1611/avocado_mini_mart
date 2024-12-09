@@ -35,6 +35,8 @@ const OrderLogTimeline: React.FC<OrderLogTimelineProps> = ({ logs }) => {
         return <FaTimesCircle className='text-red-500' />
       case ORDER_STATUS.REJECTED:
         return <FaBan className='text-red-500' />
+      case ORDER_STATUS.RETURNED:
+        return <FaBoxOpen className='text-red-500' />
       default:
         return null
     }
@@ -54,6 +56,8 @@ const OrderLogTimeline: React.FC<OrderLogTimelineProps> = ({ logs }) => {
         return 'Your order has been cancelled.'
       case ORDER_STATUS.REJECTED:
         return 'Your order was rejected.'
+      case ORDER_STATUS.RETURNED:
+        return 'Your order was returned.'
       default:
         return 'Unknown status.'
     }
@@ -72,7 +76,8 @@ const OrderLogTimeline: React.FC<OrderLogTimelineProps> = ({ logs }) => {
             <div
               className={`absolute w-3 h-3 rounded-full -left-1.5 border border-white ${
                 log.status === ORDER_STATUS.CANCELLED ||
-                log.status === ORDER_STATUS.REJECTED
+                log.status === ORDER_STATUS.REJECTED ||
+                log.status === ORDER_STATUS.RETURNED
                   ? 'bg-red-500'
                   : 'bg-primary'
               }`}
