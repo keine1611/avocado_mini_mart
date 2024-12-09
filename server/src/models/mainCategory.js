@@ -70,6 +70,7 @@ export class MainCategory extends Model {
     MainCategory.hasMany(models.SubCategory, {
       foreignKey: 'mainCategoryId',
       as: 'subCategories',
+      onDelete: 'CASCADE',
     })
   }
 }

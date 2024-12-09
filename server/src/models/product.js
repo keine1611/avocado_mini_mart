@@ -113,6 +113,7 @@ export class Product extends Model {
     Product.hasMany(models.ProductImage, {
       foreignKey: 'productId',
       as: 'productImages',
+      onDelete: 'CASCADE',
     })
     Product.hasMany(models.PriceHistory, {
       foreignKey: 'productId',
@@ -130,22 +131,27 @@ export class Product extends Model {
     Product.hasMany(models.Cart, {
       foreignKey: 'productId',
       as: 'carts',
+      onDelete: 'CASCADE',
     })
     Product.hasMany(models.ProductDiscount, {
       foreignKey: 'productId',
       as: 'productDiscounts',
+      onDelete: 'RESTRICT',
     })
     Product.hasMany(models.Favorite, {
       foreignKey: 'productId',
       as: 'favorites',
+      onDelete: 'CASCADE',
     })
     Product.hasMany(models.BatchProduct, {
       foreignKey: 'productId',
       as: 'batchProducts',
+      onDelete: 'RESTRICT',
     })
     Product.hasMany(models.Review, {
       foreignKey: 'productId',
       as: 'reviews',
+      onDelete: 'CASCADE',
     })
   }
 }

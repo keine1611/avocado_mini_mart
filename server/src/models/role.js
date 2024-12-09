@@ -31,9 +31,10 @@ export class Role extends Model {
       foreignKey: 'roleId',
       as: 'rolePermissions',
     })
-    this.hasOne(models.Account, {
+    this.hasMany(models.Account, {
       foreignKey: 'roleId',
-      as: 'account',
+      as: 'accounts',
+      onDelete: 'RESTRICT',
     })
   }
 }

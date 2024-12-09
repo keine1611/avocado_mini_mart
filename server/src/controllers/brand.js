@@ -176,10 +176,20 @@ export const brandController = {
         data: null,
       })
     } catch (error) {
-      res.status(500).json({
-        message: formatError(error.message),
-        data: null,
-      })
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        const table = error.table
+        const violatedIndex = error.index
+        const referencedTable = violatedIndex.split('_')[0]
+        return res.status(400).json({
+          message: `Record in table ${table} is referenced by table ${referencedTable}.`,
+          data: null,
+        })
+      } else {
+        res.status(500).json({
+          message: formatError(error.message || 'Cannot delete record'),
+          data: null,
+        })
+      }
     }
   },
 }

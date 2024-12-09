@@ -83,6 +83,7 @@ class Brand extends Model {
     Brand.hasMany(models.Product, {
       foreignKey: 'brandId',
       as: 'products',
+      onDelete: 'RESTRICT',
     })
   }
 }

@@ -3,6 +3,9 @@ import { sequelize } from '@/config'
 import { statusProduct } from '@/enum'
 import fs from 'fs/promises'
 import path from 'path'
+import dayjs from 'dayjs'
+
+const { DATE_FORMAT } = process.env
 
 export const connectToDB = async () => {
   try {
@@ -50,6 +53,8 @@ export const syncDatabase = async () => {
         email: 'admin@gmail.com',
         password: '123456',
         roleId: 1,
+        verifiedAt: global.dayjs().format(DATE_FORMAT),
+        isVerified: true,
         profile: {
           firstName: 'Admin',
           lastName: 'Admin',
@@ -67,6 +72,8 @@ export const syncDatabase = async () => {
       email: 'staff@gmail.com',
       password: '123456',
       roleId: 3,
+      verifiedAt: global.dayjs().format(DATE_FORMAT),
+      isVerified: true,
     })
 
     const adminRolePermission = await models.RolePermission.bulkCreate(

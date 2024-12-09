@@ -65,8 +65,8 @@ const AdminMainCategory: React.FC = () => {
         try {
           await deleteMainCategory(id).unwrap()
           message.success('Main Category deleted successfully')
-        } catch (err) {
-          message.error('Failed to delete Main Category')
+        } catch (err: any) {
+          message.error(err.data?.message || 'Failed to delete Main Category')
         }
       },
     })

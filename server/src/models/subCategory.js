@@ -64,6 +64,7 @@ export class SubCategory extends Model {
     SubCategory.hasMany(models.Product, {
       foreignKey: 'subCategoryId',
       as: 'products',
+      onDelete: 'RESTRICT',
     })
   }
 }

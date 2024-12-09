@@ -34,6 +34,11 @@ export class Batch extends Model {
           type: DataTypes.STRING(14),
           allowNull: true,
         },
+        isActive: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
         createdAt: {
           type: DataTypes.STRING(14),
           allowNull: false,
@@ -60,10 +65,12 @@ export class Batch extends Model {
     Batch.hasMany(models.BatchProduct, {
       foreignKey: 'batchId',
       as: 'batchProducts',
+      onDelete: 'CASCADE',
     })
     Batch.hasMany(models.OrderItemBatch, {
       foreignKey: 'batchId',
       as: 'orderItemBatches',
+      onDelete: 'RESTRICT',
     })
   }
 }

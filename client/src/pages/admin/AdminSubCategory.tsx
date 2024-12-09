@@ -69,8 +69,8 @@ const AdminSubCategory: React.FC = () => {
         try {
           await deleteSubCategory(id).unwrap()
           message.success('Sub-category deleted successfully')
-        } catch (error) {
-          message.error('Failed to delete sub-category')
+        } catch (error: any) {
+          message.error(error.data?.message || 'Failed to delete sub-category')
         }
       },
     })
@@ -92,7 +92,7 @@ const AdminSubCategory: React.FC = () => {
         setIsModalVisible(false)
         form.resetFields()
       } catch (error: any) {
-        message.error(error.data.message || 'Failed to save sub-category')
+        message.error(error.data?.message || 'Failed to save sub-category')
       }
     })
   }

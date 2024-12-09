@@ -373,11 +373,20 @@ export const productController = {
       })
     } catch (error) {
       if (transaction) await transaction.rollback()
-      res.status(500).json({
-        message:
-          'Failed to delete product because of foreign key. If you want to delete this product, you must delete all related data first or change the product status to inactive.',
-        data: null,
-      })
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        const table = error.table
+        const violatedIndex = error.index
+        const referencedTable = violatedIndex.split('_')[0]
+        return res.status(400).json({
+          message: `Record in table ${table} is referenced by table ${referencedTable}.`,
+          data: null,
+        })
+      } else {
+        res.status(500).json({
+          message: formatError(error.message || 'Cannot delete record'),
+          data: null,
+        })
+      }
     }
   },
   getDetail: async (req, res) => {
