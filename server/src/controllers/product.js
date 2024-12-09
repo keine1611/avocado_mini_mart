@@ -449,7 +449,10 @@ export const productController = {
           {
             model: models.Batch,
             as: 'batch',
-            where: { arrivalDate: { [Op.lte]: getToday() } },
+            where: {
+              arrivalDate: { [Op.lte]: getToday() },
+              isActive: true,
+            },
           },
         ],
       })
@@ -537,7 +540,8 @@ export const productController = {
       const productStock = batchProduct.reduce((acc, curr) => {
         if (
           dayjs(curr.expiredDate, DATE_FORMAT).isAfter(global.dayjs()) &&
-          dayjs(curr.batch.arrivalDate, DATE_FORMAT).isBefore(global.dayjs())
+          dayjs(curr.batch.arrivalDate, DATE_FORMAT).isBefore(global.dayjs()) &&
+          curr.batch.isActive
         ) {
           return acc + curr.quantity
         }

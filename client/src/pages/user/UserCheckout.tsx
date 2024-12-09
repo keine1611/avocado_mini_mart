@@ -263,7 +263,7 @@ const UserCheckout: React.FC = () => {
             </div>
           </Form>
         </div>
-        <div className='lg:col-span-2 md:px-12 px-0'>
+        <div className='lg:col-span-2 lg:px-12 px-0'>
           <h2 className='text-2xl font-bold mb-4 text-primary'>
             Your Products
           </h2>
@@ -280,11 +280,11 @@ const UserCheckout: React.FC = () => {
                     </span>
                   )}
                   <div className='flex items-center'>
-                    <div className='relative'>
+                    <div className='relative flex-shrink-0'>
                       <img
                         src={item.product?.mainImage}
                         alt={item.product?.name}
-                        className='w-20 h-20 object-contain rounded-md mr-4'
+                        className='md:w-20 md:h-20 w-10 h-10 object-contain rounded-md mr-4'
                       />
                       {item.product?.maxDiscount != undefined &&
                         item.product?.maxDiscount > 0 && (
@@ -296,7 +296,9 @@ const UserCheckout: React.FC = () => {
                         )}
                     </div>
                     <div className='flex flex-col gap-2'>
-                      <span className='font-medium'>{item.product?.name}</span>
+                      <span className='font-medium line-clamp-2'>
+                        {item.product?.name}
+                      </span>
                       <span className='text-gray-500'>
                         {item.product?.maxDiscount &&
                         item.product?.maxDiscount > 0 ? (

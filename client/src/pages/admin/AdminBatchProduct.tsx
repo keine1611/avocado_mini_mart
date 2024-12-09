@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BatchProduct, Product } from '@/types'
-import { Select, Table, Tabs, Tooltip } from 'antd'
+import { Select, Table, Tabs, Tag, Tooltip } from 'antd'
 import {
   useGetAllProductWithoutPaginationQuery,
   useLazyGetBatchProductQuery,
@@ -82,6 +82,18 @@ const AdminBatchProduct: React.FC = () => {
       },
       sorter: (a, b) =>
         Number(a.batch?.arrivalDate) - Number(b.batch?.arrivalDate),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'batch.isActive',
+      key: 'batch.isActive',
+      render: (_, record) => {
+        return (
+          <Tag color={record.batch?.isActive ? 'green' : 'red'}>
+            {record.batch?.isActive ? 'Active' : 'Inactive'}
+          </Tag>
+        )
+      },
     },
     {
       title: 'Expired Date',

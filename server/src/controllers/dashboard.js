@@ -15,7 +15,7 @@ import {
 } from '@/services'
 import { Product, BatchProduct, models } from '@/models'
 import { Op } from 'sequelize'
-import { formatError } from '@/utils'
+import { formatError, getToday } from '@/utils'
 import sequelize from '@/config/database'
 const { DATE_FORMAT } = process.env
 
@@ -230,6 +230,14 @@ const dashboardController = {
 
       const batchProducts = await BatchProduct.findAll({
         where: { productId: product.id, quantity: { [Op.gt]: 0 } },
+        include: {
+          model: models.Batch,
+          as: 'batch',
+          where: {
+            isActive: true,
+            arrivalDate: { [Op.lt]: getToday() },
+          },
+        },
       })
 
       let totalQuantity = 0

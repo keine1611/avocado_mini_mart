@@ -328,12 +328,12 @@ const HeaderNavBar: React.FC = () => {
         width={1000}
         footer={null}
       >
-        <div className='cart-list p-4 bg-white rounded-lg overflow-y-auto'>
+        <div className='cart-list md:p-4 bg-white rounded-lg overflow-y-auto'>
           {cart.length === 0 ? (
             <p className='text-center text-gray-500'>Your cart is empty.</p>
           ) : (
             <div className='grid sm:grid-cols-1 md:grid-cols-3 gap-4'>
-              <div className='md:col-span-2 max-h-[400px] overflow-y-auto pr-4'>
+              <div className='md:col-span-2 max-h-[400px] overflow-y-auto md:pr-4 pr-1'>
                 <div className='space-y-4'>
                   {cart.map((item: Cart) => (
                     <div
@@ -353,11 +353,11 @@ const HeaderNavBar: React.FC = () => {
                             handleCheckboxChange(item, e.target.checked)
                           }
                         />
-                        <div className='relative'>
+                        <div className='relative flex-shrink-0'>
                           <img
                             src={item.product?.mainImage}
                             alt={item.product?.name}
-                            className='w-20 h-20 object-contain rounded-md mr-4'
+                            className='md:w-20 md:h-20 w-10 h-10 object-contain rounded-md mr-4'
                           />
                           {item.product?.maxDiscount != undefined &&
                             item.product?.maxDiscount > 0 && (
@@ -369,7 +369,7 @@ const HeaderNavBar: React.FC = () => {
                             )}
                         </div>
                         <div className='flex flex-col gap-2'>
-                          <span className='font-medium'>
+                          <span className='font-medium line-clamp-2 md:line-clamp-3'>
                             {item.product?.name}
                           </span>
                           <span className='text-gray-500'>
@@ -477,7 +477,7 @@ const HeaderNavBar: React.FC = () => {
                 </p>
                 <button
                   onClick={handleCheckout}
-                  className='btn btn-primary mt-4 btn-block mx-auto'
+                  className='btn btn-primary mt-4 btn-block mx-auto text-white'
                 >
                   Checkout
                 </button>

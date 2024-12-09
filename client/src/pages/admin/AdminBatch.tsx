@@ -9,6 +9,8 @@ import {
   Table,
   message,
   Upload,
+  Tag,
+  Switch,
 } from 'antd'
 import {
   EyeOutlined,
@@ -53,6 +55,8 @@ const AdminBatch: React.FC = () => {
     useGetAllProductWithoutPaginationQuery()
   const [createBatch, { isLoading: isCreating }] = useCreateBatchMutation()
 
+  const [isFormReady, setIsFormReady] = useState(false)
+
   const handleAddBatch = () => {
     setBatchProducts([])
     setEditBatch(null)
@@ -69,6 +73,7 @@ const AdminBatch: React.FC = () => {
     const newBatch: Batch = {
       code: values.code,
       arrivalDate: dayjs(values.arrivalDate).format(VITE_DATE_FORMAT_API),
+      isActive: values.isActive,
       batchProducts: batchProducts.map((item) => {
         if (editBatch) {
           return {
@@ -94,6 +99,7 @@ const AdminBatch: React.FC = () => {
           arrivalDate: newBatch.arrivalDate,
           id: editBatch.id,
           batchProducts: newBatch.batchProducts,
+          isActive: newBatch.isActive,
         }
         await updateBatch(updatedBatch).unwrap()
         message.success('Batch updated successfully')
@@ -111,25 +117,33 @@ const AdminBatch: React.FC = () => {
   }
 
   const handleEditBatch = (batch: Batch) => {
-    form.setFieldsValue({
-      code: batch.code,
-      arrivalDate: dayjs(batch.arrivalDate, VITE_DATE_FORMAT_API),
-    })
-    batch.batchProducts.forEach((item) => {
-      form.setFieldValue(
-        `initialQuantity_${item.productId}`,
-        item.initialQuantity
-      )
-      form.setFieldValue(`quantity_${item.productId}`, item.quantity)
-      form.setFieldValue(`price_${item.productId}`, item.price)
-      form.setFieldValue(
-        `expiredDate_${item.productId}`,
-        dayjs(item.expiredDate, VITE_DATE_FORMAT_API)
-      )
-    })
-    setEditBatch(batch)
-    setBatchProducts(batch.batchProducts)
+    setIsFormReady(false)
     setIsModalVisible(true)
+    requestAnimationFrame(() => {
+      setEditBatch(batch)
+      setBatchProducts(batch.batchProducts)
+      requestAnimationFrame(() => {
+        const batchProductFields = {
+          code: batch.code,
+          arrivalDate: dayjs(batch.arrivalDate, VITE_DATE_FORMAT_API),
+          isActive: batch.isActive,
+        }
+        batch.batchProducts.forEach((item) => {
+          ;(batchProductFields as any)[`initialQuantity_${item.productId}`] =
+            item.initialQuantity as number
+          ;(batchProductFields as any)[`quantity_${item.productId}`] =
+            item.quantity as number
+          ;(batchProductFields as any)[`price_${item.productId}`] =
+            item.price as number
+          ;(batchProductFields as any)[`expiredDate_${item.productId}`] = dayjs(
+            item.expiredDate as string,
+            VITE_DATE_FORMAT_API
+          )
+        })
+        form.setFieldsValue(batchProductFields)
+        setIsFormReady(true)
+      })
+    })
   }
 
   const handleDeleteBatch = (id: number) => {
@@ -155,6 +169,7 @@ const AdminBatch: React.FC = () => {
     formViewBatch.setFieldsValue({
       code: batch.code,
       arrivalDate: dayjs(batch.arrivalDate, VITE_DATE_FORMAT_API),
+      isActive: batch.isActive,
     })
     setIsViewBatchVisible(true)
   }
@@ -249,6 +264,15 @@ const AdminBatch: React.FC = () => {
       title: 'Arrival Date',
       dataIndex: 'arrivalDate',
       render: (text: string) => stringToDate(text),
+      sorter: (a: Batch, b: Batch) =>
+        Number(b.arrivalDate) - Number(a.arrivalDate),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'isActive',
+      render: (text: boolean) => (
+        <Tag color={text ? 'green' : 'red'}>{text ? 'Active' : 'Inactive'}</Tag>
+      ),
     },
     {
       title: 'Created By',
@@ -523,110 +547,130 @@ const AdminBatch: React.FC = () => {
       />
       <Modal
         open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => {
+          setIsModalVisible(false)
+          setIsFormReady(false)
+        }}
         width={1400}
         footer={null}
         centered
       >
-        <h1 className='text-2xl font-bold text-primary mb-7'>
+        <h1 className='text-2xl font-bold text-primary mb-3'>
           {editBatch ? 'Edit Batch' : 'Create Batch'}
         </h1>
-        <Form form={form} layout='vertical' className='space-y-4'>
-          {!editBatch && (
-            <Form.Item
-              label='Code'
-              name='code'
-              rules={[{ required: true, message: 'Code is required' }]}
-            >
-              <Input />
-            </Form.Item>
-          )}
-          <Form.Item
-            label='Arrival Date'
-            name='arrivalDate'
-            rules={[{ required: true, message: 'Arrival Date is required' }]}
-            getValueProps={(value) => {
-              return {
-                value: value ? dayjs(value, VITE_DATE_FORMAT_API) : null,
-              }
-            }}
-          >
-            <DatePicker format={'DD-MM-YYYY'} className='w-full' />
-          </Form.Item>
-          <Form.Item label='Upload Excel File'>
-            <Upload
-              accept='.xlsx, .xls'
-              beforeUpload={(file) => {
-                handleUploadExcelFile(file)
-                return false
-              }}
-              multiple={false}
-              maxCount={1}
-              showUploadList={false}
-            >
-              <Button icon={<UploadOutlined />}>Upload</Button>
-            </Upload>
-          </Form.Item>
-          <Form.Item label='Select Product'>
-            <Select
-              onChange={(value) => {
-                const product = products?.data?.find((p) => p.id === value)
-                handleAddBatchProduct(product)
-              }}
-              placeholder='Select a product'
-              className='w-full'
-              filterOption={(input, option) => {
-                return (option?.label ?? '')
-                  .toString()
-                  .toLowerCase()
-                  .includes(input.toString().toLowerCase())
-              }}
-              value={null}
-              showSearch
-            >
-              {products?.data?.map((product) => (
-                <Option
-                  key={product.id}
-                  value={product.id}
-                  label={product.name}
-                >
-                  <div className='flex flex-row items-center justify-between gap-2 px-3'>
-                    <div className='flex items-center gap-2'>
-                      <img
-                        src={product.mainImage}
-                        alt={product.name}
-                        className=' h-8 w-8 object-cover'
-                      />
-                      <p>{product.name}</p>
-                    </div>
-                    <p className='hidden md:block'>{product.barcode}</p>
-                  </div>
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
 
-          <Table
-            dataSource={batchProducts}
-            columns={batchProductColumns}
-            rowKey={(record) => record.productId}
-            pagination={false}
-            scroll={{ y: 250, x: 'fit-content' }}
-          />
-          <div className='flex flex-row justify-end gap-2 mt-5'>
-            <Button
-              className=' bg-primary text-white'
-              onClick={handleModalOk}
-              disabled={isUpdating || isCreating}
-              loading={isUpdating || isCreating}
-            >
-              {isUpdating || isCreating ? 'Loading...' : 'Save'}
-            </Button>
-            <Button className='' onClick={() => setIsModalVisible(false)}>
-              Cancel
-            </Button>
+        {editBatch && !isFormReady ? (
+          <div className='flex justify-center items-center h-64'>
+            <div className='loading loading-spinner loading-lg'></div>
           </div>
-        </Form>
+        ) : (
+          <Form
+            form={form}
+            layout='vertical'
+            className='space-y-2'
+            initialValues={editBatch ? { isActive: editBatch.isActive } : {}}
+          >
+            {!editBatch && (
+              <Form.Item
+                label='Code'
+                name='code'
+                rules={[{ required: true, message: 'Code is required' }]}
+              >
+                <Input />
+              </Form.Item>
+            )}
+            <Form.Item
+              label='Arrival Date'
+              name='arrivalDate'
+              rules={[{ required: true, message: 'Arrival Date is required' }]}
+              getValueProps={(value) => {
+                return {
+                  value: value ? dayjs(value, VITE_DATE_FORMAT_API) : null,
+                }
+              }}
+            >
+              <DatePicker format={'DD-MM-YYYY'} className='w-full' />
+            </Form.Item>
+            <Form.Item label='Upload Excel File'>
+              <Upload
+                accept='.xlsx, .xls'
+                beforeUpload={(file) => {
+                  handleUploadExcelFile(file)
+                  return false
+                }}
+                multiple={false}
+                maxCount={1}
+                showUploadList={false}
+              >
+                <Button icon={<UploadOutlined />}>Upload</Button>
+              </Upload>
+            </Form.Item>
+            {editBatch && (
+              <Form.Item label='Status' name='isActive'>
+                <Switch />
+              </Form.Item>
+            )}
+            <Form.Item label='Select Product'>
+              <Select
+                onChange={(value) => {
+                  const product = products?.data?.find((p) => p.id === value)
+                  handleAddBatchProduct(product)
+                }}
+                placeholder='Select a product'
+                className='w-full'
+                filterOption={(input, option) => {
+                  return (option?.label ?? '')
+                    .toString()
+                    .toLowerCase()
+                    .includes(input.toString().toLowerCase())
+                }}
+                value={null}
+                showSearch
+              >
+                {products?.data?.map((product) => (
+                  <Option
+                    key={product.id}
+                    value={product.id}
+                    label={product.name}
+                  >
+                    <div className='flex flex-row items-center justify-between gap-2 px-3'>
+                      <div className='flex items-center gap-2'>
+                        <img
+                          src={product.mainImage}
+                          alt={product.name}
+                          className=' h-8 w-8 object-cover'
+                        />
+                        <p>{product.name}</p>
+                      </div>
+                      <p className='hidden md:block'>{product.barcode}</p>
+                    </div>
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Table
+              dataSource={batchProducts}
+              columns={batchProductColumns}
+              rowKey={(record) => record.productId}
+              pagination={false}
+              scroll={{ y: 200, x: 'fit-content' }}
+            />
+            <div className='flex flex-row justify-end gap-2 mt-5'>
+              <Button
+                className=' bg-primary text-white'
+                onClick={handleModalOk}
+                disabled={isUpdating || isCreating}
+                loading={isUpdating || isCreating}
+              >
+                {isUpdating || isCreating ? 'Loading...' : 'Save'}
+              </Button>
+              <Button className='' onClick={() => setIsModalVisible(false)}>
+                Cancel
+              </Button>
+            </div>
+          </Form>
+        )}
       </Modal>
       <Modal
         open={isViewBatchVisible}
@@ -652,6 +696,9 @@ const AdminBatch: React.FC = () => {
           >
             <Input readOnly />
           </Form.Item>
+          <Form.Item label='Status' name='isActive'>
+            <Switch disabled />
+          </Form.Item>
         </Form>
         <h2 className=' mb-5'>Batch Product</h2>
         <Table
@@ -659,7 +706,7 @@ const AdminBatch: React.FC = () => {
           columns={viewBatchProductColumns}
           rowKey={(record) => record.productId}
           pagination={false}
-          scroll={{ y: 250, x: 'fit-content' }}
+          scroll={{ y: 200, x: 'fit-content' }}
         />
       </Modal>
     </div>

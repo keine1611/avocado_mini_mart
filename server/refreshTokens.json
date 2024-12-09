@@ -20,13 +20,13 @@
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJzdGFmZkBnbWFpbC5jb20iLCJpYXQiOjE3MzMwNjc2Nzl9.EaF3Q0TnTQimXlXtB0eR3FBhzeVSlrIAAWvxVuJJet4"
   },
   {
-    "email": "khanghoang1611@gmail.com",
-    "id": 3,
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJraGFuZ2hvYW5nMTYxMUBnbWFpbC5jb20iLCJpYXQiOjE3MzM3MTgxOTB9.Ct8D1Ewg4pu_c-OC1DkdZ_BPSFmGeMrtJ_sLC6mj6S4"
-  },
-  {
     "email": "admin@gmail.com",
     "id": 1,
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM3MTkzOTV9.wugiWz566gRPS-jEZjeiJZcJSJl98PQ9JdnABa6AJzs"
+  },
+  {
+    "email": "khanghoang1611@gmail.com",
+    "id": 3,
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJraGFuZ2hvYW5nMTYxMUBnbWFpbC5jb20iLCJpYXQiOjE3MzM3MjI0ODZ9.3FxMuZCjuBwvAS0x9UL6S5WvdvFJFI8BqMNl4RLydek"
   }
 ]

@@ -32,7 +32,10 @@ export const createOrderItems = async (orderItems, transaction, orderId) => {
         include: {
           model: models.Batch,
           as: 'batch',
-          where: { arrivalDate: { [Op.lt]: getToday() } },
+          where: {
+            arrivalDate: { [Op.lt]: getToday() },
+            isActive: true,
+          },
         },
         order: [['expiredDate', 'ASC']],
       })
@@ -289,7 +292,10 @@ export const getProductById = async (productId) => {
     include: {
       model: models.Batch,
       as: 'batch',
-      where: { arrivalDate: { [Op.lte]: getToday() } },
+      where: {
+        arrivalDate: { [Op.lt]: getToday() },
+        isActive: true,
+      },
     },
   })
   const totalQuantity = batchProducts.reduce((acc, batch) => {
