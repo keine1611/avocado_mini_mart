@@ -49,12 +49,12 @@ export const orderApi = createApi({
     }),
     updateOrderStatus: builder.mutation<
       ApiResponse<Order>,
-      { orderCode: string; orderStatus: ORDER_STATUS }
+      { orderCode: string; orderStatus: ORDER_STATUS; note?: string }
     >({
-      query: ({ orderCode, orderStatus }) => ({
+      query: ({ orderCode, orderStatus, note }) => ({
         url: `/update-status/${orderCode}`,
         method: 'PUT',
-        body: { orderStatus },
+        body: { orderStatus, note },
       }),
       invalidatesTags: [{ type: 'orderApi' as const, id: 'LIST' }],
     }),

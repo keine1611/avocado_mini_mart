@@ -1,10 +1,15 @@
 import { Op } from 'sequelize'
-import { ORDER_STATUS } from '@/enum'
-import { Order } from '@/models'
+import { ORDER_STATUS, ACCOUNT_STATUS } from '@/enum'
+import { Order, Account, OrderLog } from '@/models'
 
 const { DATE_FORMAT } = process.env
 export const orderService = {
   getNumberOfCancelledOrdersOfAccountIn24Hours: async (accountId) => {
+    const account = await Account.findByPk(accountId)
+    if (!account) {
+      throw new Error('Account not found')
+    }
+
     const orders = await Order.findAll({
       where: {
         accountId,
@@ -13,6 +18,16 @@ export const orderService = {
         },
         orderStatus: ORDER_STATUS.CANCELLED,
       },
+      include: [
+        {
+          model: OrderLog,
+          as: 'orderLogs',
+          where: {
+            status: ORDER_STATUS.CANCELLED,
+            updatedBy: account.email,
+          },
+        },
+      ],
     })
 
     return orders.length

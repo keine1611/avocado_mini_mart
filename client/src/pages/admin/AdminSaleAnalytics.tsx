@@ -46,7 +46,7 @@ const AdminSaleAnalytics = () => {
       render: (_, record) => (
         <div className='flex items-center gap-2'>
           <img
-            className='w-16 h-16 rounded-md'
+            className='w-24 h-24 object-contain rounded-md'
             src={record.mainImage}
             alt='product'
           />
@@ -514,7 +514,7 @@ const ProductInfo = ({
             <img
               src={product.mainImage}
               alt=''
-              className='h-24 w-24 object-cover'
+              className='h-24 w-24 object-contain'
             />
             <p className='text-lg font-bold text-center'>{product.name}</p>
           </div>

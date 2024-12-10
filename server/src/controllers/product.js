@@ -588,7 +588,7 @@ export const productController = {
             (acc, curr) => acc + curr.quantity,
             0
           )
-          if (stock < 10) {
+          if (stock < 30) {
             return { ...product.dataValues, stock }
           }
           return null
@@ -608,7 +608,7 @@ export const productController = {
   getNearlyExpiredProduct: async (req, res) => {
     try {
       const { param } = req.query
-      const { days = 7 } = await decodeQueryFromBase64({ param })
+      const { days = 14 } = await decodeQueryFromBase64({ param })
 
       const products = await Product.findAll({
         include: [

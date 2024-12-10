@@ -9,7 +9,11 @@ import {
   BatchProduct,
   Account,
 } from '@/models'
-import { formatError } from '@/utils'
+import {
+  formatError,
+  sendOrderStatusChangeEmail,
+  sendChangeStatusAccountEmail,
+} from '@/utils'
 import { sequelize } from '@/config'
 import {
   PAYMENT_METHOD,
@@ -140,7 +144,7 @@ const orderController = {
     }
   },
   updateOrderStatus: async (req, res) => {
-    const { orderStatus } = req.body
+    const { orderStatus, note } = req.body
     const { orderCode } = req.params
     const account = req.account
     let transaction
@@ -212,11 +216,18 @@ const orderController = {
             order.accountId
           )
         if (numberOfReturnedOrders >= 3) {
+          const account = await Account.findOne({
+            where: { id: order.accountId },
+          })
           await Account.update(
             {
               status: ACCOUNT_STATUS.BANNED,
             },
             { where: { id: order.accountId }, transaction }
+          )
+          await sendChangeStatusAccountEmail(
+            account.email,
+            ACCOUNT_STATUS.BANNED
           )
         }
       }
@@ -233,6 +244,7 @@ const orderController = {
           orderId: order.id,
           status: orderStatus,
           updatedBy: account.email,
+          note: note,
         },
         { transaction }
       )
@@ -245,6 +257,22 @@ const orderController = {
           order.paymentStatus = PAYMENT_STATUS.REFUNDED
         }
       }
+      const orderDetails = await Order.findOne({
+        where: { id: order.id },
+        include: [
+          {
+            model: models.OrderItem,
+            as: 'orderItems',
+            include: [
+              {
+                model: Product,
+                as: 'product',
+              },
+            ],
+          },
+        ],
+      })
+      await sendOrderStatusChangeEmail(order.email, orderDetails)
       await transaction.commit()
       res.json({ message: 'Update order status successfully' })
     } catch (error) {

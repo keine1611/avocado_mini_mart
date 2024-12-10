@@ -231,7 +231,7 @@ const AdminBatchProduct: React.FC = () => {
                     <img
                       src={product.mainImage}
                       alt={product.name}
-                      className=' h-8 w-8 object-cover'
+                      className=' h-8 w-8 object-contain'
                     />
                     <p>{product.name}</p>
                   </div>
@@ -245,7 +245,7 @@ const AdminBatchProduct: React.FC = () => {
               <img
                 src={batchProduct?.product.mainImage}
                 alt=''
-                className='h-24 w-24 object-cover'
+                className='h-32 w-32 object-contain'
               />
               <p className='text-lg font-bold text-center'>
                 {batchProduct?.product.name}
@@ -351,7 +351,7 @@ const TableNearlyExpiredProduct: React.FC = () => {
           <img
             src={record.mainImage}
             alt={record.name}
-            className='h-16 w-16 object-cover'
+            className='h-16 w-16 object-contain'
           />
         )
       },
@@ -457,9 +457,9 @@ const TableNearlyExpiredProduct: React.FC = () => {
         placeholder='Select days'
         className=' w-full'
       >
-        <Select.Option value={7}> Nearly expired 7 days</Select.Option>
         <Select.Option value={14}> Nearly expired 14 days</Select.Option>
         <Select.Option value={30}> Nearly expired 30 days</Select.Option>
+        <Select.Option value={60}> Nearly expired 60 days</Select.Option>
       </Select>
       <Table
         rowKey='id'

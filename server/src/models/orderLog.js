@@ -17,6 +17,10 @@ export class OrderLog extends Model {
           values: Object.values(ORDER_STATUS),
           allowNull: false,
         },
+        note: {
+          type: DataTypes.STRING(1000),
+          allowNull: true,
+        },
         updatedBy: {
           type: DataTypes.STRING(320),
           allowNull: false,

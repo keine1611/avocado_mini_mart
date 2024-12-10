@@ -63,6 +63,10 @@ export class Account extends Model {
           allowNull: true,
           defaultValue: null,
         },
+        note: {
+          type: DataTypes.STRING(1000),
+          allowNull: true,
+        },
         deletedAt: {
           type: DataTypes.STRING(14),
           allowNull: true,

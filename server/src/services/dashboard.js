@@ -441,29 +441,29 @@ export const calculateTopProductSoldComparisonByPeriod = async ({ period }) => {
   let endDateString
   switch (period) {
     case 'day':
-      startDateString = global.dayjs().startOf('day').format(DATE_FORMAT)
-      endDateString = global.dayjs().endOf('day').format(DATE_FORMAT)
+      startDateString = global.dayjs().subtract(24, 'hour').format(DATE_FORMAT)
+      endDateString = global.dayjs().format(DATE_FORMAT)
       return await calculateTopProductSoldComparisonInTimePeriod({
         startDateString,
         endDateString,
       })
     case 'week':
-      startDateString = global.dayjs().startOf('week').format(DATE_FORMAT)
-      endDateString = global.dayjs().endOf('week').format(DATE_FORMAT)
+      startDateString = global.dayjs().subtract(7, 'day').format(DATE_FORMAT)
+      endDateString = global.dayjs().format(DATE_FORMAT)
       return await calculateTopProductSoldComparisonInTimePeriod({
         startDateString,
         endDateString,
       })
     case 'month':
-      startDateString = global.dayjs().startOf('month').format(DATE_FORMAT)
-      endDateString = global.dayjs().endOf('month').format(DATE_FORMAT)
+      startDateString = global.dayjs().subtract(30, 'day').format(DATE_FORMAT)
+      endDateString = global.dayjs().format(DATE_FORMAT)
       return await calculateTopProductSoldComparisonInTimePeriod({
         startDateString,
         endDateString,
       })
     case 'year':
       startDateString = global.dayjs().startOf('year').format(DATE_FORMAT)
-      endDateString = global.dayjs().endOf('year').format(DATE_FORMAT)
+      endDateString = global.dayjs().format(DATE_FORMAT)
       return await calculateTopProductSoldComparisonInTimePeriod({
         startDateString,
         endDateString,
@@ -533,8 +533,16 @@ export const getProductSalesData = async ({
         Sequelize.literal(`
           COALESCE(
             SUM(
-              \`orderItems\`.\`price\` * (1 - \`orderItems\`.\`discount\` / 100) * \`orderItems\`.\`quantity\` - 
-              \`orderItems->orderItemBatches\`.\`quantity\` * \`batchProducts\`.\`price\`
+              \`orderItems\`.\`price\` * (1 - \`orderItems\`.\`discount\` / 100) * \`orderItems\`.\`quantity\` -
+              COALESCE(
+                (
+                  SELECT SUM(oib.quantity * bp.price)
+                  FROM order_item_batches oib
+                  JOIN batch_products bp ON bp.batchId = oib.batchId AND bp.productId = Product.id
+                  WHERE oib.orderItemId = orderItems.id
+                ),
+                0
+              )
             ),
             0
           )
@@ -572,19 +580,7 @@ export const getProductSalesData = async ({
               },
             },
           },
-          {
-            model: OrderItemBatch,
-            as: 'orderItemBatches',
-            attributes: [],
-            required: false,
-          },
         ],
-      },
-      {
-        model: BatchProduct,
-        as: 'batchProducts',
-        attributes: [],
-        required: false,
       },
       {
         model: Review,
@@ -637,8 +633,16 @@ export const getProductAnalyticsData = async ({
         Sequelize.literal(`
           COALESCE(
             SUM(
-              \`orderItems\`.\`price\` * (1 - \`orderItems\`.\`discount\` / 100) * \`orderItems\`.\`quantity\` - 
-              \`orderItems->orderItemBatches\`.\`quantity\` * \`batchProducts\`.\`price\`
+              \`orderItems\`.\`price\` * (1 - \`orderItems\`.\`discount\` / 100) * \`orderItems\`.\`quantity\` -
+              COALESCE(
+                (
+                  SELECT SUM(oib.quantity * bp.price)
+                  FROM order_item_batches oib
+                  JOIN batch_products bp ON bp.batchId = oib.batchId AND bp.productId = Product.id
+                  WHERE oib.orderItemId = orderItems.id
+                ),
+                0
+              )
             ),
             0
           )
@@ -667,19 +671,7 @@ export const getProductAnalyticsData = async ({
               },
             },
           },
-          {
-            model: OrderItemBatch,
-            as: 'orderItemBatches',
-            attributes: [],
-            required: false,
-          },
         ],
-      },
-      {
-        model: BatchProduct,
-        as: 'batchProducts',
-        attributes: [],
-        required: false,
       },
     ],
     group: ['Product.id'],

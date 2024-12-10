@@ -24,6 +24,10 @@ authRouter.post('/add-order-info', authController.addOrderInfo)
 authRouter.put('/update-order-info/:id', authController.updateOrderInfo)
 authRouter.delete('/delete-order-info/:id', authController.deleteOrderInfo)
 authRouter.put(
+  '/set-default-order-info/:id',
+  authController.setDefaultOrderInfo
+)
+authRouter.put(
   '/update-profile/',
   upload.single('avatar'),
   authController.updateProfile

@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 import { login, register } from '@/services/auth'
 import { sequelize } from '@/config'
-import { uploadFileToFirebase, getUniqueFilename } from '@/utils'
+import { uploadFileToFirebase, getUniqueFilename, getToday } from '@/utils'
 import {
   Account,
   models,
@@ -199,6 +199,11 @@ export const authController = {
         password: pendingRegistration.password,
       })
       global.pendingRegistrations.delete(email)
+      await Account.update(
+        { verifiedAt: getToday() },
+        { where: { id: account.id } }
+      )
+
       res
         .status(200)
         .json({ message: 'Account created successfully', data: account })
@@ -421,6 +426,44 @@ export const authController = {
       await OrderInfo.destroy({ where: { id, accountId: account.id } })
       res.status(200).json({ message: 'success' })
     } catch (error) {
+      res.status(400).json({ message: error.message, data: null })
+    }
+  },
+
+  setDefaultOrderInfo: async (req, res, next) => {
+    const { id } = req.params
+    const account = req.account
+    let transaction
+    try {
+      transaction = await sequelize.transaction()
+      const orderInfo = await OrderInfo.findOne({
+        where: { id, accountId: account.id },
+      })
+      if (!orderInfo) {
+        return res
+          .status(404)
+          .json({ message: 'Order info not found', data: null })
+      }
+      const defaultOrderInfo = await OrderInfo.findOne({
+        where: { accountId: account.id, isDefault: true },
+      })
+      if (defaultOrderInfo) {
+        await OrderInfo.update(
+          { isDefault: false },
+          { where: { id: defaultOrderInfo.id }, transaction }
+        )
+      }
+      await OrderInfo.update(
+        { isDefault: true },
+        { where: { id, accountId: account.id }, transaction }
+      )
+      await transaction.commit()
+      const orderInfos = await OrderInfo.findAll({
+        where: { accountId: account.id },
+      })
+      res.status(200).json({ message: 'success', data: orderInfos })
+    } catch (error) {
+      if (transaction) await transaction.rollback()
       res.status(400).json({ message: error.message, data: null })
     }
   },

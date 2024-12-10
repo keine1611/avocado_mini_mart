@@ -113,6 +113,12 @@ export const authApi = createApi({
         body,
       }),
     }),
+    setDefaultOrderInfo: builder.mutation<ApiResponse<OrderInfo[]>, number>({
+      query: (id) => ({
+        url: `/set-default-order-info/${id}`,
+        method: 'PUT',
+      }),
+    }),
     deleteOrderInfo: builder.mutation<ApiResponse<void>, number>({
       query: (id) => ({
         url: `/delete-order-info/${id}`,
@@ -197,4 +203,5 @@ export const {
   useForgotPasswordMutation,
   useVerifyResetCodeMutation,
   useResetPasswordMutation,
+  useSetDefaultOrderInfoMutation,
 } = authApi

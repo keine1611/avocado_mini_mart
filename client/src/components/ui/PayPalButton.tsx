@@ -12,7 +12,7 @@ interface PayPalButtonProps {
     quantity: number
     productId: number
   }[]
-  selectedOrderInfo: Omit<OrderInfo, 'id' | 'accountId'> | null
+  selectedOrderInfo: Omit<OrderInfo, 'id' | 'accountId' | 'isDefault'> | null
   shippingMethod: string
   discountCode: string
 }

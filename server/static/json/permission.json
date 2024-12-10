@@ -502,5 +502,11 @@
     "path": "/api/auth/reset-password",
     "method": "POST",
     "isPublic": "1"
+  },
+  {
+    "name": "SET_DEFAULT_ORDER_INFO",
+    "path": "/api/auth/set-default-order-info/:id",
+    "method": "PUT",
+    "isPublic": "0"
   }
 ]

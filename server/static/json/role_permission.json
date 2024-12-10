@@ -45,6 +45,10 @@
   },
   {
     "roleId": "2",
+    "permissionName": "SET_DEFAULT_ORDER_INFO"
+  },
+  {
+    "roleId": "2",
     "permissionName": "UPDATE_PROFILE"
   },
   {

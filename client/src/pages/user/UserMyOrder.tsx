@@ -136,7 +136,7 @@ const OrderCard: React.FC<{ order: Order }> = ({ order }) => {
                 <img
                   src={order.orderItems[0]?.product?.mainImage}
                   alt='Product'
-                  className='w-20 h-20 object-cover rounded-md border border-gray-300 shadow-sm'
+                  className='w-20 h-20 object-contain rounded-md border border-gray-300 shadow-sm'
                 />
               </div>
             </div>

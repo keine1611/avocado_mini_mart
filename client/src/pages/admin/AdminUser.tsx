@@ -258,11 +258,13 @@ const AdminUser: React.FC = () => {
       title: 'First Name',
       dataIndex: 'profile.firstName',
       ...getColumnSearchProps('profile.firstName'),
+      render: (_, record: Account) => record.profile?.firstName || '-',
     },
     {
       title: 'Last Name',
       dataIndex: 'profile.lastName',
       ...getColumnSearchProps('profile.lastName'),
+      render: (_, record: Account) => record.profile?.lastName || '-',
     },
     {
       title: 'Role',

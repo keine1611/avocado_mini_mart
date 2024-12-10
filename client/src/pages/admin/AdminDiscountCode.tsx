@@ -286,6 +286,29 @@ const AdminDiscountCode: React.FC = () => {
               label='Discount Value'
               rules={[
                 { required: true, message: 'Please input the discount value!' },
+                {
+                  validator: (_, value) => {
+                    if (isNaN(value)) {
+                      return Promise.reject('Discount value must be a number!')
+                    }
+                    if (value && value < 1) {
+                      return Promise.reject(
+                        'Discount value must be greater than 0!'
+                      )
+                    }
+                    if (
+                      form.getFieldValue('discountType') ===
+                        DISCOUNT_TYPE.PERCENTAGE &&
+                      value &&
+                      value > 100
+                    ) {
+                      return Promise.reject(
+                        'Discount value must be less than 100!'
+                      )
+                    }
+                    return Promise.resolve()
+                  },
+                },
               ]}
             >
               <Input className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary' />
@@ -295,6 +318,20 @@ const AdminDiscountCode: React.FC = () => {
               label='Expiry Date'
               rules={[
                 { required: true, message: 'Please input the expiry date!' },
+                {
+                  validator: (_, value) => {
+                    if (
+                      value &&
+                      dayjs(value).format(VITE_DATE_FORMAT_API) <
+                        dayjs().format(VITE_DATE_FORMAT_API)
+                    ) {
+                      return Promise.reject(
+                        'Expiry date must be in the future!'
+                      )
+                    }
+                    return Promise.resolve()
+                  },
+                },
               ]}
               getValueProps={(value) => {
                 return {
@@ -312,6 +349,19 @@ const AdminDiscountCode: React.FC = () => {
               label='Usage Limit'
               rules={[
                 { required: true, message: 'Please input the usage limit!' },
+                {
+                  validator: (_, value) => {
+                    if (isNaN(value)) {
+                      return Promise.reject('Usage limit must be a number!')
+                    }
+                    if (value && value < 1) {
+                      return Promise.reject(
+                        'Usage limit must be greater than 0!'
+                      )
+                    }
+                    return Promise.resolve()
+                  },
+                },
               ]}
             >
               <Input />

@@ -45,6 +45,27 @@ export const sendOrderConfirmationEmail = async (email, orderDetails) => {
   }
 }
 
+export const sendOrderStatusChangeEmail = async (email, orderDetails) => {
+  const total =
+    orderDetails.totalAmount + orderDetails.shippingFee - orderDetails.discount
+  const html = await compileTemplate('orderStatusChange', {
+    orderDetails,
+    total,
+  })
+
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: email,
+    subject: `Order of ${orderDetails.code} is ${orderDetails.orderStatus}`,
+    html,
+  }
+  try {
+    await transporter.sendMail(mailOptions)
+  } catch (error) {
+    throw new Error('Failed to send order status change email')
+  }
+}
+
 export const sendVerificationEmail = async (email, code, type) => {
   const html = await compileTemplate('verifiedCode', { code, type })
   const mailOptions = {
@@ -57,5 +78,20 @@ export const sendVerificationEmail = async (email, code, type) => {
     await transporter.sendMail(mailOptions)
   } catch (error) {
     throw new Error('Failed to send verification code email')
+  }
+}
+
+export const sendChangeStatusAccountEmail = async (email, status) => {
+  const html = await compileTemplate('changeStatusAccount', { status })
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: email,
+    subject: 'Account Status Change',
+    html,
+  }
+  try {
+    await transporter.sendMail(mailOptions)
+  } catch (error) {
+    throw new Error('Failed to send change status account email')
   }
 }

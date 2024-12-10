@@ -64,6 +64,10 @@ const AdminCheckOrder: React.FC = () => {
     refetchOnMountOrArgChange: true,
   })
 
+  const [note, setNote] = useState<string>('')
+  const handleNoteChange = (value: string) => {
+    setNote(value)
+  }
   const [updateOrderStatus, { isLoading: isUpdatingStatus }] =
     useUpdateOrderStatusMutation()
   const [viewOrder, setViewOrder] = useState<Order | null>(null)
@@ -460,7 +464,11 @@ const AdminCheckOrder: React.FC = () => {
             onClick={() => handleView(record)}
             className=' hover:text-primary '
           />
-          {(record.orderStatus === ORDER_STATUS.PENDING ||
+          {((record.orderStatus === ORDER_STATUS.PENDING &&
+            record.paymentMethod === PAYMENT_METHOD.PAYPAL &&
+            record.paymentStatus === PAYMENT_STATUS.PAID) ||
+            (record.orderStatus === ORDER_STATUS.PENDING &&
+              record.paymentMethod === PAYMENT_METHOD.COD) ||
             record.orderStatus === ORDER_STATUS.CONFIRMED ||
             record.orderStatus === ORDER_STATUS.SHIPPING) && (
             <Button
@@ -480,11 +488,20 @@ const AdminCheckOrder: React.FC = () => {
 
   const handleUpdateOrderStatus = async (
     orderCode: string,
-    orderStatus: ORDER_STATUS
+    orderStatus: ORDER_STATUS,
+    note?: string
   ) => {
     try {
       if (orderCode && orderStatus) {
-        await updateOrderStatus({ orderCode, orderStatus }).unwrap()
+        if (
+          orderStatus === ORDER_STATUS.CANCELLED ||
+          orderStatus === ORDER_STATUS.RETURNED ||
+          orderStatus === ORDER_STATUS.REJECTED
+        ) {
+          await updateOrderStatus({ orderCode, orderStatus, note }).unwrap()
+        } else {
+          await updateOrderStatus({ orderCode, orderStatus }).unwrap()
+        }
         showToast.success('Update order status successfully')
         setIsModalVisible(false)
       }
@@ -574,6 +591,9 @@ const AdminCheckOrder: React.FC = () => {
     setViewOrderItem(orderItem)
   }
 
+  const [orderStatusEditing, setOrderStatusEditing] =
+    useState<ORDER_STATUS | null>(null)
+
   return (
     <div className='w-full h-full overflow-y-auto p-4'>
       <OrderStatistics orders={data?.data || []} />
@@ -601,7 +621,7 @@ const AdminCheckOrder: React.FC = () => {
               label='Order Status'
               rules={[{ required: true }]}
             >
-              <Select>
+              <Select onChange={(value) => setOrderStatusEditing(value)}>
                 {getAvailableStatuses(
                   editingOrder?.orderStatus as ORDER_STATUS
                 ).map((status) => (
@@ -615,6 +635,15 @@ const AdminCheckOrder: React.FC = () => {
                 ))}
               </Select>
             </Form.Item>
+            {orderStatusEditing === ORDER_STATUS.CANCELLED ||
+            orderStatusEditing === ORDER_STATUS.RETURNED ||
+            orderStatusEditing === ORDER_STATUS.REJECTED ? (
+              <Form.Item name='note' label='Note'>
+                <NoteInput value={note} onChange={handleNoteChange} />
+              </Form.Item>
+            ) : (
+              <></>
+            )}
           </Form>
 
           <div className='flex justify-end mt-4'>
@@ -623,12 +652,13 @@ const AdminCheckOrder: React.FC = () => {
               onClick={() =>
                 handleUpdateOrderStatus(
                   editingOrder?.code || '',
-                  formEdit.getFieldValue('orderStatus')
+                  formEdit.getFieldValue('orderStatus'),
+                  formEdit.getFieldValue('note')
                 )
               }
             >
               {isUpdatingStatus ? (
-                <Loading size='loading-sm' text-color='text-white' />
+                <Loading size='loading-sm' text-color='text-black' />
               ) : (
                 'Update Status'
               )}
@@ -820,7 +850,7 @@ const AdminCheckOrder: React.FC = () => {
                       <img
                         src={record.product.mainImage}
                         alt={record.product.name}
-                        className='w-16 h-16 object-cover rounded-md border border-gray-200'
+                        className='w-20 h-20 md:w-24 md:h-24 object-contain rounded-md border border-gray-200'
                       />
                       <div>
                         <p className='font-medium'>{record.product.name}</p>
@@ -936,7 +966,7 @@ const OrderItemBatchDetailModal: React.FC<OrderItemDetailModalProps> = ({
           <img
             src={orderItem?.product?.mainImage}
             alt={orderItem?.product?.name}
-            className='w-36 h-36 object-cover rounded-lg border border-gray-200'
+            className='w-36 h-36 object-contain rounded-lg border border-gray-200'
           />
           <div className='flex-1'>
             <h3 className='text-xl font-semibold mb-2'>
@@ -1086,6 +1116,9 @@ const OrderLogTimeline: React.FC<OrderLogTimelineProps> = ({ logs }) => {
               {getStatusIcon(log.status as ORDER_STATUS)}
               <p className='text-md text-gray-900 ml-2'>
                 {getStatusText(log.status as ORDER_STATUS)}
+                {log.note && (
+                  <span className='text-sm text-gray-500'> ({log.note})</span>
+                )}
               </p>
             </div>
           </div>
@@ -1187,6 +1220,79 @@ export const OrderStatistics: React.FC<OrderStatisticsProps> = ({ orders }) => {
           </span>
         </div>
       </div>
+    </div>
+  )
+}
+
+interface NoteOption {
+  value: string
+  label: string
+}
+
+const defaultNotes: NoteOption[] = [
+  { value: 'customer_cancel', label: 'Customer requested cancellation' },
+  { value: 'wrong_address', label: 'Wrong delivery address' },
+  { value: 'out_of_stock', label: 'Items out of stock' },
+  { value: 'delivery_issue', label: 'Delivery service issues' },
+  { value: 'payment_failed', label: 'Payment verification failed' },
+  {
+    value: 'customer_not_receive',
+    label: 'The customer did not receive the order',
+  },
+]
+
+const NoteInput: React.FC<{
+  value?: string
+  onChange?: (value: string) => void
+}> = ({ value, onChange }) => {
+  const [customNote, setCustomNote] = useState<string>('')
+  const [selectedNote, setSelectedNote] = useState<string>('')
+
+  const handleNoteChange = (value: string) => {
+    setSelectedNote(value)
+    if (value === 'custom') {
+      onChange?.(customNote)
+    } else {
+      const note = defaultNotes.find((note) => note.value === value)
+      onChange?.(note?.label || '')
+    }
+  }
+
+  const handleCustomNoteChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const newValue = e.target.value
+    setCustomNote(newValue)
+    if (selectedNote === 'custom') {
+      onChange?.(newValue)
+    }
+  }
+
+  return (
+    <div className='flex flex-col gap-2'>
+      <Select
+        value={selectedNote}
+        onChange={handleNoteChange}
+        placeholder='Select or enter a note'
+        className='w-full'
+      >
+        {defaultNotes.map((note) => (
+          <Select.Option key={note.value} value={note.value}>
+            {note.label}
+          </Select.Option>
+        ))}
+        <Select.Option value='custom'>Custom note</Select.Option>
+      </Select>
+
+      {selectedNote === 'custom' && (
+        <Input.TextArea
+          value={customNote}
+          onChange={handleCustomNoteChange}
+          placeholder='Enter your custom note here...'
+          className='mt-2'
+          rows={4}
+        />
+      )}
     </div>
   )
 }

@@ -1,18 +1,8 @@
 [
   {
-    "email": "khanghoang1611@gmail.com",
-    "id": 1,
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJraGFuZ2hvYW5nMTYxMUBnbWFpbC5jb20iLCJpYXQiOjE3MzI1MjA3ODV9.i4yUOGnaYcKTqgUHHXsuVp8N_WdTLjnArpxqcUHj6ls"
-  },
-  {
     "email": "keiit1611@gmail.com",
     "id": 4,
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJrZWlpdDE2MTFAZ21haWwuY29tIiwiaWF0IjoxNzMyNjk4NTg5fQ.nzYrme7DXAaMh0jhr-6cE4l4I6kmj7aJ11ZIt0IPnQ0"
-  },
-  {
-    "email": "khanghoang1611@gmail.com",
-    "id": 2,
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJraGFuZ2hvYW5nMTYxMUBnbWFpbC5jb20iLCJpYXQiOjE3MzMwMDgzMTV9.10fnF3Lw2SeGlpxp1FiaNWgcI0EqdxvtEq-4U01XJqw"
   },
   {
     "email": "staff@gmail.com",
@@ -27,11 +17,11 @@
   {
     "email": "admin@gmail.com",
     "id": 1,
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM3NjA5MTR9.RJQ_VaiYcxIToJEATukfwgdxjlmp3O14My7xMkZjxo8"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzM3ODMzMTF9.tLL8-aku_sWBp0DG15F3HN2PMEpUnJgo_6GY-CKdMls"
   },
   {
     "email": "khanghoang1611@gmail.com",
     "id": 3,
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJraGFuZ2hvYW5nMTYxMUBnbWFpbC5jb20iLCJpYXQiOjE3MzM3NjA5Mzd9.fU38bpFkXjfjIsso1ShHJZqJ2dCFUUiVMaFcflitLbI"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJraGFuZ2hvYW5nMTYxMUBnbWFpbC5jb20iLCJpYXQiOjE3MzM3OTQwMjl9.i361Wl-zsU0srCRcTdSBrpFXimHubiIfC9DrdL0mcoE"
   }
 ]

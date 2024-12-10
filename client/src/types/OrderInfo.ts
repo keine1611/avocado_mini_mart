@@ -8,4 +8,5 @@ export type OrderInfo = {
   districtCode: string
   wardCode: string
   accountId: number
+  isDefault: boolean
 }

@@ -287,6 +287,7 @@ const paymentController = {
           {
             status: ACCOUNT_STATUS.RESTRICTED,
             restrictedUntil: global.dayjs().add(1, 'day').format(DATE_FORMAT),
+            note: 'Account is restricted due to too many cancelled orders',
           },
           { transaction }
         )

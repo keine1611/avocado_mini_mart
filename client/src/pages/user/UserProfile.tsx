@@ -35,6 +35,7 @@ import {
   useChangePasswordMutation,
   useChangePasswordRequestMutation,
   useResendChangePasswordCodeMutation,
+  useSetDefaultOrderInfoMutation,
 } from '@/services'
 import { showToast } from '@/components'
 import { OrderInfo } from '@/types'
@@ -43,6 +44,8 @@ import { Gender } from '@/enum'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useNavigate } from 'react-router-dom'
+import { CheckOutlined } from '@ant-design/icons'
+import { ImCheckboxUnchecked } from 'react-icons/im'
 dayjs.extend(customParseFormat)
 
 const { Title, Text } = Typography
@@ -61,7 +64,7 @@ const UserProfile: React.FC = () => {
   const [editOrderInfo, setEditOrderInfo] = useState<OrderInfo | null>(null)
   const [deleteOrderInfo] = useDeleteOrderInfoMutation()
   const dispatch = useAppDispatch()
-
+  const [setDefaultOrderInfo] = useSetDefaultOrderInfoMutation()
   const handleEditOrderInfo = (orderInfo: OrderInfo) => {
     setEditOrderInfo(orderInfo)
     setModalAddAddressOpen(true)
@@ -94,6 +97,17 @@ const UserProfile: React.FC = () => {
     setModalChangePasswordOpen(true)
   }
 
+  const handleSetDefaultOrderInfo = async (id: number) => {
+    try {
+      const res = await setDefaultOrderInfo(id).unwrap()
+      if (res.message === 'success') {
+        dispatch(authActions.setOrderInfos(res.data))
+        showToast.success('Set default address successfully')
+      }
+    } catch (error: any) {
+      showToast.error(error?.data?.message || 'Something went wrong')
+    }
+  }
   return (
     <div className='container mx-auto'>
       <Card className='shadow-lg rounded-lg' style={{ padding: '24px' }}>
@@ -185,46 +199,59 @@ const UserProfile: React.FC = () => {
               {user?.orderInfos.length === 0 && (
                 <Text className='text-lg'>No address</Text>
               )}
-              {user?.orderInfos.map((orderInfo) => (
-                <div
-                  key={orderInfo.id}
-                  className='flex justify-between border px-4 py-2 border-gray-200 items-center'
-                >
-                  <div className='flex flex-col gap-2'>
-                    <span className='text-lg'>
-                      {orderInfo.fullName}
-                      <span className='text-sm text-gray-500'>
-                        {` `}| {formatPhoneNumber(orderInfo.phone)}
+              {[...(user?.orderInfos || [])]
+                .sort((a, b) => (b.isDefault ? 1 : -1))
+                .map((orderInfo) => (
+                  <div
+                    key={orderInfo.id}
+                    className='flex justify-between border px-4 py-2 border-gray-200 items-center'
+                  >
+                    <div className='flex flex-col gap-2'>
+                      <span className='text-lg'>
+                        {orderInfo.fullName}
+                        <span className='text-sm text-gray-500'>
+                          {` `}| {formatPhoneNumber(orderInfo.phone)}
+                        </span>
                       </span>
-                    </span>
-                    <span className='text-sm text-gray-500'>
-                      {orderInfo.address},{' '}
-                      {getLocation(
-                        orderInfo.provinceCode,
-                        orderInfo.districtCode,
-                        orderInfo.wardCode
-                      )}
-                    </span>
-                    <span className='text-sm text-gray-500'>
-                      {orderInfo.email}
-                    </span>
+                      <span className='text-sm text-gray-500'>
+                        {orderInfo.address},{' '}
+                        {getLocation(
+                          orderInfo.provinceCode,
+                          orderInfo.districtCode,
+                          orderInfo.wardCode
+                        )}
+                      </span>
+                      <span className='text-sm text-gray-500'>
+                        {orderInfo.email}
+                      </span>
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                      <button
+                        className='btn btn-sm btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:text-black disabled:font-bold hover:bg-primary-focus transition-all duration-300 text-white rounded-md'
+                        onClick={() => handleSetDefaultOrderInfo(orderInfo.id)}
+                        disabled={orderInfo.isDefault}
+                      >
+                        {orderInfo.isDefault ? (
+                          <CheckOutlined className=' text-sm' />
+                        ) : (
+                          <ImCheckboxUnchecked className=' text-sm' />
+                        )}
+                      </button>
+                      <button
+                        className='btn btn-sm btn-primary hover:bg-primary-focus transition-all duration-300 text-white rounded-md'
+                        onClick={() => handleEditOrderInfo(orderInfo)}
+                      >
+                        <EditOutlined />
+                      </button>
+                      <button
+                        className='btn btn-sm btn-error hover:bg-error-focus transition-all duration-300 text-white rounded-md'
+                        onClick={() => handleDeleteOrderInfo(orderInfo.id)}
+                      >
+                        <DeleteOutlined />
+                      </button>
+                    </div>
                   </div>
-                  <div className='flex flex-col gap-2'>
-                    <button
-                      className='btn btn-sm btn-primary hover:bg-primary-focus transition-all duration-300 text-white rounded-md'
-                      onClick={() => handleEditOrderInfo(orderInfo)}
-                    >
-                      <EditOutlined />
-                    </button>
-                    <button
-                      className='btn btn-sm btn-error hover:bg-error-focus transition-all duration-300 text-white rounded-md'
-                      onClick={() => handleDeleteOrderInfo(orderInfo.id)}
-                    >
-                      <DeleteOutlined />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>

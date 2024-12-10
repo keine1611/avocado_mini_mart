@@ -38,6 +38,11 @@ export class OrderInfo extends Model {
           type: DataTypes.STRING(5),
           allowNull: false,
         },
+        isDefault: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
       },
       {
         sequelize,

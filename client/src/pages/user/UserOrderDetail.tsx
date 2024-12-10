@@ -78,7 +78,7 @@ const UserOrderDetail: React.FC = () => {
           className='flex flex-row items-center gap-2 hover:text-primary'
         >
           <img
-            className='h-16 w-16 object-cover'
+            className='h-16 w-16 object-contain'
             src={record.product.mainImage}
           ></img>
           <span className='text-md line-clamp-2'>{record.product.name}</span>

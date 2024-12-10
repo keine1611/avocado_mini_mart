@@ -29,12 +29,10 @@ const UserCheckout: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [discountInfo, setDiscountInfo] = useState<any>(null)
   const user = useAppSelector((state) => state.auth.user)
-  const [selectedAddressID, setSelectedAddressID] = useState<number | null>(
-    null
-  )
+  const [selectedAddressID, setSelectedAddressID] = useState<number | null>()
   const [selectedAddress, setSelectedAddress] = useState<Omit<
     OrderInfo,
-    'id' | 'accountId'
+    'id' | 'accountId' | 'isDefault'
   > | null>(null)
   const [cartItems, setCartItems] = useState<Cart[]>([])
 
@@ -44,6 +42,22 @@ const UserCheckout: React.FC = () => {
   const { data: productInCarts } = useGetListProductByIdsQuery(
     cartChecked.map((item: Cart) => item.productId)
   )
+  useEffect(() => {
+    if (user?.orderInfos) {
+      const defaultOrderInfo = user?.orderInfos?.find(
+        (orderInfo) => orderInfo.isDefault
+      )
+
+      if (defaultOrderInfo) {
+        const { id, accountId, isDefault, ...rest } = defaultOrderInfo
+        setSelectedAddress(rest)
+        setSelectedAddressID(defaultOrderInfo?.id || null)
+        form.setFieldsValue({
+          orderInfo: defaultOrderInfo.id,
+        })
+      }
+    }
+  }, [user?.orderInfos])
 
   useEffect(() => {
     if (cartItems) {
@@ -81,7 +95,7 @@ const UserCheckout: React.FC = () => {
       (orderInfo) => orderInfo.id === selectedAddressID
     )
     if (orderInfo) {
-      const { id, accountId, ...rest } = orderInfo
+      const { id, accountId, isDefault, ...rest } = orderInfo
       setSelectedAddress(rest)
     } else {
       setSelectedAddress(null)
@@ -184,6 +198,7 @@ const UserCheckout: React.FC = () => {
             layout='vertical'
             initialValues={{
               shippingMethod: 'standard',
+              orderInfo: selectedAddressID,
             }}
             className='w-full'
           >
@@ -214,7 +229,7 @@ const UserCheckout: React.FC = () => {
                   >
                     <Space direction='vertical' className='w-full'>
                       {[...(user?.orderInfos || [])]
-                        ?.sort((a, b) => b.id - a.id)
+                        ?.sort((a, b) => (b.isDefault ? 1 : -1))
                         .map((orderInfo) => (
                           <Radio key={orderInfo.id} value={orderInfo.id}>
                             <div className=' flex flex-col text-sm font-medium gap-2 border-b border-gray-200 pb-2'>
@@ -423,7 +438,7 @@ const UserCheckout: React.FC = () => {
               <div className='flex flex-row items-center gap-2 justify-between font-bold'>
                 <span className='font-bold text-primary'>Total</span>
                 {discountInfo ? (
-                  discountInfo.discountType === DISCOUNT_TYPE.PERCENTAGE ? (
+                  discountInfo.discountType == DISCOUNT_TYPE.PERCENTAGE ? (
                     <span className=''>
                       {formatCurrency(
                         (provisional || 0) +
@@ -431,6 +446,11 @@ const UserCheckout: React.FC = () => {
                           (discountInfo.discountValue / 100) *
                             (provisional || 0)
                       )}
+                    </span>
+                  ) : discountInfo.discountType == DISCOUNT_TYPE.FIXED &&
+                    discountInfo.discountValue > (provisional || 0) ? (
+                    <span>
+                      {formatCurrency(shippingMethod == 'standard' ? 5 : 10)}
                     </span>
                   ) : (
                     <span>

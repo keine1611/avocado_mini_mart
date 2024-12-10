@@ -19,6 +19,7 @@ export interface Account {
   updatedAt: string
   status: string
   restrictedUntil: string
+  note: string
   profile: Profile
   role: Role
   carts: Cart[]
