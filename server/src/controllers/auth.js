@@ -203,7 +203,6 @@ export const authController = {
         { verifiedAt: getToday() },
         { where: { id: account.id } }
       )
-
       res
         .status(200)
         .json({ message: 'Account created successfully', data: account })

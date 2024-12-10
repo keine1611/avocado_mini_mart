@@ -19,7 +19,7 @@ import {
   ACCOUNT_STATUS,
 } from '@/enum'
 import { sequelize } from '@/config'
-import { generateOrderCode } from '@/utils'
+import { generateOrderCode, sendChangeStatusAccountEmail } from '@/utils'
 import {
   createOrderItems,
   getProductWithMaxDiscount,
@@ -292,6 +292,10 @@ const paymentController = {
           { transaction }
         )
         await transaction.commit()
+        await sendChangeStatusAccountEmail(
+          account.email,
+          ACCOUNT_STATUS.RESTRICTED
+        )
         return res
           .status(200)
           .json({ message: 'Order cancelled. Account is restricted' })
