@@ -229,7 +229,7 @@ const UserCheckout: React.FC = () => {
                   >
                     <Space direction='vertical' className='w-full'>
                       {[...(user?.orderInfos || [])]
-                        ?.sort((a, b) => (b.isDefault ? 1 : -1))
+                        ?.sort((_a, b) => (b.isDefault ? 1 : -1))
                         .map((orderInfo) => (
                           <Radio key={orderInfo.id} value={orderInfo.id}>
                             <div className=' flex flex-col text-sm font-medium gap-2 border-b border-gray-200 pb-2'>

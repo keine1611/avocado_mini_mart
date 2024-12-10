@@ -1244,7 +1244,7 @@ const defaultNotes: NoteOption[] = [
 const NoteInput: React.FC<{
   value?: string
   onChange?: (value: string) => void
-}> = ({ value, onChange }) => {
+}> = ({ onChange }) => {
   const [customNote, setCustomNote] = useState<string>('')
   const [selectedNote, setSelectedNote] = useState<string>('')
 

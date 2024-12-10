@@ -200,7 +200,7 @@ const UserProfile: React.FC = () => {
                 <Text className='text-lg'>No address</Text>
               )}
               {[...(user?.orderInfos || [])]
-                .sort((a, b) => (b.isDefault ? 1 : -1))
+                .sort((_a, b) => (b.isDefault ? 1 : -1))
                 .map((orderInfo) => (
                   <div
                     key={orderInfo.id}
